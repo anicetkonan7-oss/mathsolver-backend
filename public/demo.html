@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MathSolver - Démo courbes</title>
+<style>
+  body { margin: 0; padding: 12px 0 30px; background: #f2f5fb; font-family: sans-serif; color: #1c2333; }
+  h1 { font-size: 18px; margin: 0 12px 4px; }
+  p.lead { font-size: 13px; color: #5b6784; margin: 0 12px 12px; }
+  .box { margin: 0 12px 10px; background: #fff; border: 1px solid #d5dbe8; border-radius: 14px; padding: 12px 14px; }
+  .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .presets button { border: 1px solid #1a6bff; background: #fff; color: #1a6bff; border-radius: 16px; padding: 6px 10px; font-size: 13px; }
+  label { display: block; font-size: 12px; color: #5b6784; margin: 8px 0 3px; }
+  input[type=text] { width: 100%; box-sizing: border-box; border: 1px solid #c5cde0; border-radius: 8px; padding: 9px; font-size: 15px; }
+  #go { margin-top: 10px; width: 100%; border: 0; background: #1a6bff; color: #fff; border-radius: 10px; padding: 11px; font-size: 16px; font-weight: bold; }
+</style>
+</head>
+<body>
+<h1>Démo : courbe + tableau de variation</h1>
+<p class="lead">Choisis un exemple ou écris ta propre fonction. Écriture : <b>*</b> pour multiplier, <b>^</b> pour la puissance, <b>ln(x)</b>, <b>exp(x)</b>, <b>sqrt(x)</b>, <b>abs(x)</b>, <b>pi</b>.</p>
+
+<div class="box">
+  <div class="presets" id="presets"></div>
+  <label for="expr">Fonction f(x) =</label>
+  <input type="text" id="expr" value="x - 2 + ln(x)/x" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false">
+  <label for="dom">Domaine (ex : ]0;+inf[  ou  R  ou  ]-inf;0[ U ]0;+inf[ )</label>
+  <input type="text" id="dom" value="]0;+inf[" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false">
+  <button id="go">Tracer</button>
+</div>
+
+<div id="extras"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.2/lib/browser/math.js"></script>
+<script src="plot.js?v=1"></script>
+<script>
+(function () {
+  var presets = [
+    ["x − 2 + ln(x)/x", "x - 2 + ln(x)/x", "]0;+inf["],
+    ["x² + 1 − ln x", "x^2 + 1 - ln(x)", "]0;+inf["],
+    ["x³ − 3x", "x^3 - 3*x", "R"],
+    ["1/x", "1/x", "R*"],
+    ["eˣ / x", "exp(x)/x", "]0;+inf["],
+    ["x·e⁻ˣ", "x*exp(-x)", "R"],
+    ["(x²−1)/(x−2)", "(x^2-1)/(x-2)", "R\\{2}"],
+    ["sin x sur [0 ; 2π]", "sin(x)", "[0;2*pi]"]
+  ];
+  var box = document.getElementById("presets"), ex = document.getElementById("expr"), dm = document.getElementById("dom");
+  var out = document.getElementById("extras");
+
+  function draw() {
+    out.innerHTML = "";
+    if (!window.math) {
+      out.innerHTML = '<div class="box">math.js n\'a pas pu se charger : vérifie ta connexion internet.</div>';
+      return;
+    }
+    window.MathSolverPlot.renderInto(out, [{ name: "f", expr: ex.value, domain: dm.value }]);
+  }
+
+  presets.forEach(function (p) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.textContent = p[0];
+    b.onclick = function () { ex.value = p[1]; dm.value = p[2]; draw(); };
+    box.appendChild(b);
+  });
+  document.getElementById("go").onclick = draw;
+  draw();
+})();
+</script>
+</body>
+</html>
