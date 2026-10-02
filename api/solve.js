@@ -16,6 +16,7 @@ const CONSIGNE =
   "Termine par une ligne qui commence par @@REPONSE suivie directement de la réponse finale (sans écrire le mot Réponse). " +
   "N'écris rien avant la première étape : pas d'introduction ni de conclusion. " +
   "Écris les formules en LaTeX entre $...$ (dans une phrase) ou $$...$$ (sur une ligne seule). " +
+  "Chaque formule $$...$$ doit tenir sur UNE SEULE ligne : aucun retour à la ligne à l'intérieur, même pour un tableau. " +
   "N'utilise pas de titres avec #. Vérifie ton résultat avant de répondre. " +
   "Si le sujet contient plusieurs exercices ou plusieurs questions, résous-les TOUS, dans l'ordre, sans en omettre aucun. " +
   "COURBES : uniquement si l'exercice demande d'étudier une ou plusieurs fonctions (variations, dérivée, limites, courbe, tableau de variation), " +
@@ -24,6 +25,7 @@ const CONSIGNE =
   "et les fonctions ln(x), exp(x), sqrt(x), abs(x), sin(x), cos(x), tan(x) et pi. " +
   "Le domaine est l'ensemble de définition (ou l'intervalle d'étude) en texte simple : ]0;+inf[ ou ]-inf;0[ U ]0;+inf[ ou R ou R* ou [0;2*pi]. " +
   "Exemple : @@COURBE f | x - 2 + ln(x)/x | ]0;+inf[ . " +
+  "Quand tu écris une ligne @@COURBE, ne dessine PAS de tableau de variations en LaTeX (pas de \\begin{array}) : l'application le dessine elle-même ; résume les variations dans une ou deux phrases. " +
   "N'écris aucune ligne @@COURBE si l'exercice ne demande pas d'étudier une fonction, si la fonction contient un paramètre (m, a, k...) ou si elle est définie par morceaux.";
 
 // Réglages essayés dans l'ordre pour chaque modèle (le 2e est le plus simple, au cas où le 1er est refusé)
