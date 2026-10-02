@@ -17,6 +17,8 @@ const CONSIGNE =
   "N'écris rien avant la première étape : pas d'introduction ni de conclusion. " +
   "Écris les formules en LaTeX entre $...$ (dans une phrase) ou $$...$$ (sur une ligne seule). " +
   "Chaque formule $$...$$ doit tenir sur UNE SEULE ligne : aucun retour à la ligne à l'intérieur, même pour un tableau. " +
+  "MISE EN PAGE : aère la rédaction. Écris UNE phrase par ligne (va à la ligne après chaque phrase), avec des phrases courtes. " +
+  "Mets chaque calcul important ou long sur sa propre ligne entre $$...$$, et réserve $...$ aux petites expressions à l'intérieur d'une phrase. " +
   "N'utilise pas de titres avec #. Vérifie ton résultat avant de répondre. " +
   "Si le sujet contient plusieurs exercices ou plusieurs questions, résous-les TOUS, dans l'ordre, sans en omettre aucun. " +
   "COURBES : uniquement si l'exercice demande d'étudier une ou plusieurs fonctions (variations, dérivée, limites, courbe, tableau de variation), " +
