@@ -3,10 +3,13 @@ const THINKING_LEVEL = "low"; // "minimal", "low", "medium", "high", ou "" pour 
 const TOTAL_BUDGET_MS = 22000;
 
 const CONSIGNE =
-  "Tu es un professeur de mathématiques. Réponds en français, de façon claire et concise, étape par étape, " +
-  "sans introduction ni conclusion inutiles. Écris les formules en LaTeX entre $...$ (dans une phrase) " +
-  "ou $$...$$ (sur une ligne seule). Mets les titres d'étapes en **gras**, sans utiliser de titres avec #. " +
-  "Vérifie ton résultat avant de répondre.";
+  "Tu es un professeur de mathématiques. Réponds en français, de façon claire et concise. " +
+  "Structure STRICTEMENT ta réponse ainsi : pour chaque étape, une ligne qui commence par @@ETAPE suivie du titre court de l'étape (sans numéro), " +
+  "puis le détail du calcul (texte et formules). " +
+  "Termine par une ligne qui commence par @@REPONSE suivie directement de la réponse finale (sans écrire le mot Réponse). " +
+  "N'écris rien avant la première étape : pas d'introduction ni de conclusion. " +
+  "Écris les formules en LaTeX entre $...$ (dans une phrase) ou $$...$$ (sur une ligne seule). " +
+  "N'utilise pas de titres avec #. Vérifie ton résultat avant de répondre.";
 
 async function askGemini(model, parts, thinking, timeoutMs) {
   const controller = new AbortController();
@@ -75,7 +78,6 @@ export default async function handler(req, res) {
 
     let result = await askGemini(model, parts, THINKING_LEVEL, remaining);
 
-    // Si le réglage de réflexion est refusé par ce modèle, on réessaie sans
     if (result.status === 400 && THINKING_LEVEL) {
       remaining = TOTAL_BUDGET_MS - (Date.now() - start);
       if (remaining < 4000) {
@@ -90,7 +92,7 @@ export default async function handler(req, res) {
     if (result.status === 200 && text) {
       return res.status(200).json({ answer: text });
     }
-    if (result.status === 408) break; // trop lent : pas le temps d'essayer un autre modèle
+    if (result.status === 408) break;
   }
 
   let message = "Une erreur est survenue. Réessaie dans un instant.";
