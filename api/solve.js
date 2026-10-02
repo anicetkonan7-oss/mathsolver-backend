@@ -1,6 +1,13 @@
 const MODELS = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash"];
 const THINKING_LEVEL = "low"; // "minimal", "low", "medium", "high", ou "" pour ne rien imposer
-const TOTAL_BUDGET_MS = 55000;
+const MAX_OUTPUT_TOKENS = 32768; // pour les longs sujets
+
+// Réglages de temps (en millisecondes)
+const TOTAL_BUDGET_MS = Number(process.env.MS_TOTAL) || 270000; // durée maximale totale : 4 min 30
+const FIRST_BYTE_MS = Number(process.env.MS_FIRST) || 45000;    // un modèle qui ne dit rien pendant 45 s est abandonné
+const IDLE_MS = Number(process.env.MS_IDLE) || 30000;           // ou qui s'arrête d'écrire pendant 30 s
+const BEAT_MS = Number(process.env.MS_BEAT) || 8000;            // signal "je travaille" envoyé à l'appli
+const API_BASE = process.env.GEMINI_API_BASE || "https://generativelanguage.googleapis.com/v1beta/models/";
 
 const CONSIGNE =
   "Tu es un professeur de mathématiques. Réponds en français, de façon claire et concise. " +
@@ -10,6 +17,7 @@ const CONSIGNE =
   "N'écris rien avant la première étape : pas d'introduction ni de conclusion. " +
   "Écris les formules en LaTeX entre $...$ (dans une phrase) ou $$...$$ (sur une ligne seule). " +
   "N'utilise pas de titres avec #. Vérifie ton résultat avant de répondre. " +
+  "Si le sujet contient plusieurs exercices ou plusieurs questions, résous-les TOUS, dans l'ordre, sans en omettre aucun. " +
   "COURBES : uniquement si l'exercice demande d'étudier une ou plusieurs fonctions (variations, dérivée, limites, courbe, tableau de variation), " +
   "ajoute, APRÈS la réponse finale, une ligne par fonction étudiée (3 au maximum) de la forme : @@COURBE nom | expression | domaine. " +
   "Dans ces lignes, n'utilise ni LaTeX ni le signe $ : écris l'expression en texte simple, avec la variable x, * pour multiplier, ^ pour les puissances, " +
@@ -18,45 +26,157 @@ const CONSIGNE =
   "Exemple : @@COURBE f | x - 2 + ln(x)/x | ]0;+inf[ . " +
   "N'écris aucune ligne @@COURBE si l'exercice ne demande pas d'étudier une fonction, si la fonction contient un paramètre (m, a, k...) ou si elle est définie par morceaux.";
 
-async function askGemini(model, parts, thinking, timeoutMs) {
+// Réglages essayés dans l'ordre pour chaque modèle (le 2e est le plus simple, au cas où le 1er est refusé)
+const VARIANTS = [
+  { thinking: THINKING_LEVEL, maxOut: MAX_OUTPUT_TOKENS },
+  { thinking: "", maxOut: 0 },
+];
+
+// Interroge un modèle en "streaming" : on lit la réponse au fur et à mesure qu'elle s'écrit.
+async function askGemini(model, parts, variant, deadline, outerSignal) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  let reason = "";
+  let timer = null;
+  const abort = (why) => {
+    if (!reason) reason = why;
+    controller.abort();
+  };
+  const arm = (ms) => {
+    clearTimeout(timer);
+    const left = deadline - Date.now();
+    timer = setTimeout(() => abort(Date.now() >= deadline - 50 ? "délai total" : "silence"), Math.max(0, Math.min(ms, left)));
+  };
+  const onOuter = () => abort("client");
+  if (outerSignal) outerSignal.addEventListener("abort", onOuter);
+
+  let text = "";
+  let finish = "";
   try {
     const generationConfig = {};
-    if (thinking) {
-      generationConfig.thinkingConfig = { thinkingLevel: thinking };
+    if (variant.thinking) generationConfig.thinkingConfig = { thinkingLevel: variant.thinking };
+    if (variant.maxOut) generationConfig.maxOutputTokens = variant.maxOut;
+
+    arm(FIRST_BYTE_MS);
+    const r = await fetch(API_BASE + model + ":streamGenerateContent?alt=sse", {
+      method: "POST",
+      headers: {
+        "x-goog-api-key": process.env.GEMINI_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: CONSIGNE }] },
+        contents: [{ parts }],
+        generationConfig,
+      }),
+      signal: controller.signal,
+    });
+
+    if (!r.ok) {
+      await r.text().catch(() => "");
+      return { status: r.status, text: "", finish: "", reason: "" };
     }
-    const r = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent",
-      {
-        method: "POST",
-        headers: {
-          "x-goog-api-key": process.env.GEMINI_API_KEY,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: CONSIGNE }] },
-          contents: [{ parts }],
-          generationConfig,
-        }),
-        signal: controller.signal,
+
+    const reader = r.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let buffer = "";
+    let errorCode = 0;
+
+    const handleEvent = (block) => {
+      const lines = block.split(/\r?\n/).filter((l) => l.startsWith("data:")).map((l) => l.slice(5).trim());
+      if (!lines.length) return;
+      let obj;
+      try {
+        obj = JSON.parse(lines.join("\n"));
+      } catch (e) {
+        return;
       }
-    );
-    const data = await r.json().catch(() => ({}));
-    return { status: r.status, data };
+      if (obj && obj.error) {
+        errorCode = Number(obj.error.code) || 500;
+        return;
+      }
+      const cand = obj && obj.candidates && obj.candidates[0];
+      if (!cand) return;
+      if (cand.finishReason) finish = cand.finishReason;
+      const ps = (cand.content && cand.content.parts) || [];
+      for (const p of ps) {
+        if (p.text && !p.thought) text += p.text;
+      }
+    };
+
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      arm(IDLE_MS);
+      buffer += decoder.decode(value, { stream: true });
+      let m;
+      while ((m = buffer.match(/\r?\n\r?\n/))) {
+        const block = buffer.slice(0, m.index);
+        buffer = buffer.slice(m.index + m[0].length);
+        handleEvent(block);
+      }
+    }
+    buffer += decoder.decode();
+    if (buffer.trim()) handleEvent(buffer);
+
+    if (errorCode) return { status: errorCode, text, finish, reason: "" };
+    return { status: 200, text, finish, reason: "" };
   } catch (e) {
-    return { status: e && e.name === "AbortError" ? 408 : 0, data: {} };
+    return { status: reason ? 408 : 0, text, finish, reason };
   } finally {
     clearTimeout(timer);
+    if (outerSignal) outerSignal.removeEventListener("abort", onOuter);
   }
 }
 
-function extractText(data) {
-  const parts = (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) || [];
-  return parts
-    .filter((p) => p.text && !p.thought)
-    .map((p) => p.text)
-    .join("");
+// Essaie les modèles les uns après les autres (2 tours maximum) jusqu'à obtenir une réponse complète.
+async function solve(parts, signal) {
+  const deadline = Date.now() + TOTAL_BUDGET_MS;
+  const dead = {};
+  let lastStatus = 0;
+  let lastReason = "";
+  let partial = "";
+
+  outer: for (let round = 0; round < 2; round++) {
+    if (round > 0) await new Promise((ok) => setTimeout(ok, 3000)); // petite pause avant le 2e tour
+    for (const model of MODELS) {
+      if (dead[model]) continue;
+      if (signal.aborted || deadline - Date.now() < 5000) break outer;
+
+      let r = null;
+      for (let v = 0; v < VARIANTS.length; v++) {
+        r = await askGemini(model, parts, VARIANTS[v], deadline, signal);
+        if (r.status === 400 && v < VARIANTS.length - 1) continue;
+        break;
+      }
+
+      lastStatus = r.status;
+      lastReason = r.reason;
+      if (r.reason === "client") return "";
+      if (r.status === 200 && r.text.trim()) {
+        let out = r.text;
+        if (r.finish === "MAX_TOKENS") {
+          out += "\n\n⚠️ La réponse a été coupée car elle est très longue. Envoie la partie restante de l'exercice pour avoir la suite.";
+        }
+        return out;
+      }
+      if (r.text.length > partial.length) partial = r.text;
+      if (r.status === 400 || r.status === 403 || r.status === 404) dead[model] = true;
+    }
+  }
+
+  if (partial.trim().length > 400) {
+    return partial + "\n\n⚠️ Réponse incomplète : le service d'IA s'est interrompu. Appuie de nouveau sur Résoudre pour obtenir la solution complète.";
+  }
+
+  let message = "Une erreur est survenue. Réessaie dans un instant.";
+  if (lastStatus === 408) {
+    message = "Le service d'IA n'a pas répondu à temps, même après plusieurs essais. Réessaie dans un instant.";
+  } else if (lastStatus === 503) {
+    message = "Le service d'IA est très sollicité en ce moment. Réessaie dans quelques secondes.";
+  } else if (lastStatus === 429) {
+    message = "La limite d'utilisation gratuite est atteinte pour le moment. Réessaie dans quelques minutes.";
+  }
+  return message + "\n(détail technique : " + lastStatus + (lastReason ? ", " + lastReason : "") + ")";
 }
 
 export default async function handler(req, res) {
@@ -76,39 +196,30 @@ export default async function handler(req, res) {
     parts.push({ inline_data: { mime_type: "image/jpeg", data: imageBase64 } });
   }
 
-  const start = Date.now();
-  let lastStatus = 0;
+  // On répond tout de suite "200" puis on envoie un petit signal régulier (un espace)
+  // pour que la connexion reste ouverte pendant les longs calculs. La vraie réponse arrive à la fin.
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.setHeader("Cache-Control", "no-store, no-transform");
+  res.setHeader("X-Accel-Buffering", "no");
+  res.write(" ");
+  const beat = setInterval(() => {
+    try {
+      res.write(" ");
+    } catch (e) {}
+  }, BEAT_MS);
 
-  for (const model of MODELS) {
-    let remaining = TOTAL_BUDGET_MS - (Date.now() - start);
-    if (remaining < 4000) break;
+  const outer = new AbortController();
+  res.on("close", () => {
+    if (!res.writableEnded) outer.abort();
+  });
 
-    let result = await askGemini(model, parts, THINKING_LEVEL, remaining);
-
-    if (result.status === 400 && THINKING_LEVEL) {
-      remaining = TOTAL_BUDGET_MS - (Date.now() - start);
-      if (remaining < 4000) {
-        lastStatus = 400;
-        break;
-      }
-      result = await askGemini(model, parts, "", remaining);
-    }
-
-    lastStatus = result.status;
-    const text = extractText(result.data);
-    if (result.status === 200 && text) {
-      return res.status(200).json({ answer: text });
-    }
-    if (result.status === 408) break;
+  let answer;
+  try {
+    answer = await solve(parts, outer.signal);
+  } catch (e) {
+    answer = "Une erreur est survenue. Réessaie dans un instant.";
   }
-
-  let message = "Une erreur est survenue. Réessaie dans un instant.";
-  if (lastStatus === 408) {
-    message = "La réponse est trop longue à produire. Essaie une question plus courte, ou découpe l'exercice en plusieurs parties.";
-  } else if (lastStatus === 503) {
-    message = "Le service d'IA est très sollicité en ce moment. Réessaie dans quelques secondes.";
-  } else if (lastStatus === 429) {
-    message = "La limite d'utilisation gratuite est atteinte pour le moment. Réessaie dans quelques minutes.";
-  }
-  return res.status(200).json({ answer: message });
+  clearInterval(beat);
+  res.end(JSON.stringify({ answer }));
 }
