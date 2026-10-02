@@ -1,4 +1,4 @@
-/* MathSolver - fichier 1/2 : calculs (fonction, dérivée, domaine, analyse) */
+/* MathSolver - fichier 1/3 : calculs (fonction, dérivée, domaine, analyse, éléments remarquables) */
 (function (root) {
   "use strict";
 
@@ -239,12 +239,142 @@
     return { fns: fns, domain: domain, intervals: intervals };
   }
 
+
+  /* ---------- Éléments remarquables : asymptotes, extremums, zéros, inflexions ---------- */
+  function snap(v, tol) {
+    for (var q = 1; q <= 12; q++) {
+      var p = Math.round(v * q);
+      if (Math.abs(v - p / q) <= tol) { return p / q; }
+    }
+    return Math.round(v * 1e4) / 1e4;
+  }
+
+  function sameLine(f, side, a, b) {
+    var tests = [2.3, 7.1, 19.7];
+    for (var i = 0; i < tests.length; i++) {
+      var x = side * tests[i], y = f(x);
+      if (!isNum(y) || Math.abs(y - (a * x + b)) > 1e-7 * (1 + Math.abs(y))) { return false; }
+    }
+    return true;
+  }
+
+  function horizontalAt(f, side) {
+    var v6 = f(side * 1e6), v7 = f(side * 1e7), v8 = f(side * 1e8);
+    if (!isNum(v6) || !isNum(v7) || !isNum(v8)) { return null; }
+    var d = Math.abs(v8 - v7);
+    if (d > 1e-4 * (1 + Math.abs(v8)) || d > Math.abs(v7 - v6) + 1e-12) { return null; }
+    var y = snap(v8, Math.max(2 * d, 1e-6));
+    return sameLine(f, side, 0, y) ? null : y;
+  }
+
+  function obliqueAt(f, side) {
+    function sl(k) {
+      var x1 = side * Math.pow(10, k), x2 = side * Math.pow(10, k + 1), y1 = f(x1), y2 = f(x2);
+      return isNum(y1) && isNum(y2) ? (y2 - y1) / (x2 - x1) : NaN;
+    }
+    var s3 = sl(3), s4 = sl(4), s5 = sl(5);
+    if (!isNum(s3) || !isNum(s4) || !isNum(s5)) { return null; }
+    if (Math.abs(s5 - s4) > 1e-3 * (1 + Math.abs(s5)) || Math.abs(s4 - s3) > 1e-2 * (1 + Math.abs(s4))) { return null; }
+    var a = snap(s5, Math.max(2 * Math.abs(s5 - s4), 1e-7));
+    if (Math.abs(a) < 1e-9) { return null; }
+    var b = [3, 4, 5].map(function (k) { var x = side * Math.pow(10, k); return f(x) - a * x; });
+    if (!isNum(b[0]) || !isNum(b[1]) || !isNum(b[2])) { return null; }
+    var d1 = Math.abs(b[2] - b[1]), d0 = Math.abs(b[1] - b[0]);
+    if (d1 > 5e-3 * (1 + Math.abs(b[2])) || d1 > d0 + 1e-9) { return null; }
+    var bb = snap(b[2], Math.max(2 * d1, 1e-7));
+    return sameLine(f, side, a, bb) ? null : { a: a, b: bb };
+  }
+
+  function crossings(g, iv, thr) {
+    var out = [], prev = null, N = 400;
+    for (var k = 1; k < N; k++) {
+      var x = mapU(iv.a, iv.b, 0.5 * (1 - Math.cos(Math.PI * k / N)));
+      if (!isFinite(x)) { continue; }
+      var v = g(x);
+      if (!isNum(v)) { prev = null; continue; }
+      if (Math.abs(v) <= thr || v === 0) { continue; }
+      if (prev && prev.v * v < 0) {
+        var r = bisect(g, prev.x, x), gr = r === null ? NaN : g(r);
+        if (isNum(gr) && Math.abs(gr) <= 0.1 * Math.min(Math.abs(prev.v), Math.abs(v)) + 1e-9) { out.push(r); }
+      }
+      prev = { x: x, v: v };
+    }
+    return out;
+  }
+
+  function uniqSorted(list) {
+    list.sort(function (p, q) { return p - q; });
+    return list.filter(function (r, j) { return j === 0 || Math.abs(r - list[j - 1]) > 1e-7 * Math.max(1, Math.abs(r)); });
+  }
+
+  function features(model) {
+    var f = model.fns.f, df = model.fns.df;
+    var F = { vert: [], horiz: [], obl: [], ext: [], zeros: [], infl: [], yint: null };
+    function addSide(list, item, side, same) {
+      var h = list.filter(same)[0];
+      if (h) { h.side = "both"; } else { item.side = side > 0 ? "+" : "-"; list.push(item); }
+    }
+    model.intervals.forEach(function (an) {
+      if (an.error) { return; }
+      var last = an.pts.length - 1;
+      [0, last].forEach(function (k) {
+        var p = an.pts[k], val = an.vals[k];
+        if (!val) { return; }
+        if (isFinite(p)) {
+          if (val.t === "inf" && !F.vert.some(function (q) { return Math.abs(q - p) < 1e-9; })) { F.vert.push(p); }
+          return;
+        }
+        var side = p > 0 ? 1 : -1;
+        if (val.t === "val") {
+          var y = horizontalAt(f, side);
+          if (y !== null) { addSide(F.horiz, { y: y }, side, function (q) { return Math.abs(q.y - y) < 1e-6; }); }
+        } else if (val.t === "inf") {
+          var o = obliqueAt(f, side);
+          if (o) { addSide(F.obl, { a: o.a, b: o.b }, side, function (q) { return Math.abs(q.a - o.a) < 1e-6 && Math.abs(q.b - o.b) < 1e-6; }); }
+        }
+      });
+      for (var i = 1; i < an.pts.length - 1; i++) {
+        var sl = an.signs[i - 1], sr = an.signs[i], yy = f(an.pts[i]);
+        if (isNum(yy) && sl * sr < 0) { F.ext.push({ x: an.pts[i], y: yy, kind: sl > 0 ? "max" : "min" }); }
+      }
+    });
+    var zs = [];
+    model.intervals.forEach(function (an) {
+      if (an.error) { return; }
+      zs = zs.concat(crossings(f, an, 0));
+      [[an.a, an.ca], [an.b, an.cb]].forEach(function (e) {
+        if (isFinite(e[0]) && e[1]) { var v = f(e[0]); if (isNum(v) && Math.abs(v) < 1e-12) { zs.push(e[0]); } }
+      });
+    });
+    F.ext.forEach(function (e) { if (Math.abs(e.y) < 1e-9) { zs.push(e.x); } });
+    zs = uniqSorted(zs);
+    if (zs.length <= 8) { F.zeros = zs.map(function (x) { return { x: x, y: 0 }; }); }
+    var d2 = function (x) {
+      var h = 1e-3 * Math.max(1, Math.abs(x)), a = df(x + h), b = df(x - h);
+      return isNum(a) && isNum(b) ? (a - b) / (2 * h) : NaN;
+    };
+    var is = [];
+    model.intervals.forEach(function (an) { if (!an.error) { is = is.concat(crossings(d2, an, 1e-5)); } });
+    is = uniqSorted(is);
+    if (is.length <= 5) {
+      is.forEach(function (x) {
+        var y = f(x);
+        if (isNum(y) && !F.zeros.some(function (z) { return Math.abs(z.x - x) < 1e-6; })) { F.infl.push({ x: x, y: y }); }
+      });
+    }
+    var y0 = inDomain(0, model.domain) ? f(0) : NaN;
+    if (isNum(y0) && !F.zeros.some(function (z) { return Math.abs(z.x) < 1e-9; }) && !F.ext.some(function (e) { return Math.abs(e.x) < 1e-9; })) {
+      F.yint = { x: 0, y: y0 };
+    }
+    return F;
+  }
+
   function intervalLabel(iv) {
     return (iv.ca ? "[" : "]") + fmt(iv.a) + " ; " + fmt(iv.b) + (iv.cb ? "]" : "[");
   }
 
   root.MSCore = {
     isNum: isNum, fmt: fmt, fmtVal: fmtVal, normalizeExpr: normalizeExpr, parseDomain: parseDomain,
-    inDomain: inDomain, analyze: analyzeFunction, intervalLabel: intervalLabel
+    inDomain: inDomain, analyze: analyzeFunction, features: features, intervalLabel: intervalLabel
   };
 })(typeof window !== "undefined" ? window : globalThis);
