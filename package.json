@@ -1,8 +1,0 @@
-{
-  "name": "mathsolver-backend",
-  "version": "1.0.0",
-  "description": "Backend for MathSolver API",
-  "scripts": {
-    "start": "node api/solve.js"
-  }
-}
