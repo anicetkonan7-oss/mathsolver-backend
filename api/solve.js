@@ -1,6 +1,6 @@
 const MODELS = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash"];
 const THINKING_LEVEL = "low"; // "minimal", "low", "medium", "high", ou "" pour ne rien imposer
-const TOTAL_BUDGET_MS = 22000;
+const TOTAL_BUDGET_MS = 55000;
 
 const CONSIGNE =
   "Tu es un professeur de mathématiques. Réponds en français, de façon claire et concise. " +
