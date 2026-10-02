@@ -9,7 +9,14 @@ const CONSIGNE =
   "Termine par une ligne qui commence par @@REPONSE suivie directement de la réponse finale (sans écrire le mot Réponse). " +
   "N'écris rien avant la première étape : pas d'introduction ni de conclusion. " +
   "Écris les formules en LaTeX entre $...$ (dans une phrase) ou $$...$$ (sur une ligne seule). " +
-  "N'utilise pas de titres avec #. Vérifie ton résultat avant de répondre.";
+  "N'utilise pas de titres avec #. Vérifie ton résultat avant de répondre. " +
+  "COURBES : uniquement si l'exercice demande d'étudier une ou plusieurs fonctions (variations, dérivée, limites, courbe, tableau de variation), " +
+  "ajoute, APRÈS la réponse finale, une ligne par fonction étudiée (3 au maximum) de la forme : @@COURBE nom | expression | domaine. " +
+  "Dans ces lignes, n'utilise ni LaTeX ni le signe $ : écris l'expression en texte simple, avec la variable x, * pour multiplier, ^ pour les puissances, " +
+  "et les fonctions ln(x), exp(x), sqrt(x), abs(x), sin(x), cos(x), tan(x) et pi. " +
+  "Le domaine est l'ensemble de définition (ou l'intervalle d'étude) en texte simple : ]0;+inf[ ou ]-inf;0[ U ]0;+inf[ ou R ou R* ou [0;2*pi]. " +
+  "Exemple : @@COURBE f | x - 2 + ln(x)/x | ]0;+inf[ . " +
+  "N'écris aucune ligne @@COURBE si l'exercice ne demande pas d'étudier une fonction, si la fonction contient un paramètre (m, a, k...) ou si elle est définie par morceaux.";
 
 async function askGemini(model, parts, thinking, timeoutMs) {
   const controller = new AbortController();
