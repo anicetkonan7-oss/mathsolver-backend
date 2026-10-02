@@ -21,14 +21,17 @@ const CONSIGNE =
   "Mets chaque calcul important ou long sur sa propre ligne entre $$...$$, et réserve $...$ aux petites expressions à l'intérieur d'une phrase. " +
   "N'utilise pas de titres avec #. Vérifie ton résultat avant de répondre. " +
   "Si le sujet contient plusieurs exercices ou plusieurs questions, résous-les TOUS, dans l'ordre, sans en omettre aucun. " +
-  "COURBES : uniquement si l'exercice demande d'étudier une ou plusieurs fonctions (variations, dérivée, limites, courbe, tableau de variation), " +
-  "ajoute, APRÈS la réponse finale, une ligne par fonction étudiée (3 au maximum) de la forme : @@COURBE nom | expression | domaine. " +
-  "Dans ces lignes, n'utilise ni LaTeX ni le signe $ : écris l'expression en texte simple, avec la variable x, * pour multiplier, ^ pour les puissances, " +
+  "GRAPHIQUES (seulement si l'énoncé les exige) : après la ligne @@REPONSE, tu peux ajouter des lignes de la forme @@TABLEAU nom | expression | domaine et/ou @@COURBE nom | expression | domaine. " +
+  "N'écris une ligne @@TABLEAU QUE si l'énoncé demande explicitement un tableau de variation(s), ou une étude complète de la fonction. " +
+  "N'écris une ligne @@COURBE QUE si l'énoncé demande de tracer, construire ou représenter la courbe (représentation graphique, courbe représentative, dans un repère), ou une étude complète de la fonction. " +
+  "Si l'énoncé demande les deux, écris les deux lignes. " +
+  "Si l'énoncé ne demande ni tableau ni courbe (calcul de limite ou de dérivée, équation, inéquation, suite, probabilités, géométrie, simple étude du sens de variation sans tableau, etc.), n'écris AUCUNE de ces lignes. " +
+  "Au maximum 3 fonctions. Dans ces lignes, n'utilise ni LaTeX ni le signe $ : écris l'expression en texte simple, avec la variable x, * pour multiplier, ^ pour les puissances, " +
   "et les fonctions ln(x), exp(x), sqrt(x), abs(x), sin(x), cos(x), tan(x) et pi. " +
   "Le domaine est l'ensemble de définition (ou l'intervalle d'étude) en texte simple : ]0;+inf[ ou ]-inf;0[ U ]0;+inf[ ou R ou R* ou [0;2*pi]. " +
-  "Exemple : @@COURBE f | x - 2 + ln(x)/x | ]0;+inf[ . " +
-  "Quand tu écris une ligne @@COURBE, ne dessine PAS de tableau de variations en LaTeX (pas de \\begin{array}) : l'application le dessine elle-même ; résume les variations dans une ou deux phrases. " +
-  "N'écris aucune ligne @@COURBE si l'exercice ne demande pas d'étudier une fonction, si la fonction contient un paramètre (m, a, k...) ou si elle est définie par morceaux.";
+  "Exemple : @@TABLEAU f | x - 2 + ln(x)/x | ]0;+inf[ puis @@COURBE f | x - 2 + ln(x)/x | ]0;+inf[ . " +
+  "Quand tu écris une ligne @@TABLEAU ou @@COURBE, ne dessine PAS toi-même de tableau de variations en LaTeX (pas de \\begin{array}) : l'application le dessine ; résume les variations dans une ou deux phrases, et donne bien dans ta résolution les limites, asymptotes et extremums (l'application les repère aussi sur le graphique). " +
+  "N'écris aucune de ces lignes si la fonction contient un paramètre (m, a, k...) ou si elle est définie par morceaux.";
 
 // Réglages essayés dans l'ordre pour chaque modèle (le 2e est le plus simple, au cas où le 1er est refusé)
 const VARIANTS = [
