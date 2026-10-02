@@ -1,19 +1,52 @@
 const MODELS = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash"];
+const THINKING_LEVEL = "low"; // "minimal", "low", "medium", "high", ou "" pour ne rien imposer
+const TOTAL_BUDGET_MS = 22000;
 
-async function askGemini(model, parts) {
-  const r = await fetch(
-    "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent",
-    {
-      method: "POST",
-      headers: {
-        "x-goog-api-key": process.env.GEMINI_API_KEY,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ contents: [{ parts }] }),
+const CONSIGNE =
+  "Tu es un professeur de mathématiques. Réponds en français, de façon claire et concise, étape par étape, " +
+  "sans introduction ni conclusion inutiles. Écris les formules en LaTeX entre $...$ (dans une phrase) " +
+  "ou $$...$$ (sur une ligne seule). Mets les titres d'étapes en **gras**, sans utiliser de titres avec #. " +
+  "Vérifie ton résultat avant de répondre.";
+
+async function askGemini(model, parts, thinking, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const generationConfig = {};
+    if (thinking) {
+      generationConfig.thinkingConfig = { thinkingLevel: thinking };
     }
-  );
-  const data = await r.json().catch(() => ({}));
-  return { status: r.status, data };
+    const r = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent",
+      {
+        method: "POST",
+        headers: {
+          "x-goog-api-key": process.env.GEMINI_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: CONSIGNE }] },
+          contents: [{ parts }],
+          generationConfig,
+        }),
+        signal: controller.signal,
+      }
+    );
+    const data = await r.json().catch(() => ({}));
+    return { status: r.status, data };
+  } catch (e) {
+    return { status: e && e.name === "AbortError" ? 408 : 0, data: {} };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function extractText(data) {
+  const parts = (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) || [];
+  return parts
+    .filter((p) => p.text && !p.thought)
+    .map((p) => p.text)
+    .join("");
 }
 
 export default async function handler(req, res) {
@@ -27,32 +60,43 @@ export default async function handler(req, res) {
   }
 
   const parts = [
-    {
-      text: "Résous étape par étape, en français : " + (promptText || "l'exercice de la photo"),
-    },
+    { text: "Exercice : " + (promptText || "voir la photo ci-jointe") },
   ];
   if (imageBase64) {
     parts.push({ inline_data: { mime_type: "image/jpeg", data: imageBase64 } });
   }
 
+  const start = Date.now();
   let lastStatus = 0;
+
   for (const model of MODELS) {
-    try {
-      const { status, data } = await askGemini(model, parts);
-      lastStatus = status;
-      const text = (data?.candidates?.[0]?.content?.parts || [])
-        .map((p) => p.text || "")
-        .join("");
-      if (status === 200 && text) {
-        return res.status(200).json({ answer: text });
+    let remaining = TOTAL_BUDGET_MS - (Date.now() - start);
+    if (remaining < 4000) break;
+
+    let result = await askGemini(model, parts, THINKING_LEVEL, remaining);
+
+    // Si le réglage de réflexion est refusé par ce modèle, on réessaie sans
+    if (result.status === 400 && THINKING_LEVEL) {
+      remaining = TOTAL_BUDGET_MS - (Date.now() - start);
+      if (remaining < 4000) {
+        lastStatus = 400;
+        break;
       }
-    } catch (e) {
-      lastStatus = 0;
+      result = await askGemini(model, parts, "", remaining);
     }
+
+    lastStatus = result.status;
+    const text = extractText(result.data);
+    if (result.status === 200 && text) {
+      return res.status(200).json({ answer: text });
+    }
+    if (result.status === 408) break; // trop lent : pas le temps d'essayer un autre modèle
   }
 
   let message = "Une erreur est survenue. Réessaie dans un instant.";
-  if (lastStatus === 503) {
+  if (lastStatus === 408) {
+    message = "La réponse est trop longue à produire. Essaie une question plus courte, ou découpe l'exercice en plusieurs parties.";
+  } else if (lastStatus === 503) {
     message = "Le service d'IA est très sollicité en ce moment. Réessaie dans quelques secondes.";
   } else if (lastStatus === 429) {
     message = "La limite d'utilisation gratuite est atteinte pour le moment. Réessaie dans quelques minutes.";
