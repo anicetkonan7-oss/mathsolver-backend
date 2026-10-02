@@ -47,7 +47,8 @@ window.addEventListener("error", function (e) {
 <div id="extras"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.2/lib/browser/math.js"></script>
-<script src="plot.js?v=2"></script>
+<script src="plot_core.js?v=3"></script>
+<script src="plot.js?v=3"></script>
 <script>
 (function () {
   var presets = [
@@ -65,10 +66,11 @@ window.addEventListener("error", function (e) {
 
   function showDiag() {
     var okMath = !!window.math;
-    var okPlot = !!(window.MathSolverPlot && window.MathSolverPlot.renderInto);
+    var okCore = !!window.MSCore;
+    var okPlot = !!(window.MathSolverPlot && window.MathSolverPlot.drawPlot);
     diag.innerHTML = "";
     var l = document.createElement("div");
-    l.textContent = "Démo v2 · math.js : " + (okMath ? "chargé ✅" : "NON chargé ❌") + " · plot.js : " + (okPlot ? "chargé ✅" : "NON chargé ❌");
+    l.textContent = "Démo v3 · math.js : " + (okMath ? "✅" : "❌") + " · plot_core.js : " + (okCore ? "✅" : "❌") + " · plot.js : " + (okPlot ? "✅" : "❌");
     diag.appendChild(l);
     window.__errs.forEach(function (m) {
       var d = document.createElement("div");
@@ -82,7 +84,8 @@ window.addEventListener("error", function (e) {
     out.innerHTML = "";
     try {
       if (!window.math) { throw new Error("math.js n'est pas chargé : vérifie ta connexion internet puis recharge la page."); }
-      if (!(window.MathSolverPlot && window.MathSolverPlot.renderInto)) { throw new Error("plot.js n'est pas chargé complètement : le fichier sur GitHub est peut-être incomplet."); }
+      if (!window.MSCore) { throw new Error("plot_core.js n'est pas chargé : le fichier est absent ou incomplet sur GitHub."); }
+      if (!(window.MathSolverPlot && window.MathSolverPlot.drawPlot)) { throw new Error("plot.js n'est pas chargé : le fichier est absent ou incomplet sur GitHub."); }
       window.MathSolverPlot.renderInto(out, [{ name: "f", expr: ex.value, domain: dm.value }]);
     } catch (e) {
       var d = document.createElement("div");
