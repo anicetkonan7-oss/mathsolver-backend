@@ -175,15 +175,34 @@ async function solve(parts, signal) {
     return partial + "\n\n⚠️ Réponse incomplète : le service d'IA s'est interrompu. Appuie de nouveau sur Résoudre pour obtenir la solution complète.";
   }
 
-  let message = "Une erreur est survenue. Réessaie dans un instant.";
-  if (lastStatus === 408) {
-    message = "Le service d'IA n'a pas répondu à temps, même après plusieurs essais. Réessaie dans un instant.";
-  } else if (lastStatus === 503) {
-    message = "Le service d'IA est très sollicité en ce moment. Réessaie dans quelques secondes.";
-  } else if (lastStatus === 429) {
-    message = "La limite d'utilisation gratuite est atteinte pour le moment. Réessaie dans quelques minutes.";
+  return failure(lastStatus, lastReason);
+}
+
+// Message d'erreur présenté proprement à l'élève (le détail technique reste discret)
+function failure(status, reason) {
+  let title = "Service momentanément indisponible";
+  let error = "Le service d'IA ne répond pas correctement pour le moment.";
+  let hint = "Réessaie dans quelques instants.";
+  if (status === 408) {
+    title = "Réponse trop lente";
+    error = "Le service d'IA met plus de temps que prévu à répondre.";
+    hint = "Ton exercice est conservé : appuie de nouveau sur « Résoudre ».";
+  } else if (status === 503 || status === 500 || status === 502 || status === 504) {
+    title = "Service très sollicité";
+    error = "Le service d'IA est très sollicité en ce moment.";
+    hint = "Patiente quelques secondes, puis appuie de nouveau sur « Résoudre ».";
+  } else if (status === 429) {
+    title = "Limite atteinte pour le moment";
+    error = "Trop de demandes ont été envoyées en peu de temps.";
+    hint = "Patiente quelques minutes, puis réessaie.";
+  } else if (status === 400) {
+    title = "Exercice non traité";
+    error = "Le service n'a pas réussi à lire cet exercice.";
+    hint = "Vérifie que l'énoncé ou la photo est bien lisible, puis réessaie.";
+  } else if (status === 0) {
+    error = "La connexion au service d'IA a échoué.";
   }
-  return message + "\n(détail technique : " + lastStatus + (lastReason ? ", " + lastReason : "") + ")";
+  return { error, title, hint, detail: status + (reason ? " " + reason : "") };
 }
 
 export default async function handler(req, res) {
@@ -221,12 +240,13 @@ export default async function handler(req, res) {
     if (!res.writableEnded) outer.abort();
   });
 
-  let answer;
+  let out;
   try {
-    answer = await solve(parts, outer.signal);
+    const r = await solve(parts, outer.signal);
+    out = typeof r === "string" ? { answer: r } : r;
   } catch (e) {
-    answer = "Une erreur est survenue. Réessaie dans un instant.";
+    out = failure(500, "exception");
   }
   clearInterval(beat);
-  res.end(JSON.stringify({ answer }));
+  res.end(JSON.stringify(out));
 }
