@@ -109,6 +109,7 @@
       loadSeq([BASE + "ms_ui.js?v=1"].concat(w.MSVoice ? [BASE + "ms_fr.js?v=1", BASE + "ms_say.js?v=1"] : [], S.titles.length ? [BASE + "report.js?v=1"] : []), 0);
     }
     w.MS_OK = true;
+    loadSeq([BASE + "ed_model.js?v=2", BASE + "ed_parse.js?v=2", BASE + "ed_seg.js?v=2", BASE + "ms_fx.js?v=1"], 0);
     if (document.readyState === "complete") { renderMath(); } else { w.addEventListener("load", renderMath); }
   }
 
