@@ -35,6 +35,7 @@
       if (i === a.length) { break; }
       n = a[i];
       x = rn(n);
+      if (n.t === "c" && n.v === "," && a[i - 1] && a[i - 1].k === "n" && a[i + 1] && a[i + 1].k === "n") { x.className = "c kn"; }
       n.el = x;
       sp = n.t === "c" && (n.k === "s" || n.k === "b");
       if (top && !sp) {
