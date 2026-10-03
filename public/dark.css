@@ -1,14 +1,13 @@
 html.dk{color-scheme:dark;}
 .dk body{background:#0e1424;color:#d5ddee;}
 .dk .photo{background:#172033;border-bottom-color:#26324a;box-shadow:0 2px 8px rgba(0,0,0,.4);}
-.dk .exf{background:#172033;border-color:#26324a;}
-.dk .pview,.dk .exo{background:#172033;}
-.dk .pview.txt.clip:after{background:linear-gradient(to bottom,rgba(23,32,51,0),#172033);}
+.dk .pview:not(.txt){background:#172033;}
+.dk .pview.txt{--c:#172033;}
 .dk .pview .exo+img{border-top-color:#26324a;}
-.dk .elab{color:#93a2c4;}
+.dk .elab,.dk .gtxt{color:#93a2c4;}
 .dk .etx{color:#e8edf8;}
-.dk .more,.dk .tb button,.dk .lk{color:#8fb4ff;}
-.dk .more:after,.dk .chev{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239aa9c9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");}
+.dk .tb button,.dk .lk{color:#8fb4ff;}
+.dk .chev{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239aa9c9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");}
 .dk .grip{background:#1b2742;}
 .dk .pill{background:#4a5a7d;}
 .dk .intro,.dk .tb,.dk .st,.dk .empty{color:#93a2c4;}
