@@ -25,13 +25,42 @@
     if (j.answer !== undefined) {
       var a = String(j.answer);
       if (!a.trim()) { return { e: ["Réponse vide", "Le service n'a rien renvoyé pour cet exercice.", RETRY, ""] }; }
-      return { a: a };
+      if (a.indexOf("@@HORSSUJET") >= 0 && a.indexOf("@@ETAPE") < 0) {
+        return { o: 1, e: ["Maths uniquement", "MathSolver résout seulement des exercices de mathématiques.", "Écris un énoncé de maths (équation, fonction, suite, géométrie, probabilités…) ou prends-le en photo.", ""] };
+      }
+      return { a: fixNum(a) };
     }
     if (j.error !== undefined) {
       return { e: [j.title !== undefined ? String(j.title) : "Une erreur est survenue", String(j.error) || "Le service n'a pas pu terminer la résolution.", j.hint !== undefined ? String(j.hint) : "Réessaie dans quelques instants.", j.detail !== undefined ? String(j.detail) : ""] };
     }
     return { e: ["Une erreur est survenue", "La réponse du service est incomplète.", "Réessaie dans quelques instants.", ""] };
   }
+
+  // Virgule décimale dans une formule : 2,8 -> 2{,}8 (sinon KaTeX écrit « 2, 8 »)
+  var MATH = /\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^$\n]+?\$/g;
+  function fixNum(a) {
+    return a.replace(MATH, function (m) {
+      return m.replace(/\d+(?:,\d+)+/g, function (t) { return t.split(",").length === 2 ? t.replace(",", "{,}") : t; });
+    });
+  }
+
+  // Mode nuit : charge dark.css si l'appli le demande (pont MSPref)
+  function theme() {
+    var d = false, r = document.documentElement, l = document.getElementById("msdk"), app = document.getElementById("app");
+    try { d = !!(w.MSPref && w.MSPref.dark()); } catch (e) { }
+    r.className = d ? "dk" : "";
+    r.style.background = d ? "#0e1424" : "";
+    if (d && !l && app) {
+      l = document.createElement("link");
+      l.id = "msdk"; l.rel = "stylesheet"; l.href = BASE + "dark.css?v=1";
+      app.style.visibility = "hidden";
+      l.onload = l.onerror = function () { app.style.visibility = ""; };
+      setTimeout(function () { app.style.visibility = ""; }, 1500);
+      document.head.appendChild(l);
+    }
+    if (l) { l.disabled = !d; }
+  }
+  w.msTheme = theme;
 
   function loadSeq(urls, i) {
     if (i >= urls.length) { return; }
@@ -58,6 +87,7 @@
     var app = document.getElementById("app");
     if (!app) { return; }
     V.style();
+    theme();
     var d = decide(), html = V.exo(D.q, D.img), S = null;
     if (d.e) {
       html += V.err(d.e[0], d.e[1], d.e[2], d.e[3]);
@@ -68,6 +98,7 @@
       if (S.titles.length) { html += '<div id="rep"></div>'; }
     }
     app.innerHTML = html;
+    if (d.o) { var ic = app.querySelector(".err .ic"); if (ic) { ic.textContent = "∑"; ic.style.background = "#e4edff"; ic.style.color = "#1a4db5"; } }
     V.grip();
     if (S && S.funcs.length) {
       w.MS_FUNCS = S.funcs;
@@ -75,7 +106,7 @@
     }
     if (S) {
       w.MS_CTX = { q: String(D.q || ""), a: d.a };
-      loadSeq([BASE + "ms_ui.js?v=1"].concat(S.titles.length ? [BASE + "report.js?v=1"] : []), 0);
+      loadSeq([BASE + "ms_ui.js?v=1"].concat(w.MSVoice ? [BASE + "ms_fr.js?v=1", BASE + "ms_say.js?v=1"] : [], S.titles.length ? [BASE + "report.js?v=1"] : []), 0);
     }
     w.MS_OK = true;
     if (document.readyState === "complete") { renderMath(); } else { w.addEventListener("load", renderMath); }
