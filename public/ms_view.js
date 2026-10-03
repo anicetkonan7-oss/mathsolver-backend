@@ -13,7 +13,8 @@
     ".exo{padding:12px 16px;background:#fff}" +
     ".elab{margin:0 0 6px;font-size:12px;font-weight:bold;letter-spacing:.08em;text-transform:uppercase;color:#5b6784}" +
     ".etx{font-size:16px;line-height:1.6;color:#111827;white-space:pre-wrap;overflow-wrap:break-word}" +
-    ".pview.txt{height:auto;max-height:32vh}" +
+    ".pview.txt{height:auto;max-height:124px}" +
+    ".pview.nog{border-bottom:1px solid #e2e7f1}" +
     ".pview .exo+img{border-top:1px solid #e2e7f1}";
 
   function style() {
@@ -59,6 +60,11 @@
     var pv = document.getElementById("pv"), g = document.getElementById("grip");
     if (!pv || !g) { return; }
     var txt = pv.className.indexOf("txt") >= 0, sy = 0, sh = 0, mv = false;
+    if (txt && pv.scrollHeight <= pv.clientHeight + 6) {
+      g.style.display = "none";
+      pv.className += " nog";
+      return;
+    }
     function top() {
       var m = Math.round(window.innerHeight * 0.8);
       return txt ? Math.max(60, Math.min(m, pv.scrollHeight)) : m;
