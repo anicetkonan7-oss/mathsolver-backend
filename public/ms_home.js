@@ -1,9 +1,9 @@
-/* MathSolver - accueil : récents, exemples variés, astuce ; page Historique */
+/* MathSolver - accueil : récents, enregistrées, exemples variés, astuce ; page Historique */
 (function (w) {
   "use strict";
-  var A = w.MSApp, N = w.MSNav, D = document, app = D.getElementById("app");
+  var A = w.MSApp, N = w.MSNav, L = w.MSLib, D = document, app = D.getElementById("app");
   var BASE = "https://mathsolver-backend-gray.vercel.app/";
-  var mode = (w.MS_HOME && w.MS_HOME.mode === "history") ? "history" : "home", armed = 0;
+  var mode = (w.MS_HOME && w.MS_HOME.mode === "history") ? "history" : "home", armed = 0, tab = "rec", cf = "", ready = 0;
   if (!app) { return; }
   var EX = [[["Résoudre $2x+6=0$", "Résoudre 2x + 6 = 0"]]], TIPS = ["Pour une photo, cadre bien l'énoncé, sans ombre ni reflet."];
 
@@ -39,47 +39,70 @@
     try { var a = JSON.parse(A.recents()); return a instanceof Array ? a : []; } catch (e) { return []; }
   }
 
-  function row(cls, html, val) {
-    return '<button class="' + cls + '" data-v="' + esc(val) + '">' + (cls === "rc" ? '<span class="ri"></span>' : "") + '<span class="it">' + html + '</span><span class="chv"></span></button>';
-  }
-
   function render() {
-    var r = A && A.recents ? list() : [], s = "", i, n, ex;
+    var r = A && A.recents ? list() : [], B = w.MSLB, v = B.on ? B.all() : [], s = "", i, n, ex;
     if (mode === "history") {
-      s = '<div class="hh"><span class="st">Historique</span>' + (r.length ? '<button class="lk" id="clr">Tout effacer</button>' : "") + "</div>";
-      if (!r.length) { s += '<div class="empty"><b>Rien pour le moment</b>Les exercices que tu r&eacute;sous apparaissent ici.</div>'; }
-      for (i = 0; i < r.length; i++) { s += row("rc", esc(r[i]), r[i]); }
+      s = B.head("Historique", tab === "rec" && r.length ? "clr" : "", "Tout effacer");
+      if (B.on) { s += B.tabs(tab, v.length); } else { tab = "rec"; }
+      if (tab === "sav") {
+        if (!v.length) { s += B.empty("Aucune correction enregistr&eacute;e", "Sous une solution, appuie sur &laquo;&nbsp;Enregistrer la correction&nbsp;&raquo; pour la retrouver ici."); }
+        for (i = 0; i < v.length; i++) { s += B.row(v[i], cf); }
+      } else {
+        if (!r.length) { s += B.empty("Rien pour le moment", "Les exercices que tu r&eacute;sous apparaissent ici."); }
+        for (i = 0; i < r.length; i++) { s += B.rc("rc", esc(r[i]), r[i]); }
+      }
       s += '<button class="lk bk" id="home">Retour &agrave; l\'accueil</button>';
     } else {
       if (r.length) {
-        s += '<div class="hh"><span class="st">R&eacute;cents</span>' + (r.length > 3 ? '<button class="lk" id="all">Tout voir</button>' : "") + "</div>";
-        for (i = 0; i < Math.min(3, r.length); i++) { s += row("rc", esc(r[i]), r[i]); }
+        s += B.head("R&eacute;cents", r.length > 3 ? "all" : "", "Tout voir");
+        for (i = 0; i < Math.min(3, r.length); i++) { s += B.rc("rc", esc(r[i]), r[i]); }
       }
-      s += '<div class="hh"><span class="st">Essaie un exemple</span><button class="lk" id="again">Autres exemples</button></div>';
+      if (v.length) {
+        s += B.head("Enregistr&eacute;es", v.length > 3 ? "allsav" : "", "Tout voir");
+        for (i = 0; i < Math.min(3, v.length); i++) { s += B.row(v[i], cf); }
+      }
+      s += B.head("Essaie un exemple", "again", "Autres exemples");
       ex = pick();
-      for (i = 0; i < ex.length; i++) { s += row("ex", esc(ex[i][0]), ex[i][1]); }
+      for (i = 0; i < ex.length; i++) { s += B.rc("ex", esc(ex[i][0]), ex[i][1]); }
       n = Math.floor(Math.random() * TIPS.length);
       s += '<div class="tip"><b>Astuce</b>' + esc(TIPS[n]) + "</div>";
     }
     app.innerHTML = s;
     if (w.renderMathInElement) {
-      w.renderMathInElement(app, { delimiters: [{ left: "$", right: "$", display: false }], throwOnError: false });
+      w.renderMathInElement(app, { delimiters: [{ left: "$", right: "$", display: false }], ignoredClasses: ["rc", "sv"], throwOnError: false });
     } else {
       app.innerHTML = app.innerHTML.replace(/\$/g, "");
     }
+    if (ready) { B.type(app); }
   }
 
   D.addEventListener("click", function (e) {
-    var t = e.target.closest ? e.target.closest("button") : null, c;
+    var t = e.target.closest ? e.target.closest("button") : null, a, id;
     if (!t) { return; }
-    c = t.className;
-    if (c === "ex" || c === "rc") {
+    a = t.getAttribute("data-a");
+    id = t.getAttribute("data-id");
+    if (a === "fill") {
       if (N && N.show) { try { N.show(); } catch (x) { } }
-      if (A && A.fill) { try { A.fill(t.getAttribute("data-v")); } catch (x) { } }
+      try { if (L && L.fill) { L.fill(t.getAttribute("data-v")); } else if (A && A.fill) { A.fill(t.getAttribute("data-v")); } } catch (x) { }
+    } else if (a === "open") {
+      try { L.open(id); } catch (x) { }
+    } else if (a === "del" || a === "no") {
+      cf = a === "del" ? id : "";
+      render();
+    } else if (a === "yes") {
+      try { L.remove(id); } catch (x) { }
+      cf = "";
+      render();
+    } else if (a === "tab") {
+      tab = t.getAttribute("data-t");
+      cf = "";
+      render();
     } else if (t.id === "again") {
       render();
-    } else if (t.id === "all" || t.id === "home") {
-      mode = t.id === "all" ? "history" : "home";
+    } else if (t.id === "all" || t.id === "allsav" || t.id === "home") {
+      mode = t.id === "home" ? "home" : "history";
+      tab = t.id === "allsav" ? "sav" : "rec";
+      cf = "";
       if (mode === "home" && N && N.show) { try { N.show(); } catch (x) { } }
       render();
     } else if (t.id === "clr") {
@@ -95,15 +118,28 @@
     }
   });
 
-  // Les exemples sont dans ms_ex.js ; s'il ne charge pas, on garde l'exemple de secours
-  var sc = D.createElement("script");
-  sc.src = BASE + "ms_ex.js?v=1";
-  sc.onload = sc.onerror = function () {
+  function load(u, cb) {
+    var sc = D.createElement("script");
+    sc.src = BASE + u;
+    sc.onload = sc.onerror = cb;
+    D.head.appendChild(sc);
+  }
+  function seq(a, i, cb) {
+    if (i >= a.length) { cb(); return; }
+    load(a[i], function () { seq(a, i + 1, cb); });
+  }
+  // Les exemples (ms_ex.js) et les enregistrées (ms_lib.js) arrivent d'abord ; les formules des listes ensuite
+  var wait = 2;
+  function start() {
+    if (--wait) { return; }
     if (w.MS_EX && w.MS_EX.length > 4) { EX = w.MS_EX; }
     if (w.MS_TIPS && w.MS_TIPS.length) { TIPS = w.MS_TIPS; }
+    if (!w.MSLB) { app.innerHTML = '<p style="margin:28px 16px;font:15px sans-serif;color:#4b5563;text-align:center">&Eacute;cris ton exercice ci-dessus, puis appuie sur &laquo;&nbsp;R&eacute;soudre&nbsp;&raquo;.</p>'; return; }
     render();
     w.MS_OK = true;
-  };
+    seq(["ed_model.js?v=2", "ed_parse.js?v=2", "ed_seg.js?v=2", "ms_fx.js?v=2"], 0, function () { ready = 1; w.MSLB.type(app); });
+  }
   theme();
-  D.head.appendChild(sc);
+  load("ms_ex.js?v=1", start);
+  load("ms_lib.js?v=1", start);
 })(window);
