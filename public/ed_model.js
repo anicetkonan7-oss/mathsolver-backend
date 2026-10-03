@@ -29,8 +29,11 @@
   E.sub = function (pre) { var b = E.box("sub", 1); if (pre) { fill(b.f[0], pre); E.cur.i = pre.length; } return b; };
   E.big = function (sym) { E.put(sym); E.box("ss", 2); };
   E.frac = function () {
-    var c = E.cur, a = c.s.n, j = c.i, f = box("frac", 2), m;
+    var c = E.cur, a = c.s.n, j = c.i, f = box("frac", 2), m, p;
     while (j > 0 && opd(a, j - 1)) { j--; }
+    for (p = c.i - 1; p >= j; p--) {
+      if (a[p].t === "c" && a[p].k === "f" && a[p].v === "lim") { j = p + 1 + (a[p + 1] && a[p + 1].t === "sub" ? 1 : 0); break; }
+    }
     m = a.splice(j, c.i - j);
     m.forEach(function (n) { n.q = f.f[0]; });
     f.f[0].n = m;
