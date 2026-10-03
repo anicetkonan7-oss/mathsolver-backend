@@ -48,6 +48,7 @@
     }
     return e;
   }
+  E.rs = rs;
   E.render = function () {
     var cr;
     host = host || document.getElementById("ed");
