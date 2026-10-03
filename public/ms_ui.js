@@ -1,4 +1,4 @@
-/* MathSolver - affichage 4/4 : actions (replier les étapes, copier, partager, barre du bas) */
+/* MathSolver - affichage 4/4 : actions (replier, copier, partager, barre du bas, historique) */
 (function (w) {
   "use strict";
   var A = w.MSApp, D = document;
@@ -90,5 +90,7 @@
     D.body.appendChild(bar);
     D.body.className += " hasbar";
   }
+  if (A && A.saveRecent && w.MS_CTX && w.MS_CTX.q) { call(function () { A.saveRecent(w.MS_CTX.q); }); }
+  if (A && A.solved) { call(function () { A.solved(); }); }
   w.MSUI = { plain: plain, shareText: shareText };
 })(window);
