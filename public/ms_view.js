@@ -49,30 +49,29 @@
     return s;
   }
 
-  // Exercice (texte tapé et/ou photo) : fixe en haut ; texte : « Voir tout », photo : poignée
+  // Exercice : texte seul = carte qui défile avec la page ; avec photo = fixe en haut, poignée pour la redimensionner
   function exo(q, img) {
     q = String(q || "").trim();
     if (!q && !img) { return ""; }
-    var s = '<div class="photo"><div class="pview' + (img ? "" : " txt") + '" id="pv">';
+    var s = '<div class="pview' + (img ? "" : " txt") + '" id="pv">';
     if (q) { s += '<div class="exo"><div class="elab">Exercice</div><div class="etx">' + esc(q) + "</div></div>"; }
     if (img) { s += '<img src="data:image/jpeg;base64,' + img + '">'; }
     s += "</div>";
     s += img ? '<div class="grip" id="grip"><span class="pill"></span></div>' : '<button class="more" id="more">Voir tout</button>';
-    return s + "</div>";
+    return '<div class="' + (img ? "photo" : "exf") + '">' + s + "</div>";
   }
 
   function grip() {
     var pv = $("pv"), g = $("grip"), more = $("more");
     if (!pv) { return; }
     if (more) {
-      if (pv.scrollHeight <= pv.clientHeight + 6) { more.style.display = "none"; return; }
+      if (pv.scrollHeight <= 150) { more.style.display = "none"; return; }
       pv.className += " clip";
       more.onclick = function () {
-        var o = pv.className.indexOf(" open") >= 0;
-        pv.className = "pview txt" + (o ? " clip" : " open");
+        var o = pv.className.indexOf(" clip") < 0;
+        pv.className = "pview txt" + (o ? " clip" : "");
         more.className = o ? "more" : "more up";
         more.firstChild.nodeValue = o ? "Voir tout" : "Réduire";
-        pv.scrollTop = 0;
       };
       return;
     }
