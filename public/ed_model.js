@@ -10,7 +10,7 @@
   function ins(n) { var c = E.cur; c.s.n.splice(c.i, 0, n); n.q = c.s; c.i++; return n; }
   function into(s) { E.cur.s = s; E.cur.i = 0; }
   function leaf(v, txt) {
-    var k = v === " " ? "s" : v === "\n" ? "b" : txt ? "t" : BG.indexOf(v) >= 0 ? "g" : /[0-9.]/.test(v) ? "n" : /[A-Za-zÀ-ÿŒœα-ωΑ-Ω]/.test(v) ? "v" : BIN.indexOf(v) >= 0 ? "o" : PUN.indexOf(v) >= 0 ? "p" : "x";
+    var k = v === " " ? "s" : v === "\n" ? "b" : txt ? "t" : BG.indexOf(v) >= 0 ? "g" : /[0-9.]/.test(v) ? "n" : /[A-Za-zÀ-ÖØ-öø-ÿŒœα-ωΑ-Ω]/.test(v) ? "v" : BIN.indexOf(v) >= 0 ? "o" : PUN.indexOf(v) >= 0 ? "p" : "x";
     return { t: "c", v: v, k: k };
   }
   function fill(s, str) { str.split("").forEach(function (v) { var n = leaf(v); n.q = s; s.n.push(n); }); }
@@ -87,16 +87,18 @@
 })(window);
 (function (E) {
   "use strict";
-  var SIM = /^[\w.,À-ÿα-ωΑ-Ω]+$/;
+  var SIM = /^[\w.,À-ÖØ-öø-ÿα-ωΑ-Ω]+$/;
   function one(s) {
-    var m = s.match(/^[\wÀ-ÿ.]*\(/), d = 0, i;
+    var m = s.match(/^[\wÀ-ÖØ-öø-ÿ.]*\(/), d = 0, i;
     if (!m) { return false; }
     for (i = m[0].length - 1; i < s.length; i++) {
       if (s.charAt(i) === "(") { d++; } else if (s.charAt(i) === ")" && --d === 0) { return i === s.length - 1; }
     }
     return false;
   }
-  function wr(s) { return SIM.test(s) || one(s) ? s : "(" + s + ")"; }
+  var ATM = /^(\d+([.,]\d+)?|[A-Za-zÀ-ÖØ-öø-ÿα-ωΑ-Ω])$/;
+  function wn(s) { return SIM.test(s) || one(s) ? s : "(" + s + ")"; }
+  function wr(s) { return ATM.test(s) || one(s) ? s : "(" + s + ")"; }
   function od(n) { return !!n && (n.t !== "c" || "nvfx".indexOf(n.k) >= 0); }
   function tx(s) {
     var a = s.n, o = "", i, n, r, u;
@@ -105,7 +107,7 @@
       if (n.t === "c") { o += n.v === "−" ? "-" : n.v; continue; }
       u = n.f.map(tx);
       switch (n.t) {
-        case "frac": r = wr(u[0]) + "/" + wr(u[1]); if (od(a[i - 1]) || od(a[i + 1])) { r = "(" + r + ")"; } break;
+        case "frac": r = wn(u[0]) + "/" + wr(u[1]); if (od(a[i - 1]) || od(a[i + 1])) { r = "(" + r + ")"; } break;
         case "sup": r = "^" + wr(u[0]); break;
         case "sub": r = "_" + wr(u[0]); break;
         case "ss": r = "_" + wr(u[0]) + "^" + wr(u[1]); break;
