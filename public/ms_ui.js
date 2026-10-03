@@ -1,7 +1,7 @@
 /* MathSolver - affichage 4/4 : actions (replier, copier, partager, barre du bas, historique) */
 (function (w) {
   "use strict";
-  var A = w.MSApp, D = document;
+  var A = w.MSApp, N = w.MSNav, D = document;
   function $(id) { return D.getElementById(id); }
   function svg(p) { return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + "</svg>"; }
   var IC = {
@@ -67,9 +67,9 @@
     } else if (t.id === "bshare") {
       call(function () { A.share(shareText()); });
     } else if (t.id === "bedit") {
-      call(function () { A.edit(); });
+      call(function () { N.edit(); });
     } else if (t.id === "bnew") {
-      call(function () { A.newEx(); });
+      call(function () { N.newEx(); });
     }
   });
 
@@ -83,7 +83,7 @@
   if (box && A && A.copy && A.share) {
     box.innerHTML = '<button class="act" id="bcopy">' + IC.copy + 'Copier</button><button class="act" id="bshare">' + IC.share + "Partager</button>";
   }
-  if (A && A.newEx) {
+  if (N && N.newEx) {
     bar = D.createElement("div");
     bar.className = "bar";
     bar.innerHTML = '<button class="b2" id="bedit">' + IC.pen + 'Modifier</button><button class="b1" id="bnew">' + IC.plus + "Nouvel exercice</button>";
@@ -91,6 +91,6 @@
     D.body.className += " hasbar";
   }
   if (A && A.saveRecent && w.MS_CTX && w.MS_CTX.q) { call(function () { A.saveRecent(w.MS_CTX.q); }); }
-  if (A && A.solved) { call(function () { A.solved(); }); }
+  if (N && N.solved) { call(function () { N.solved(); }); }
   w.MSUI = { plain: plain, shareText: shareText };
 })(window);
