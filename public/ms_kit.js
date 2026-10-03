@@ -5,7 +5,8 @@
   if (w.MSKIT || !A || !G || !app) { return; }
   var t = A.t, e = A.esc;
 
-  function plain(s) { return String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+  var ACC = new RegExp("[" + String.fromCharCode(768) + "-" + String.fromCharCode(879) + "]", "g");
+  function plain(s) { return String(s).normalize("NFD").replace(ACC, "").toLowerCase(); }
   // en-tête : retour (id="home" = retour système), progression (1 à 3), titre
   function head(back, dots, ttl) {
     var i, s = '<div class="ach"><button class="bkb" id="home" data-o="back" aria-label="' + e(t("bk")) + '"' + (back ? "" : ' style="visibility:hidden"') + "></button>";
