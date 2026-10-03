@@ -49,44 +49,45 @@
     return s;
   }
 
-  // Exercice : texte seul = carte qui défile avec la page ; avec photo = fixe en haut, poignée pour la redimensionner
+  // Exercice (texte et/ou photo) : fixe en haut, poignée pour agrandir ou réduire ; le texte défile à l'intérieur
   function exo(q, img) {
     q = String(q || "").trim();
     if (!q && !img) { return ""; }
-    var s = '<div class="pview' + (img ? "" : " txt") + '" id="pv">';
+    var s = '<div class="photo"><div class="pview' + (img ? "" : " txt") + '" id="pv">';
     if (q) { s += '<div class="exo"><div class="elab">Exercice</div><div class="etx">' + esc(q) + "</div></div>"; }
     if (img) { s += '<img src="data:image/jpeg;base64,' + img + '">'; }
-    s += "</div>";
-    s += img ? '<div class="grip" id="grip"><span class="pill"></span></div>' : '<button class="more" id="more">Voir tout</button>';
-    return '<div class="' + (img ? "photo" : "exf") + '">' + s + "</div>";
+    return s + '</div><div class="grip" id="grip"><span class="pill"></span>' + (img ? "" : '<span class="gtxt">Glisse pour agrandir ou r&eacute;duire</span>') + "</div></div>";
   }
 
   function grip() {
-    var pv = $("pv"), g = $("grip"), more = $("more");
-    if (!pv) { return; }
-    if (more) {
-      if (pv.scrollHeight <= 150) { more.style.display = "none"; return; }
-      pv.className += " clip";
-      more.onclick = function () {
-        var o = pv.className.indexOf(" clip") < 0;
-        pv.className = "pview txt" + (o ? " clip" : "");
-        more.className = o ? "more" : "more up";
-        more.firstChild.nodeValue = o ? "Voir tout" : "Réduire";
-      };
-      return;
+    var pv = $("pv"), g = $("grip");
+    if (!pv || !g) { return; }
+    var txt = pv.className.indexOf("txt") >= 0, sy = 0, sh = 0, mv = false;
+    function top() {
+      var m = Math.round(window.innerHeight * 0.8);
+      return txt ? Math.max(60, Math.min(m, pv.scrollHeight)) : m;
     }
-    if (!g) { return; }
-    var sy = 0, sh = 0, mv = false;
-    function setH(h) { pv.style.height = h + "px"; }
+    function setH(h) { pv.style.maxHeight = "none"; pv.style.height = h + "px"; }
+    function chk() {
+      if (txt && !pv.style.height) { g.style.display = pv.scrollHeight > pv.clientHeight + 6 ? "" : "none"; }
+    }
     g.addEventListener("touchstart", function (e) { mv = false; sy = e.touches[0].clientY; sh = pv.offsetHeight; }, { passive: true });
     g.addEventListener("touchmove", function (e) {
       mv = true;
       e.preventDefault();
-      setH(Math.max(60, Math.min(sh + (e.touches[0].clientY - sy), Math.round(window.innerHeight * 0.8))));
+      setH(Math.max(60, Math.min(sh + (e.touches[0].clientY - sy), top())));
     }, { passive: false });
     g.addEventListener("touchend", function () {
-      if (!mv) { pv.style.height = pv.offsetHeight > window.innerHeight * 0.5 ? "32vh" : "65vh"; }
+      if (mv) { return; }
+      if (!txt) { pv.style.height = pv.offsetHeight > window.innerHeight * 0.5 ? "32vh" : "65vh"; }
+      else if (pv.style.height) { pv.style.height = ""; pv.style.maxHeight = ""; chk(); }
+      else { setH(Math.min(Math.round(window.innerHeight * 0.65), pv.scrollHeight)); }
     });
+    if (txt) {
+      chk();
+      if (window.ResizeObserver && pv.firstChild) { new window.ResizeObserver(chk).observe(pv.firstChild); }
+      else { setTimeout(chk, 400); setTimeout(chk, 1500); }
+    }
   }
 
   // Les formules larges défilent, la ponctuation reste collée à la formule
