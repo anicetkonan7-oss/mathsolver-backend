@@ -1,4 +1,4 @@
-/* MathSolver - affichage 3/3 : assemble la page (nécessite ms_parse.js et ms_view.js) */
+/* MathSolver - affichage 3/4 : assemble la page (nécessite ms_parse.js et ms_view.js) */
 (function (w) {
   "use strict";
   var P = w.MSP, V = w.MSV, D = w.MS_DATA || {};
@@ -73,9 +73,9 @@
       w.MS_FUNCS = S.funcs;
       loadSeq(["https://cdn.jsdelivr.net/npm/mathjs@12.4.2/lib/browser/math.js", BASE + "plot_core.js?v=5", BASE + "plot_draw.js?v=5", BASE + "plot.js?v=5"], 0);
     }
-    if (S && S.titles.length) {
+    if (S) {
       w.MS_CTX = { q: String(D.q || ""), a: d.a };
-      loadSeq([BASE + "report.js?v=1"], 0);
+      loadSeq([BASE + "ms_ui.js?v=1"].concat(S.titles.length ? [BASE + "report.js?v=1"] : []), 0);
     }
     w.MS_OK = true;
     if (document.readyState === "complete") { renderMath(); } else { w.addEventListener("load", renderMath); }
