@@ -1,4 +1,4 @@
-/* MathSolver - éditeur de formules 2/4 : affichage 2D, curseur, clic, boutons Insérer et abc */
+/* MathSolver - éditeur de formules 2/4 : affichage 2D, lignes, curseur, clic, boutons Insérer et abc */
 (function (E) {
   "use strict";
   var RD = '<svg class="rd" viewBox="0 0 12 20" preserveAspectRatio="none"><path d="M.5 11.5l2.5-1.5 3 8.5L11.5 1"/></svg>';
@@ -26,22 +26,24 @@
     return e;
   }
   function rs(s, top) {
-    var e = sh("sq" + (top ? " top" : "") + (s.n.length ? "" : " e") + (s === E.bad ? " bad" : "")), a = s.n, c = E.cur, w = null, i, n, x, sp;
+    var e = sh("sq" + (top ? " top" : "") + (s.n.length ? "" : " e") + (s === E.bad ? " bad" : "")), a = s.n, c = E.cur, w = null, l = e, i, n, x, sp;
     s.el = e;
     e.__s = s;
+    if (top) { l = sh("ln"); e.appendChild(l); }
     for (i = 0; i <= a.length; i++) {
-      if (c.s === s && c.i === i) { (w || e).appendChild(sh("cr")); }
+      if (c.s === s && c.i === i) { (w || l).appendChild(sh("cr")); }
       if (i === a.length) { break; }
       n = a[i];
       x = rn(n);
       n.el = x;
       sp = n.t === "c" && (n.k === "s" || n.k === "b");
       if (top && !sp) {
-        if (!w || (n.t === "c" && n.k === "o")) { w = sh("wd"); e.appendChild(w); }
+        if (!w || (n.t === "c" && n.k === "o")) { w = sh("wd"); l.appendChild(w); }
         w.appendChild(x);
       } else {
         w = null;
-        e.appendChild(x);
+        l.appendChild(x);
+        if (top && n.k === "b") { l = sh("ln"); e.appendChild(l); }
       }
     }
     return e;
@@ -74,12 +76,18 @@
       a = s.n;
       for (i = 0; i < a.length; i++) {
         r = a[i].el.getBoundingClientRect();
-        if (ev.clientY < r.top || (ev.clientY <= r.bottom && ev.clientX < r.left + r.width / 2)) { break; }
+        if (ev.clientY < r.top || (ev.clientY <= r.bottom && (a[i].k === "b" || ev.clientX < r.left + r.width / 2))) { break; }
       }
       c.s = s;
       c.i = i;
     }
     E.render();
+  };
+  var put0 = E.put;
+  E.put = function (v, t) {
+    var c = E.cur, p;
+    if (v === "\n") { while (c.s.p) { p = c.s.p; c.s = p.q; c.i = p.q.n.indexOf(p) + 1; } }
+    put0(v, t);
   };
   var mt = 0;
   function $(s) { return document.getElementById(s); }
