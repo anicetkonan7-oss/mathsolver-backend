@@ -55,3 +55,24 @@ html.dk{color-scheme:dark;}
 .dk .rp-cancel{background:#1f2c4a;color:#c9d4ec;}
 .dk .rp-ok{background:#10261b;border-color:#1f5a38;color:#bbf7d0;}
 .dk .rp-err{color:#fca5a5;}
+.dk .ac,.dk .ac h1,.dk .ht,.dk .opt,.dk .lvg .opt b,.dk .row .v,.dk .pc b,.dk .ct b,.dk .si,.dk .in{color:#eef2fb;}
+.dk .ac .sub,.dk .gh,.dk .lb,.dk .opt small,.dk .row .k,.dk .pc i,.dk .ct i{color:#93a2c4;}
+.dk .opt,.dk .pc,.dk .row,.dk .chip{background:#172033;border-color:#26324a;}
+.dk .opt:active,.dk .chip:active{background:#1d2a47;}
+.dk .opt.on{background:#16264a;border-color:#2f6df0;}
+.dk .si,.dk .in{background:#172033;border-color:#33415f;}
+.dk .si:focus,.dk .in:focus{border-color:#4d8bff;}
+.dk .bkb{background-color:#1f2c4a;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a9c4ff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M15 5l-7 7 7 7'/></svg>");}
+.dk .dots i{background:#26324a;}
+.dk .dots i.on{background:#2f6df0;}
+.dk .sb2{background:#1f2c4a;color:#c9d4ec;}
+.dk .tl{color:#8fb4ff;}
+.dk .tl.red{color:#ff8787;}
+.dk .sg{background:#16213a;}
+.dk .sg button{color:#a9c4ff;}
+.dk .sg button.on{background:#2f6df0;color:#fff;}
+.dk .pill2{background:#10261b;color:#7fe0a8;}
+.dk .pill2.g{background:#1f2c4a;color:#a9b6d3;}
+.dk .er{color:#ff8787;}
+.dk .ok{color:#7fe0a8;}
+.dk .fn{color:#7f8db0;}
