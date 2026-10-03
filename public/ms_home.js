@@ -1,7 +1,7 @@
 /* MathSolver - accueil : récents, exemples, astuce ; page Historique */
 (function (w) {
   "use strict";
-  var A = w.MSApp, D = document, app = D.getElementById("app");
+  var A = w.MSApp, N = w.MSNav, D = document, app = D.getElementById("app");
   var mode = (w.MS_HOME && w.MS_HOME.mode === "history") ? "history" : "home", armed = 0;
   if (!app) { return; }
   var EX = [
@@ -58,9 +58,11 @@
     if (!t) { return; }
     c = t.className;
     if (c === "ex" || c === "rc") {
+      if (N && N.show) { try { N.show(); } catch (x) { } }
       if (A && A.fill) { try { A.fill(t.getAttribute("data-v")); } catch (x) { } }
     } else if (t.id === "all" || t.id === "home") {
       mode = t.id === "all" ? "history" : "home";
+      if (mode === "home" && N && N.show) { try { N.show(); } catch (x) { } }
       render();
     } else if (t.id === "clr") {
       if (!armed) {
