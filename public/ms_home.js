@@ -9,7 +9,6 @@
 
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
 
-  // Mode nuit : charge dark.css si l'appli le demande (pont MSPref)
   function theme() {
     var d = false, r = D.documentElement, l = D.getElementById("msdk");
     try { d = !!(w.MSPref && w.MSPref.dark()); } catch (e) { }
@@ -53,6 +52,7 @@
       }
       s += '<button class="lk bk" id="home">Retour &agrave; l\'accueil</button>';
     } else {
+      s = w.MSAC ? w.MSAC.chip() : "";
       if (r.length) {
         s += B.head("R&eacute;cents", r.length > 3 ? "all" : "", "Tout voir");
         for (i = 0; i < Math.min(3, r.length); i++) { s += B.rc("rc", esc(r[i]), r[i]); }
@@ -128,8 +128,7 @@
     if (i >= a.length) { cb(); return; }
     load(a[i], function () { seq(a, i + 1, cb); });
   }
-  // Les exemples (ms_ex.js) et les enregistrées (ms_lib.js) arrivent d'abord ; les formules des listes ensuite
-  var wait = 2;
+  var wait = 3;
   function start() {
     if (--wait) { return; }
     if (w.MS_EX && w.MS_EX.length > 4) { EX = w.MS_EX; }
@@ -138,8 +137,11 @@
     render();
     w.MS_OK = true;
     seq(["ed_model.js?v=2", "ed_parse.js?v=2", "ed_seg.js?v=2", "ms_fx.js?v=2"], 0, function () { ready = 1; w.MSLB.type(app); });
+    if (mode === "home" && w.MSAC && w.MSAC.need()) { w.MSAC.open("onb"); }
   }
+  w.MSHOME = { home: function () { mode = "home"; tab = "rec"; cf = ""; render(); } };
   theme();
   load("ms_ex.js?v=1", start);
   load("ms_lib.js?v=1", start);
+  load("ms_acct.js?v=1", start);
 })(window);
