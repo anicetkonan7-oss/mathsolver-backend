@@ -1,15 +1,14 @@
 /* MathSolver - affichage 4/4 : actions (replier, copier, partager, barre du bas, historique) */
 (function (w) {
   "use strict";
-  var A = w.MSApp, N = w.MSNav, L = w.MSLib && w.MSLib.save ? w.MSLib : null, D = document, sid = "";
+  var A = w.MSApp, N = w.MSNav, D = document;
   function $(id) { return D.getElementById(id); }
   function svg(p) { return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + "</svg>"; }
   var IC = {
     copy: svg('<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>'),
     share: svg('<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4"/><path d="M15.4 6.5l-6.8 4"/>'),
     pen: svg('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>'),
-    plus: svg('<path d="M12 5v14"/><path d="M5 12h14"/>'),
-    bm: svg('<path d="M6 3h12v18l-6-4-6 4z"/>')
+    plus: svg('<path d="M12 5v14"/><path d="M5 12h14"/>')
   };
   var SUP = "⁰¹²³⁴⁵⁶⁷⁸⁹", SUB = "₀₁₂₃₄₅₆₇₈₉";
   var SYM = {
@@ -46,20 +45,6 @@
 
   function call(f) { try { f(); } catch (e) { } }
 
-  // Enregistrer la correction : le bouton se coche, un second appui la retire
-  function mark() {
-    var b = $("bsave");
-    if (!b) { return; }
-    b.className = sid ? "act wide on" : "act wide";
-    b.lastChild.nodeValue = sid ? "Correction enregistrée" : "Enregistrer la correction";
-  }
-  function keep() {
-    var c = w.MS_CTX || {};
-    if (sid) { L.remove(sid); sid = ""; L.toast("Retirée des enregistrées"); }
-    else { sid = String(L.save(JSON.stringify({ q: String(c.q || ""), a: String(c.a || "") }))); if (sid) { L.toast("Correction enregistrée ✓"); } }
-    mark();
-  }
-
   D.addEventListener("click", function (e) {
     var t = e.target.closest ? e.target.closest("button") : null, cs, i, open, h, ans;
     if (!t) { return; }
@@ -81,8 +66,6 @@
       call(function () { A.copy(shareText()); });
     } else if (t.id === "bshare") {
       call(function () { A.share(shareText()); });
-    } else if (t.id === "bsave") {
-      call(keep);
     } else if (t.id === "bedit") {
       call(function () { N.edit(); });
     } else if (t.id === "bnew") {
@@ -99,12 +82,10 @@
   }
   if (box && A && A.copy && A.share) {
     box.innerHTML = '<button class="act" id="bcopy">' + IC.copy + 'Copier</button><button class="act" id="bshare">' + IC.share + "Partager</button>";
-    if (L && w.MS_CTX && w.MS_CTX.a) {
-      box.innerHTML += '<button class="act wide" id="bsave">' + IC.bm + "Enregistrer la correction</button>";
-      call(function () { sid = String(L.find(String(w.MS_CTX.q || "")) || ""); mark(); });
-      st = D.createElement("style");
-      st.textContent = ".acts{flex-wrap:wrap}.act.wide{flex:1 1 100%}.act.on{background:#e6f6ec;border-color:#34a06a}.solo .act.on{background:#e6eeff;border-color:#1a62e8}.act.on svg{fill:currentColor}.dk .act.on{background:#17301f}.dk .solo .act.on{background:#1f2c4a}";
-      D.head.appendChild(st);
+    if (w.MSLib && w.MSLib.save && w.MS_CTX && w.MS_CTX.a) {
+      st = D.createElement("script");
+      st.src = "https://mathsolver-backend-gray.vercel.app/ms_save.js?v=1";
+      D.body.appendChild(st);
     }
   }
   if (N && N.newEx) {
