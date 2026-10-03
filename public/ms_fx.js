@@ -47,13 +47,22 @@
   function fm(x) {
     try { return w.katex ? w.katex.renderToString(S(E.parse(x)), { throwOnError: false }) : esc(x); } catch (e) { return esc(x); }
   }
-  w.MSFX = { tex: function (x) { return S(E.parse(x)); } };
-  var el = D.querySelector(".etx"), t = String((w.MS_DATA || {}).q || "").trim(), sg, h = "", p = 0, mo;
+  function html(x) {
+    var sg, h = "", p = 0;
+    x = String(x || "");
+    html.n = 0;
+    if (!E || !E.segs || !x) { return esc(x); }
+    sg = E.segs(x, 0, x.length, false, []);
+    html.n = sg.length;
+    sg.forEach(function (g) { h += esc(x.slice(p, g[0])) + fm(x.slice(g[0], g[1])); p = g[1]; });
+    return h + esc(x.slice(p));
+  }
+  w.MSFX = { tex: function (x) { return S(E.parse(x)); }, html: html };
+  var el = D.querySelector(".etx"), t = String((w.MS_DATA || {}).q || "").trim(), h, mo;
   if (!el || !t || !E || !E.segs) { return; }
-  sg = E.segs(t, 0, t.length, false, []);
-  if (!sg.length) { return; }
-  sg.forEach(function (g) { h += esc(t.slice(p, g[0])) + fm(t.slice(g[0], g[1])); p = g[1]; });
-  el.innerHTML = h + esc(t.slice(p));
+  h = html(t);
+  if (!html.n) { return; }
+  el.innerHTML = h;
   mo = D.getElementById("more");
   if (mo && w.MSV) { mo.style.display = ""; w.MSV.grip(); }
 })(window);
