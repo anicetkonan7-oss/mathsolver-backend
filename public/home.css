@@ -43,3 +43,9 @@
 .dk .dl:active{background-color:#3a1f22;}
 .dk .cf{color:#eef2fb;}
 .dk .cn{background:#1f2c4a;color:#c9d4ec;}
+.chip{display:flex;align-items:center;gap:12px;box-sizing:border-box;width:calc(100% - 24px);margin:12px 12px 0;padding:10px 12px 10px 10px;text-align:left;background:#fff;border:1px solid #e1e7f2;border-radius:18px;}
+.chip:active{background:#eef3ff;}
+.av{flex:none;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;color:#fff;font-size:20px;font-weight:800;}
+.ct{flex:1;min-width:0;}
+.ct b{display:block;font-size:16px;color:#0f1b33;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ct i{display:block;margin-top:1px;font-style:normal;font-size:13px;color:#5b6784;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
