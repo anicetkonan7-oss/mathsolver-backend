@@ -134,10 +134,10 @@
     if (w.MS_EX && w.MS_EX.length > 4) { EX = w.MS_EX; }
     if (w.MS_TIPS && w.MS_TIPS.length) { TIPS = w.MS_TIPS; }
     if (!w.MSLB) { app.innerHTML = '<p style="margin:28px 16px;font:15px sans-serif;color:#4b5563;text-align:center">&Eacute;cris ton exercice ci-dessus, puis appuie sur &laquo;&nbsp;R&eacute;soudre&nbsp;&raquo;.</p>'; return; }
-    render();
-    w.MS_OK = true;
     seq(["ed_model.js?v=2", "ed_parse.js?v=2", "ed_seg.js?v=2", "ms_fx.js?v=2"], 0, function () { ready = 1; w.MSLB.type(app); });
-    if (mode === "home" && w.MSAC && w.MSAC.need()) { w.MSAC.open("onb"); }
+    w.MS_OK = true;
+    if (mode === "home" && w.MSAC && w.MSAC.need()) { w.MSAC.open("onb"); return; }
+    render();
   }
   w.MSHOME = { home: function () { mode = "home"; tab = "rec"; cf = ""; render(); } };
   theme();
