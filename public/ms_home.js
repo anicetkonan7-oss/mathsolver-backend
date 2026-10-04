@@ -141,7 +141,7 @@
     if (mode === "menu") { mode = "home"; if (w.MSHOME.menu) { w.MSHOME.menu(); return; } }
     render();
   }
-  w.MSHOME = { home: function (m, b) { mode = m === "history" ? "history" : "home"; tab = b === "sav" ? "sav" : "rec"; cf = ""; render(); } };
+  w.MSHOME = { home: function (m, b) { mode = m === "history" ? "history" : "home"; tab = b === "sav" ? "sav" : "rec"; cf = ""; render(); w.scrollTo(0, 0); } };
   theme();
   load("ms_ex.js?v=1", start);
   load("ms_lib.js?v=1", start);
