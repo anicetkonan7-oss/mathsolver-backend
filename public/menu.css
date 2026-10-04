@@ -1,0 +1,34 @@
+/* MathSolver - menu : groupes de lignes, pages Comment ça marche, FAQ, À propos */
+.mm .chip{width:100%;margin:6px 0 0;}
+.mg{margin:0 0 4px;background:#fff;border:1px solid #e1e7f2;border-radius:16px;overflow:hidden;}
+.mr{display:flex;align-items:center;gap:14px;box-sizing:border-box;width:100%;min-height:58px;padding:8px 14px;text-align:left;background:transparent;border:0;border-top:1px solid #edf1f8;font-size:16px;font-weight:600;color:#0f1b33;}
+.mr:first-child{border-top:0;}
+.mr:active{background:#eef3ff;}
+.mi{flex:none;display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:12px;background:#e8eeff;color:#1741a6;}
+.mi svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.mt{flex:1;min-width:0;}
+.mt small{display:block;margin-top:1px;font-size:12px;font-weight:500;color:#6b7791;}
+.mv{margin:18px 0 0;font-size:12px;line-height:1.6;color:#6b7791;text-align:center;}
+.hw{display:flex;gap:14px;margin:0 0 10px;padding:14px;background:#fff;border:1px solid #e1e7f2;border-radius:16px;}
+.hn{flex:none;display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#1a62e8;color:#fff;font-size:16px;font-weight:800;}
+.hw b{display:block;margin-bottom:2px;font-size:16px;color:#0f1b33;}
+.hw p{margin:0;font-size:14px;line-height:1.5;color:#5b6784;}
+.fq{margin:0 0 10px;background:#fff;border:1px solid #e1e7f2;border-radius:16px;overflow:hidden;}
+.fq button{display:flex;align-items:center;gap:10px;box-sizing:border-box;width:100%;min-height:54px;padding:10px 14px;text-align:left;font-size:15px;font-weight:700;line-height:1.35;color:#0f1b33;background:transparent;border:0;}
+.fq button:after{content:"";flex:none;width:10px;height:10px;margin-left:auto;border-right:2.5px solid #6b7791;border-bottom:2.5px solid #6b7791;transform:rotate(45deg);transition:transform .2s;}
+.fq.on button:after{transform:rotate(-135deg);}
+.fq div{display:none;padding:0 14px 14px;font-size:14px;line-height:1.55;color:#4b5873;}
+.fq.on div{display:block;}
+.mab{margin:6px 0 0;padding:6px 8px;text-align:center;}
+.mab .hero{margin:10px auto 14px;}
+.mab p{margin:0 0 10px;font-size:15px;line-height:1.55;color:#4b5873;}
+.mab b{font-size:22px;color:#0f1b33;}
+.dk .mg,.dk .hw,.dk .fq{background:#172033;border-color:#26324a;}
+.dk .mr{color:#eef2fb;border-top-color:#212c43;}
+.dk .mr:active{background:#1d2a47;}
+.dk .mi{background:#1f2c4a;color:#8fb4ff;}
+.dk .mt small,.dk .mv{color:#93a2c4;}
+.dk .hw b,.dk .mab b{color:#eef2fb;}
+.dk .hw p,.dk .mab p,.dk .fq div{color:#b4c0da;}
+.dk .fq button{color:#eef2fb;}
+.dk .fq button:after{border-color:#93a2c4;}
