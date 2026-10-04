@@ -105,8 +105,8 @@
     pre: pre,
     show: function (v) {
       try { w.MSNav.solved(); } catch (x) { }
-      var n = 3, fin = function () {
-        if (--n) { return; }
+      var n = 3, q = w.MS_NAV, fin = function () {
+        if (--n || q !== w.MS_NAV) { return; }
         K = w.MSKIT; T = (w.MSMT && w.MSMT[lg()]) || null;
         if (K && T) { show(v); } else { A.toast(A.t("net")); A.close(); }
       };
