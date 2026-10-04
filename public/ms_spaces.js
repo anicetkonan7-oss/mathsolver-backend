@@ -1,7 +1,7 @@
 /* MathSolver - les espaces de l'accueil (Cours, Formules, Exercices, Évaluation, Examens, Progression) et les exemples du niveau */
 (function (w) {
   "use strict";
-  var D = document, sel = "", LIVE = {}, K = ["cours", "formules", "exercices", "eval", "examens", "progres"];
+  var D = document, sel = "", LIVE = {}, SRC = { formules: "ms_form.js?v=1" }, busy = {}, K = ["cours", "formules", "exercices", "eval", "examens", "progres"];
   var CO = ["#1a62e8", "#7048e8", "#e8590c", "#2b8a3e", "#c2255c", "#0b7285"];
   var IC = [
     '<path d="M12 6c-2-1.3-4.5-2-8-2v13c3.5 0 6 .7 8 2 2-1.3 4.5-2 8-2V4c-3.5 0-6 .7-8 2zM12 6v13"/>',
@@ -13,12 +13,12 @@
   ];
   var TX = {
     fr: {
-      h: "Tes espaces", s: "Bientôt", p: "Bientôt disponible",
+      h: "Tes espaces", s: "Bientôt", w: "Nouveau", p: "Bientôt disponible",
       n: ["Cours", "Formules", "Exercices", "Évaluation", "Examens", "Progression"],
       d: ["Les leçons de ton niveau{l}, expliquées simplement, avec des exemples.", "Toutes les formules de ton niveau{l}, classées par chapitre, à retrouver en un instant.", "Des exercices de ton niveau{l}, du plus facile au plus difficile, avec correction détaillée.", "Un test noté avec un temps limité, puis une correction comme sur une copie.", "Des sujets d'examens blancs pour t'entraîner dans les conditions réelles.", "Suis tes points, tes séries de jours et tes badges."]
     },
     en: {
-      h: "Your spaces", s: "Soon", p: "Coming soon",
+      h: "Your spaces", s: "Soon", w: "New", p: "Coming soon",
       n: ["Lessons", "Formulas", "Exercises", "Assessment", "Mock exams", "Progress"],
       d: ["Lessons for your level{l}, explained simply, with examples.", "All the formulas for your level{l}, by chapter, in one tap.", "Exercises for your level{l}, from easy to hard, with detailed solutions.", "A timed, graded test, then a correction like on a real paper.", "Mock exam papers to practise in real conditions.", "Follow your points, your day streaks and your badges."]
     }
@@ -28,12 +28,12 @@
     ".sp button:active{background:#eef3ff;}.sp button.on{border-color:#1a62e8;box-shadow:0 0 0 2px #cfe0ff;}" +
     ".sp i{display:flex;align-items:center;justify-content:center;width:46px;height:46px;margin-bottom:2px;border-radius:15px;}" +
     ".sp svg{width:25px;height:25px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}" +
-    ".sp small{font-size:11px;font-weight:600;color:#6b7791;}" +
+    ".sp small{font-size:11px;font-weight:600;color:#6b7791;}.sp small.nw{color:#2b8a3e;}" +
     ".spi{margin:10px 12px 0;padding:14px 16px;border-radius:16px;background:#e8f0ff;color:#1741a6;font-size:14px;line-height:1.5;}" +
     ".spi b{display:block;margin-bottom:2px;font-size:16px;color:#0f1b33;}" +
     ".spi em{display:inline-block;margin-top:8px;padding:3px 10px;border-radius:99px;background:#fff;font-style:normal;font-size:12px;font-weight:700;color:#1a4db5;}" +
     ".dk .sp button{background:#172033;border-color:#26324a;color:#eef2fb;}.dk .sp button:active{background:#1d2a47;}" +
-    ".dk .sp button.on{border-color:#4d8bff;box-shadow:0 0 0 2px #1f3b78;}.dk .sp small{color:#93a2c4;}" +
+    ".dk .sp button.on{border-color:#4d8bff;box-shadow:0 0 0 2px #1f3b78;}.dk .sp small{color:#93a2c4;}.dk .sp small.nw{color:#7fe0a8;}" +
     ".dk .spi{background:#16264a;color:#b9cffd;}.dk .spi b{color:#eef2fb;}.dk .spi em{background:#0e1424;color:#8fb4ff;}";
 
   function lg() { return w.MSAC && w.MSAC.lang() === "en" ? "en" : "fr"; }
@@ -43,7 +43,7 @@
     var T = TX[lg()], P = pf(), s = "", i, k;
     s += '<div class="sp">';
     for (i = 0; i < K.length; i++) {
-      s += '<button data-sp="' + K[i] + '"' + (sel === K[i] ? ' class="on"' : "") + '><i style="background:' + CO[i] + '"><svg viewBox="0 0 24 24">' + IC[i] + "</svg></i>" + T.n[i] + (LIVE[K[i]] ? "" : "<small>" + T.s + "</small>") + "</button>";
+      s += '<button data-sp="' + K[i] + '"' + (sel === K[i] ? ' class="on"' : "") + '><i style="background:' + CO[i] + '"><svg viewBox="0 0 24 24">' + IC[i] + "</svg></i>" + T.n[i] + (LIVE[K[i]] || SRC[K[i]] ? '<small class="nw">' + T.w + "</small>" : "<small>" + T.s + "</small>") + "</button>";
     }
     s += "</div>";
     k = K.indexOf(sel);
@@ -71,11 +71,24 @@
     return o;
   }
 
+  // espace actif : son script est téléchargé au premier appui, puis il s'ouvre
+  function go(k) {
+    var c;
+    if (busy[k]) { return; }
+    busy[k] = 1;
+    c = D.createElement("script");
+    c.src = "https://mathsolver-backend-gray.vercel.app/" + SRC[k];
+    c.onload = function () { busy[k] = 0; if (LIVE[k]) { LIVE[k](); } };
+    c.onerror = function () { busy[k] = 0; try { w.MSAC.toast(w.MSAC.t("net")); } catch (x) { } };
+    D.head.appendChild(c);
+  }
+
   D.addEventListener("click", function (e) {
     var b = e.target.closest ? e.target.closest("[data-sp]") : null, k, g;
     if (!b) { return; }
     k = b.getAttribute("data-sp");
     if (LIVE[k]) { try { LIVE[k](); } catch (x) { } return; }
+    if (SRC[k]) { go(k); return; }
     sel = sel === k ? "" : k;
     g = D.getElementById("spg");
     if (g) { g.innerHTML = inner(); }
