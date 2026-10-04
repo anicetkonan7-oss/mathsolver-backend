@@ -92,16 +92,23 @@
   };
   window.MSF = {
     run: function (json) {
-      var q = JSON.parse(json), sg = E.segs(q.t, q.a, q.b, q.m, q.x), out = [], k = 0, f = window.MSFmt;
+      var f = window.MSFmt, out = [], sg = [], k = 0, q;
+      try { q = JSON.parse(json); sg = E.segs(q.t, q.a, q.b, q.m, q.x); } catch (e) { sg = []; }
+      // une formule qui échoue est sautée, les autres sont quand même dessinées
       function next() {
-        var g, x;
+        var g, x, done = false, tm;
         if (k >= sg.length) { f.res(JSON.stringify(out)); return; }
         g = sg[k++];
         x = q.t.slice(g[0], g[1]);
-        E.snap(E.parse(x), { fs: q.fs, r: q.r, mw: q.mw }, function (v) {
+        function fin(v) {
+          if (done) { return; }
+          done = true;
+          clearTimeout(tm);
           if (v) { out.push({ o: g[0], e: g[1], x: x, b: v.b, a: v.a }); }
           next();
-        });
+        }
+        tm = setTimeout(function () { fin(null); }, 4000);
+        try { E.snap(E.parse(x), { fs: q.fs, r: q.r, mw: q.mw }, fin); } catch (e) { fin(null); }
       }
       next();
     }
