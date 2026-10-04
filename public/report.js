@@ -13,10 +13,10 @@
     ".rp-card{margin:12px 12px 28px;background:#fff;border:1px solid #e2e7f1;border-radius:16px;padding:14px 16px;box-shadow:0 1px 2px rgba(16,24,40,.05),0 3px 10px rgba(16,24,40,.04);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#1f2937}" +
     ".rp-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}" +
     ".rp-q{font-size:14px;line-height:1.4;color:#5b6784;flex:1;min-width:150px}" +
-    ".rp-btn{font:inherit;font-size:14px;font-weight:bold;border-radius:999px;padding:9px 14px;border:1.5px solid #dc2626;background:#fff;color:#b91c1c}" +
+    ".rp-btn{font:inherit;font-size:14px;font-weight:bold;border-radius:999px;min-height:44px;padding:9px 14px;border:1.5px solid #dc2626;background:#fff;color:#b91c1c}" +
     ".rp-lab{font-size:14px;font-weight:bold;color:#111827;margin:0 0 10px}" +
     ".rp-chips{display:flex;flex-wrap:wrap;gap:8px}" +
-    ".rp-chip{font:inherit;font-size:14px;border:1px solid #cbd5e1;background:#f4f6fb;color:#334155;border-radius:999px;padding:8px 12px}" +
+    ".rp-chip{font:inherit;font-size:14px;min-height:44px;border:1px solid #cbd5e1;background:#f4f6fb;color:#334155;border-radius:999px;padding:8px 12px}" +
     ".rp-chip[aria-pressed=true]{background:#fee2e2;border-color:#dc2626;color:#991b1b;font-weight:bold}" +
     ".rp-ta{display:block;width:100%;box-sizing:border-box;min-height:84px;margin-top:12px;border:1px solid #cbd5e1;border-radius:10px;padding:10px;font:inherit;font-size:16px;color:#1f2937;background:#fff;resize:vertical}" +
     ".rp-act{display:flex;gap:8px;margin-top:12px}" +
