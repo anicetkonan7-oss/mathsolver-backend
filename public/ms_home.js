@@ -139,7 +139,7 @@
     if (!w.MSLB) { app.innerHTML = '<p class="empty">&Eacute;cris ton exercice ci-dessus, puis appuie sur &laquo;&nbsp;R&eacute;soudre&nbsp;&raquo;.</p>'; done(); return; }
     seq(["ed_model.js?v=2", "ed_parse.js?v=2", "ed_seg.js?v=2", "ms_fx.js?v=2"], 0, function () { ready = 1; w.MSLB.type(app); });
     w.MS_OK = true;
-    if (mode === "home" && w.MSAC && w.MSAC.need()) { w.MSAC.open("onb"); return; }
+    if (w.MSAC && w.MSAC.need()) { w.MSAC.open("onb"); return; }
     render();
   }
   w.MSHOME = { home: function () { mode = "home"; tab = "rec"; cf = ""; render(); } };
