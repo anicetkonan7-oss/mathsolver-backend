@@ -6,12 +6,19 @@
   var BASE = "https://mathsolver-backend-gray.vercel.app/";
   var RETRY = "Appuie de nouveau sur « Résoudre ».";
 
-  // Que contient la réponse ? { a: texte de la solution } ou { e: [titre, message, conseil, code] }
+  // pas de réseau : l'énoncé écrit (pas une photo) attend sur l'accueil
+  function keep() {
+    var q = String(D.q || "").trim();
+    if (!q || D.img) { return 0; }
+    try { w.MSStore.set("pend", q); return 1; } catch (e) { return 0; }
+  }
+
+  // { a: solution } ou { e: [titre, message, conseil, code] }
   function decide() {
     var raw = String(D.r || "").trim(), code = D.code || 0, j;
     if (D.net) {
       var slow = D.net === "timeout";
-      return { e: [slow ? "Connexion trop lente" : "Connexion impossible", slow ? "Le réseau met trop de temps à répondre." : "L'appli n'arrive pas à joindre le service de résolution.", "Vérifie ta connexion Internet, puis appuie de nouveau sur « Résoudre ».", D.nd || ""] };
+      return { e: [slow ? "Connexion trop lente" : "Connexion impossible", slow ? "Le réseau met trop de temps à répondre." : "L'appli n'arrive pas à joindre le service de résolution.", keep() ? "Ton exercice est gardé : retrouve-le sur l'accueil et appuie sur « Résoudre » dès que tu es connecté." : "Vérifie ta connexion Internet, puis appuie de nouveau sur « Résoudre ».", D.nd || ""] };
     }
     if (raw.charAt(0) !== "{") {
       var big = code === 413;
@@ -46,7 +53,7 @@
     });
   }
 
-  // Mode nuit : charge dark.css si l'appli le demande (pont MSPref)
+  // Mode nuit (pont MSPref)
   function theme() {
     var d = false, r = document.documentElement, l = document.getElementById("msdk"), app = document.getElementById("app");
     try { d = !!(w.MSPref && w.MSPref.dark()); } catch (e) { }
@@ -112,6 +119,7 @@
     }
     if (S) {
       w.MS_CTX = { q: String(D.q || ""), a: d.a };
+      try { if (w.MSStore.get("pend") === String(D.q || "").trim()) { w.MSStore.del("pend"); } } catch (e) { }
       loadSeq([BASE + "ms_ui.js?v=1"].concat(w.MSVoice ? [BASE + "ms_fr.js?v=1", BASE + "ms_say.js?v=1"] : [], S.titles.length ? [BASE + "report.js?v=1"] : []), 0);
     }
     w.MS_OK = true;
