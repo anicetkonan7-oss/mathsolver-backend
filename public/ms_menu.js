@@ -4,7 +4,7 @@
   var D = document, app = D.getElementById("app"), A = w.MSAC, BASE = "https://mathsolver-backend-gray.vercel.app/";
   // à compléter à la publication : e-mail, pages légales (https), rate = 1 pour « Noter »
   var CFG = { mail: "", privacy: "", terms: "", rate: 0 };
-  var K = null, T = null, got = {}, cur = "menu";
+  var K, T, got = {}, cur = "menu";
   if (w.MSMENU || !A || !app) { return; }
   var e = A.esc;
   var P = function (d) { return '<path d="' + d + '"/>'; };
@@ -27,14 +27,15 @@
   };
   function lg() { return A.lang() === "en" ? "en" : "fr"; }
   function t(k, v) { var s = T && T[k] !== undefined ? T[k] : k; return v ? s.replace("{v}", v) : s; }
-  function css(id, f) {
-    var l;
-    if (D.getElementById(id)) { return; }
+  // cb quand la feuille est chargée
+  function css(id, f, cb) {
+    var l = D.getElementById(id);
+    if (l) { cb(); return; }
     l = D.createElement("link");
     l.id = id; l.rel = "stylesheet"; l.href = BASE + f;
+    l.onload = l.onerror = cb;
     D.head.appendChild(l);
   }
-  // scripts téléchargés en parallèle, exécutés dans l'ordre
   function ld(a, cb) {
     var todo = a.filter(function (u) { return !got[u]; }), n = todo.length;
     if (!n) { cb(); return; }
@@ -106,12 +107,14 @@
   });
   w.MSMENU = {
     show: function (v) {
-      css("accss", "acct.css?v=1");
-      css("mncss", "menu.css?v=1");
-      ld(["ms_geo.js?v=1", "i18n_" + lg() + ".js?v=1", "ms_kit.js?v=1", "menu_" + lg() + ".js?v=1"], function () {
+      var n = 3, fin = function () {
+        if (--n) { return; }
         K = w.MSKIT; T = (w.MSMT && w.MSMT[lg()]) || null;
         if (K && T) { show(v); } else { A.toast(A.t("net")); A.close(); }
-      });
+      };
+      css("accss", "acct.css?v=1", fin);
+      css("mncss", "menu.css?v=1", fin);
+      ld(["ms_geo.js?v=1", "i18n_" + lg() + ".js?v=1", "ms_kit.js?v=1", "menu_" + lg() + ".js?v=1"], fin);
     }
   };
 })(window);
