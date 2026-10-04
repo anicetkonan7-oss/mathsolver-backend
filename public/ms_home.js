@@ -3,7 +3,7 @@
   "use strict";
   var A = w.MSApp, N = w.MSNav, L = w.MSLib, D = document, app = D.getElementById("app");
   var BASE = "https://mathsolver-backend-gray.vercel.app/";
-  var mode = (w.MS_HOME && w.MS_HOME.mode === "history") ? "history" : "home", armed = 0, tab = "rec", cf = "", ready = 0;
+  var mode = (w.MS_HOME && /^(history|menu)$/.test(w.MS_HOME.mode)) ? w.MS_HOME.mode : "home", armed = 0, tab = "rec", cf = "", ready = 0;
   if (!app) { return; }
   var EX = [[["Résoudre $2x+6=0$", "Résoudre 2x + 6 = 0"]]], TIPS = ["Pour une photo, cadre bien l'énoncé, sans ombre ni reflet."];
 
@@ -136,13 +136,14 @@
     if (--wait) { return; }
     if (w.MS_EX && w.MS_EX.length > 4) { EX = w.MS_EX; }
     if (w.MS_TIPS && w.MS_TIPS.length) { TIPS = w.MS_TIPS; }
-    if (!w.MSLB) { app.innerHTML = '<p class="empty">&Eacute;cris ton exercice ci-dessus, puis appuie sur &laquo;&nbsp;R&eacute;soudre&nbsp;&raquo;.</p>'; done(); return; }
+    if (!w.MSLB) { app.innerHTML = '<p class="empty">&Eacute;cris ton exercice ci-dessus, puis appuie sur &laquo;&nbsp;R&eacute;soudre&nbsp;&raquo;.</p>'; sh(); done(); return; }
     seq(["ed_model.js?v=2", "ed_parse.js?v=2", "ed_seg.js?v=2", "ms_fx.js?v=2"], 0, function () { ready = 1; w.MSLB.type(app); });
     w.MS_OK = true;
     if (w.MSAC && w.MSAC.need()) { w.MSAC.open("onb"); return; }
+    if (mode === "menu") { mode = "home"; load("ms_menu.js?v=1", function () { if (w.MSMENU) { w.MSMENU.show("menu"); } else { sh(); render(); } }); return; }
     render();
   }
-  w.MSHOME = { home: function () { mode = "home"; tab = "rec"; cf = ""; render(); } };
+  w.MSHOME = { home: function (m, b) { mode = m === "history" ? "history" : "home"; tab = b === "sav" ? "sav" : "rec"; cf = ""; render(); } };
   theme();
   load("ms_ex.js?v=1", start);
   load("ms_lib.js?v=1", start);
