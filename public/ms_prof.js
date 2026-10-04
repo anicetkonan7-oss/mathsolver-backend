@@ -1,7 +1,7 @@
 /* MathSolver - profil et compte : profil, création de compte, connexion, mot de passe oublié, suppression */
 (function (w) {
   "use strict";
-  var A = w.MSAC, K = w.MSKIT, G = w.MSGEO, D = document, cur = "", wait = 0;
+  var A = w.MSAC, K = w.MSKIT, G = w.MSGEO, D = document, cur = "", org = "", wait = 0;
   if (w.MSPROF || !A || !K) { return; }
   var t = A.t, e = A.esc;
   var F = { up: ["a_ut", "a_us", "a_du"], "in": ["a_it", "a_is", "a_di"], fg: ["a_ft", "a_fs", "a_fd"], del: ["x_t", "x_s", "x_do"] };
@@ -33,8 +33,12 @@
     if (k === "up") { s += '<button class="tl" data-o="in">' + e(t("a_hv")) + '</button><p class="fn">' + e(t("a_pv")) + "</p>"; }
     return s;
   }
-  function show(v) {
+  // from : écran d'où l'on vient quand c'est l'accueil de départ (welcome, done) ; org : où ramène la flèche des formulaires
+  function show(v, from) {
     if (v === "del" && !A.sess()) { v = "prof"; }
+    if (from) { org = from; }
+    else if (!D.querySelector("#app .ac")) { org = ""; }
+    else if (cur === "prof") { org = "prof"; }
     cur = v;
     wait = 0;
     K.show(v === "prof" ? prof() : form(v), on);
@@ -65,14 +69,16 @@
       else if (v === "fg") { msg("", t("a_fo")); }
       else if (v === "in") {
         A.setLang(A.lang(), function () { A.toast(t("m_in")); if (A.P().ok) { A.close(); } else { w.MSONB.show("country", 0); } });
-      } else { A.toast(t(v === "up" ? "m_up" : "m_dl")); A.close(); }
+      } else if (v === "up" && !A.P().ok) { A.toast(t("m_up")); w.MSONB.show("country", 0); }
+      else { A.toast(t(v === "up" ? "m_up" : "m_dl")); A.close(); }
     });
   }
   function back() {
     if (cur === "prof") { A.close(); }
     else if (cur === "fg") { show("in"); }
-    else if (cur === "del" || A.P().ok) { show("prof"); }
-    else { w.MSONB.show("welcome"); }
+    else if (org === "welcome" || org === "done") { w.MSONB.show(org, 0, 1); }
+    else if (org === "prof") { show("prof"); }
+    else { A.close(); }
   }
   function on(o, v) {
     if (o === "back") { back(); }
