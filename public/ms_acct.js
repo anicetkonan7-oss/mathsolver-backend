@@ -123,7 +123,7 @@
     if (w.MSHOME) { w.MSHOME.home(); }
   }
   function open(v) {
-    var l;
+    var l, q = w.MS_NAV;
     if (busy) { return; }
     busy = 1;
     if (v === "onb") { try { S.set("onb", "1"); } catch (e) { } }
@@ -137,6 +137,7 @@
     need(["ms_geo.js?v=1", "ms_fun.js?v=1", "i18n_" + lang() + ".js?v=1", "ms_kit.js?v=1", "ms_onb.js?v=1", "ms_prof.js?v=1"], function () {
       var M = /^(prof|up|in|fg|del)$/.test(v) ? w.MSPROF : w.MSONB;
       busy = 0;
+      if (v !== "onb" && q !== w.MS_NAV) { return; }
       if (M && M.show) { M.show(v); } else { toast(t("net")); close(); }
     });
   }
