@@ -50,7 +50,7 @@
       }
       s += '<button class="lk bk" id="home">Retour &agrave; l\'accueil</button>';
     } else {
-      s = (w.MSNET ? w.MSNET.card(B) : "") + (w.MSAC ? w.MSAC.chip() : "") + (w.MSSP ? w.MSSP.grid() : "");
+      s = (w.MSNET ? w.MSNET.card(B) : "") + (w.MSSP ? w.MSSP.grid() : "");
       if (r.length) {
         s += B.head("R&eacute;cents", r.length > 3 ? "all" : "", "Tout voir");
         for (i = 0; i < Math.min(3, r.length); i++) { s += B.rc("rc", esc(r[i]), r[i]); }
@@ -61,7 +61,9 @@
       }
       s += B.head("Essaie un exemple", "again", "Autres exemples");
       ex = (w.MSSP && w.MSSP.ex(4)) || pick();
+      s += '<div class="exs">';
       for (i = 0; i < ex.length; i++) { s += B.rc("ex", esc(ex[i][0]), ex[i][1]); }
+      s += "</div>";
       n = Math.floor(Math.random() * TIPS.length);
       s += '<div class="tip"><b>Astuce</b>' + esc(TIPS[n]) + "</div>";
     }
