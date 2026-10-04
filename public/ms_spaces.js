@@ -26,14 +26,14 @@
   var CSS = ".sp{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 12px;}" +
     ".sp button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 2px 9px;background:#fff;border:1px solid #e1e7f2;border-radius:16px;color:#0f1b33;font-size:13px;font-weight:700;line-height:1.2;text-align:center;}" +
     ".sp button:active{background:#eef3ff;}.sp button.on{border-color:#1a62e8;box-shadow:0 0 0 2px #cfe0ff;}" +
-    ".sp i{display:flex;align-items:center;justify-content:center;width:46px;height:46px;margin-bottom:2px;border-radius:15px;}" +
+    ".sp i{display:flex;align-items:center;justify-content:center;width:44px;height:44px;margin-bottom:2px;border-radius:12px;}" +
     ".sp svg{width:25px;height:25px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}" +
-    ".sp small{font-size:11px;font-weight:600;color:#5b6784;}.sp small.nw{color:#237a35;}" +
+    ".sp small{font-size:11px;font-weight:600;color:#5b6784;}.sp small.nw{padding:1px 8px;border-radius:9px;background:#fff1cc;color:#7a4f00;font-weight:800;}" +
     ".spi{margin:10px 12px 0;padding:14px 16px;border-radius:16px;background:#e8f0ff;color:#1741a6;font-size:14px;line-height:1.5;}" +
     ".spi b{display:block;margin-bottom:2px;font-size:16px;color:#0f1b33;}" +
     ".spi em{display:inline-block;margin-top:8px;padding:3px 10px;border-radius:99px;background:#fff;font-style:normal;font-size:12px;font-weight:700;color:#1a4db5;}" +
     ".dk .sp button{background:#172033;border-color:#26324a;color:#eef2fb;}.dk .sp button:active{background:#1d2a47;}" +
-    ".dk .sp button.on{border-color:#4d8bff;box-shadow:0 0 0 2px #1f3b78;}.dk .sp small{color:#93a2c4;}.dk .sp small.nw{color:#7fe0a8;}" +
+    ".dk .sp button.on{border-color:#4d8bff;box-shadow:0 0 0 2px #1f3b78;}.dk .sp small{color:#93a2c4;}.dk .sp small.nw{background:#3a2f12;color:#ffd77a;}" +
     ".dk .spi{background:#16264a;color:#b9cffd;}.dk .spi b{color:#eef2fb;}.dk .spi em{background:#0e1424;color:#8fb4ff;}";
 
   function lg() { return w.MSAC && w.MSAC.lang() === "en" ? "en" : "fr"; }
