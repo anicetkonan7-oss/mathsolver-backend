@@ -12,8 +12,10 @@
     D.head.appendChild(s);
   }
   H.menu = function () {
+    var q = w.MS_NAV;
     get(function () {
       var app = D.getElementById("app");
+      if (q !== w.MS_NAV) { return; }
       if (w.MSMENU) { w.MSMENU.show("menu"); return; }
       if (app && !app.firstChild) { H.home(); } else { try { w.MSAC.toast(w.MSAC.t("net")); } catch (e) { } }
     });
