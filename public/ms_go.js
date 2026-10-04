@@ -40,6 +40,13 @@
     if (cx && !w.MSHOME) { w.MS_CTX = cx; }
     end();
   }
+  // accueil très lent (15 s) : on peut redemander, mais l'accueil sera quand même nettoyé s'il arrive
+  function late() {
+    if (cx) { w.MS_CTX = cx; }
+    busy = 0;
+    nx = "";
+    nc = null;
+  }
 
   // la page solution n'a pas les styles de l'accueil : on les attend avant de toucher à l'écran
   function css(cb) {
@@ -56,8 +63,12 @@
   // depuis une solution : charge l'accueil dans la même page ; la solution reste affichée jusqu'au dernier moment
   function boot(k, c) {
     var app = D.getElementById("app"), s;
+    if (ob) { ob.disconnect(); }
+    clearTimeout(tm);
     busy = 1;
     cur = k;
+    // on quitte la correction : la lecture à voix haute s'arrête
+    try { if (w.MSVoice) { w.MSVoice.stop(); } if (w.msStopped) { w.msStopped(); } } catch (e) { }
     // les onglets disparaissent dès la demande ; rendus si l'accueil ne se charge pas
     if (w.MS_CTX) { cx = w.MS_CTX; w.MS_CTX = null; }
     ob = new MutationObserver(function () {
@@ -68,7 +79,7 @@
       if (t && t !== cur) { w.MSGO(t, c2); }
     });
     ob.observe(app, { childList: true });
-    tm = setTimeout(back, 15000);
+    tm = setTimeout(late, 15000);
     css(function () {
       w.MS_HOME = { mode: k };
       s = D.createElement("script");
