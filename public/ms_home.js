@@ -1,4 +1,4 @@
-/* MathSolver - accueil : récents, enregistrées, exemples variés, astuce ; page Historique */
+/* MathSolver - accueil : espaces, récents, enregistrées, exemples du niveau, astuce ; page Historique */
 (function (w) {
   "use strict";
   var A = w.MSApp, N = w.MSNav, L = w.MSLib, D = document, app = D.getElementById("app");
@@ -52,7 +52,7 @@
       }
       s += '<button class="lk bk" id="home">Retour &agrave; l\'accueil</button>';
     } else {
-      s = w.MSAC ? w.MSAC.chip() : "";
+      s = (w.MSAC ? w.MSAC.chip() : "") + (w.MSSP ? w.MSSP.grid() : "");
       if (r.length) {
         s += B.head("R&eacute;cents", r.length > 3 ? "all" : "", "Tout voir");
         for (i = 0; i < Math.min(3, r.length); i++) { s += B.rc("rc", esc(r[i]), r[i]); }
@@ -62,7 +62,7 @@
         for (i = 0; i < Math.min(3, v.length); i++) { s += B.row(v[i], cf); }
       }
       s += B.head("Essaie un exemple", "again", "Autres exemples");
-      ex = pick();
+      ex = (w.MSSP && w.MSSP.ex(4)) || pick();
       for (i = 0; i < ex.length; i++) { s += B.rc("ex", esc(ex[i][0]), ex[i][1]); }
       n = Math.floor(Math.random() * TIPS.length);
       s += '<div class="tip"><b>Astuce</b>' + esc(TIPS[n]) + "</div>";
@@ -74,7 +74,10 @@
       app.innerHTML = app.innerHTML.replace(/\$/g, "");
     }
     if (ready) { B.type(app); }
+    done();
   }
+  function done() { w.MS_RDY = true; }
+  function sh() { try { N.show(); } catch (e) { } }
 
   D.addEventListener("click", function (e) {
     var t = e.target.closest ? e.target.closest("button") : null, a, id;
@@ -82,8 +85,8 @@
     a = t.getAttribute("data-a");
     id = t.getAttribute("data-id");
     if (a === "fill") {
-      if (N && N.show) { try { N.show(); } catch (x) { } }
-      try { if (L && L.fill) { L.fill(t.getAttribute("data-v")); } else if (A && A.fill) { A.fill(t.getAttribute("data-v")); } } catch (x) { }
+      sh();
+      try { (L && L.fill ? L : A).fill(t.getAttribute("data-v")); } catch (x) { }
     } else if (a === "open") {
       try { L.open(id); } catch (x) { }
     } else if (a === "del" || a === "no") {
@@ -103,7 +106,7 @@
       mode = t.id === "home" ? "home" : "history";
       tab = t.id === "allsav" ? "sav" : "rec";
       cf = "";
-      if (mode === "home" && N && N.show) { try { N.show(); } catch (x) { } }
+      if (mode === "home") { sh(); }
       render();
     } else if (t.id === "clr") {
       if (!armed) {
@@ -128,12 +131,12 @@
     if (i >= a.length) { cb(); return; }
     load(a[i], function () { seq(a, i + 1, cb); });
   }
-  var wait = 3;
+  var wait = 5;
   function start() {
     if (--wait) { return; }
     if (w.MS_EX && w.MS_EX.length > 4) { EX = w.MS_EX; }
     if (w.MS_TIPS && w.MS_TIPS.length) { TIPS = w.MS_TIPS; }
-    if (!w.MSLB) { app.innerHTML = '<p style="margin:28px 16px;font:15px sans-serif;color:#4b5563;text-align:center">&Eacute;cris ton exercice ci-dessus, puis appuie sur &laquo;&nbsp;R&eacute;soudre&nbsp;&raquo;.</p>'; return; }
+    if (!w.MSLB) { app.innerHTML = '<p class="empty">&Eacute;cris ton exercice ci-dessus, puis appuie sur &laquo;&nbsp;R&eacute;soudre&nbsp;&raquo;.</p>'; done(); return; }
     seq(["ed_model.js?v=2", "ed_parse.js?v=2", "ed_seg.js?v=2", "ms_fx.js?v=2"], 0, function () { ready = 1; w.MSLB.type(app); });
     w.MS_OK = true;
     if (mode === "home" && w.MSAC && w.MSAC.need()) { w.MSAC.open("onb"); return; }
@@ -144,4 +147,6 @@
   load("ms_ex.js?v=1", start);
   load("ms_lib.js?v=1", start);
   load("ms_acct.js?v=1", start);
+  load("ms_spaces.js?v=1", start);
+  load("ms_exl.js?v=1", start);
 })(window);
