@@ -149,6 +149,6 @@
   w.MSAC = {
     P: function () { return P; }, sess: function () { return SS; }, need: function () { return !P.ok; },
     lang: lang, t: t, esc: esc, av: av, chip: chip, toast: toast, open: open, close: close,
-    save: save, labels: labels, setLang: setLang, up: up, inn: inn, out: out, fg: fg, del: del
+    save: save, labels: labels, setLang: setLang, up: up, inn: inn, out: out, fg: fg, del: del, ld: need
   };
 })(window);
