@@ -1,7 +1,7 @@
 /* MathSolver - les espaces de l'accueil (Cours, Formules, Exercices, Évaluation, Examens, Progression) et les exemples du niveau */
 (function (w) {
   "use strict";
-  var D = document, sel = "", LIVE = {}, SRC = { formules: "ms_form.js?v=1" }, busy = {}, K = ["cours", "formules", "exercices", "eval", "examens", "progres"];
+  var D = document, sel = "", LIVE = {}, SRC = { formules: "ms_form.js?v=1" }, FMOK = { l3: 1, l2: 1 }, busy = {}, K = ["cours", "formules", "exercices", "eval", "examens", "progres"];
   var CO = ["#1a62e8", "#7048e8", "#e8590c", "#2b8a3e", "#c2255c", "#0b7285"];
   var IC = [
     '<path d="M12 6c-2-1.3-4.5-2-8-2v13c3.5 0 6 .7 8 2 2-1.3 4.5-2 8-2V4c-3.5 0-6 .7-8 2zM12 6v13"/>',
@@ -39,11 +39,16 @@
   function lg() { return w.MSAC && w.MSAC.lang() === "en" ? "en" : "fr"; }
   function pf() { return w.MSAC ? w.MSAC.P() : {}; }
 
+  function rs(k) { try { return w.MSStore.get(k) || ""; } catch (x) { return ""; } }
+  // un espace est ouvert seulement s'il a du contenu pour le niveau de l'élève
+  function on(k) { var P = pf(); return !!(LIVE[k] || SRC[k]) && (k !== "formules" || !P.lv || !!FMOK[P.lv]); }
+
   function inner() {
-    var T = TX[lg()], P = pf(), s = "", i, k;
+    var T = TX[lg()], P = pf(), s = "", i, k, b;
     s += '<div class="sp">';
     for (i = 0; i < K.length; i++) {
-      s += '<button data-sp="' + K[i] + '"' + (sel === K[i] ? ' class="on"' : "") + '><i style="background:' + CO[i] + '"><svg viewBox="0 0 24 24">' + IC[i] + "</svg></i>" + T.n[i] + (LIVE[K[i]] || SRC[K[i]] ? '<small class="nw">' + T.w + "</small>" : "<small>" + T.s + "</small>") + "</button>";
+      b = on(K[i]) ? (rs("seen_" + K[i]) ? "" : '<small class="nw">' + T.w + "</small>") : "<small>" + T.s + "</small>";
+      s += '<button data-sp="' + K[i] + '"' + (sel === K[i] ? ' class="on"' : "") + '><i style="background:' + CO[i] + '"><svg viewBox="0 0 24 24">' + IC[i] + "</svg></i>" + T.n[i] + b + "</button>";
     }
     s += "</div>";
     k = K.indexOf(sel);
@@ -87,8 +92,12 @@
     var b = e.target.closest ? e.target.closest("[data-sp]") : null, k, g;
     if (!b) { return; }
     k = b.getAttribute("data-sp");
-    if (LIVE[k]) { try { LIVE[k](); } catch (x) { } return; }
-    if (SRC[k]) { go(k); return; }
+    if (on(k)) {
+      try { if (!rs("seen_" + k)) { w.MSStore.set("seen_" + k, "1"); } } catch (x) { }
+      if (LIVE[k]) { try { LIVE[k](); } catch (x) { } return; }
+      go(k);
+      return;
+    }
     sel = sel === k ? "" : k;
     g = D.getElementById("spg");
     if (g) { g.innerHTML = inner(); }
