@@ -28,6 +28,8 @@
       if (a.indexOf("@@HORSSUJET") >= 0 && a.indexOf("@@ETAPE") < 0) {
         return { o: 1, e: ["Maths uniquement", "MathSolver résout seulement des exercices de mathématiques.", "Écris un énoncé de maths (équation, fonction, suite, géométrie, probabilités…) ou prends-le en photo.", ""] };
       }
+      var nv = a.match(/@@NIVEAU\s*:?\s*([a-z0-9]+)/i);
+      if (nv && a.indexOf("@@ETAPE") < 0) { return { n: nv[1].toLowerCase() }; }
       return { a: fixNum(a) };
     }
     if (j.error !== undefined) {
@@ -89,7 +91,10 @@
     V.style();
     theme();
     var d = decide(), html = V.exo(D.q, D.img), S = null;
-    if (d.e) {
+    if (d.n) {
+      w.MS_NV = d.n;
+      html += '<div id="nvx"></div>';
+    } else if (d.e) {
       html += V.err(d.e[0], d.e[1], d.e[2], d.e[3]);
     } else {
       S = P.parse(d.a);
@@ -100,6 +105,7 @@
     app.innerHTML = html;
     if (d.o) { var ic = app.querySelector(".err .ic"); if (ic) { ic.textContent = "∑"; ic.style.background = "#e4edff"; ic.style.color = "#1a4db5"; } }
     V.grip();
+    if (d.n) { loadSeq([BASE + "ms_lvl.js?v=1"], 0); }
     if (S && S.funcs.length) {
       w.MS_FUNCS = S.funcs;
       loadSeq(["https://cdn.jsdelivr.net/npm/mathjs@12.4.2/lib/browser/math.js", BASE + "plot_core.js?v=5", BASE + "plot_draw.js?v=5", BASE + "plot.js?v=5"], 0);
