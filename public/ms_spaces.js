@@ -28,7 +28,7 @@
     ".sp button:active{background:#eef3ff;}.sp button.on{border-color:#1a62e8;box-shadow:0 0 0 2px #cfe0ff;}" +
     ".sp i{display:flex;align-items:center;justify-content:center;width:46px;height:46px;margin-bottom:2px;border-radius:15px;}" +
     ".sp svg{width:25px;height:25px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}" +
-    ".sp small{font-size:11px;font-weight:600;color:#6b7791;}.sp small.nw{color:#2b8a3e;}" +
+    ".sp small{font-size:11px;font-weight:600;color:#5b6784;}.sp small.nw{color:#237a35;}" +
     ".spi{margin:10px 12px 0;padding:14px 16px;border-radius:16px;background:#e8f0ff;color:#1741a6;font-size:14px;line-height:1.5;}" +
     ".spi b{display:block;margin-bottom:2px;font-size:16px;color:#0f1b33;}" +
     ".spi em{display:inline-block;margin-top:8px;padding:3px 10px;border-radius:99px;background:#fff;font-style:normal;font-size:12px;font-weight:700;color:#1a4db5;}" +
