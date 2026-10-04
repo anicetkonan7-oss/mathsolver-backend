@@ -129,7 +129,7 @@
     if (i >= a.length) { cb(); return; }
     load(a[i], function () { seq(a, i + 1, cb); });
   }
-  var wait = 6;
+  var wait = 7;
   function start() {
     if (--wait) { return; }
     if (w.MS_EX && w.MS_EX.length > 4) { EX = w.MS_EX; }
@@ -149,4 +149,5 @@
   load("ms_spaces.js?v=1", start);
   load("ms_exl.js?v=1", start);
   load("ms_mopen.js?v=1", start);
+  load("ms_go.js?v=1", start);
 })(window);
