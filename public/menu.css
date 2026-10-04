@@ -1,4 +1,17 @@
 /* MathSolver - menu : groupes de lignes, pages Comment ça marche, FAQ, À propos */
+/* carte du profil et chevrons : aussi sur une page solution, qui n'a pas home.css */
+.mnd .chip{display:flex;align-items:center;gap:12px;box-sizing:border-box;padding:10px 12px 10px 10px;text-align:left;background:#fff;border:1px solid #e1e7f2;border-radius:18px;}
+.mnd .chip:active{background:#eef3ff;}
+.mnd .av{flex:none;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;color:#fff;font-size:20px;font-weight:800;}
+.mnd .ct{flex:1;min-width:0;}
+.mnd .ct b{display:block;font-size:16px;color:#0f1b33;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mnd .ct i{display:block;margin-top:1px;font-style:normal;font-size:13px;color:#5b6784;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mnd .chv{flex:none;width:20px;height:20px;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7791' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6l6 6-6 6'/></svg>") center/20px no-repeat;}
+.dk .mnd .chip{background:#172033;border-color:#26324a;}
+.dk .mnd .chip:active{background:#1d2a47;}
+.dk .mnd .ct b{color:#eef2fb;}
+.dk .mnd .ct i{color:#93a2c4;}
+.dk .mnd .chv{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239aa9c9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6l6 6-6 6'/></svg>");}
 .mm .chip{width:100%;margin:6px 0 0;}
 .mg{margin:0 0 4px;background:#fff;border:1px solid #e1e7f2;border-radius:16px;overflow:hidden;}
 .mr{display:flex;align-items:center;gap:14px;box-sizing:border-box;width:100%;min-height:58px;padding:8px 14px;text-align:left;background:transparent;border:0;border-top:1px solid #edf1f8;font-size:16px;font-weight:600;color:#0f1b33;}
