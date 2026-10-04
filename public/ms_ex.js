@@ -15,7 +15,7 @@ window.MS_TIPS = [
   "Tu peux coller un sujet entier : l'appli traite chaque question à la suite.",
   "Touche le titre d'une étape pour la replier et mieux suivre la correction.",
   "Une erreur dans la correction ? Utilise « Signaler une erreur » en bas de la page.",
-  "Dans le menu ⋮, « Réglages » change la taille du texte et active le mode nuit.",
+  "Dans le menu ☰, « Réglages » change la taille du texte et active le mode nuit.",
   "Touche « Écouter » dans une correction pour l'entendre à voix haute.",
   "MathSolver ne traite que les mathématiques : équations, fonctions, suites, géométrie, probabilités…"
 ];
