@@ -4,7 +4,7 @@
   var D = document, app = D.getElementById("app"), A = w.MSAC, BASE = "https://mathsolver-backend-gray.vercel.app/";
   // à compléter à la publication : e-mail, pages légales (https), rate = 1 pour « Noter »
   var CFG = { mail: "", privacy: "", terms: "", rate: 0 };
-  var K, T, got = {}, cur = "menu";
+  var K, T, cur = "menu";
   if (w.MSMENU || !A || !app) { return; }
   var e = A.esc;
   var P = function (d) { return '<path d="' + d + '"/>'; };
@@ -36,17 +36,13 @@
     l.onload = l.onerror = cb;
     D.head.appendChild(l);
   }
-  function ld(a, cb) {
-    var todo = a.filter(function (u) { return !got[u]; }), n = todo.length;
-    if (!n) { cb(); return; }
-    todo.forEach(function (u) {
-      var s = D.createElement("script");
-      s.async = false;
-      s.src = BASE + u;
-      s.onload = function () { got[u] = 1; if (!--n) { cb(); } };
-      s.onerror = function () { if (!--n) { cb(); } };
-      D.head.appendChild(s);
+  function pre() {
+    ["menu.css", "acct.css"].forEach(function (f) {
+      var l = D.createElement("link");
+      l.rel = "preload"; l.as = "style"; l.href = BASE + f + "?v=1";
+      D.head.appendChild(l);
     });
+    A.ld(["ms_geo.js?v=1", "i18n_" + lg() + ".js?v=1", "ms_kit.js?v=1", "menu_" + lg() + ".js?v=1"], function () { });
   }
   function ver() { try { return w.MSAct && w.MSAct.version ? String(w.MSAct.version()) : ""; } catch (x) { return ""; } }
   function row(o, p, k, s) {
@@ -84,7 +80,7 @@
   function go(f) { try { f(); } catch (x) { A.toast(t("net")); } }
   function fm() {
     if (w.MSFOR) { go(w.MSFOR.open); return; }
-    ld(["ms_form.js?v=1"], function () { if (w.MSFOR) { go(w.MSFOR.open); } else { A.toast(A.t("net")); } });
+    A.ld(["ms_form.js?v=1"], function () { if (w.MSFOR) { go(w.MSFOR.open); } else { A.toast(A.t("net")); } });
   }
   function on(o) {
     if (o === "back") { if (cur === "menu") { A.close(); } else { show("menu"); } }
@@ -106,7 +102,9 @@
     if (b && b.parentNode) { b.parentNode.classList.toggle("on"); }
   });
   w.MSMENU = {
+    pre: pre,
     show: function (v) {
+      try { w.MSNav.solved(); } catch (x) { }
       var n = 3, fin = function () {
         if (--n) { return; }
         K = w.MSKIT; T = (w.MSMT && w.MSMT[lg()]) || null;
@@ -114,7 +112,7 @@
       };
       css("accss", "acct.css?v=1", fin);
       css("mncss", "menu.css?v=1", fin);
-      ld(["ms_geo.js?v=1", "i18n_" + lg() + ".js?v=1", "ms_kit.js?v=1", "menu_" + lg() + ".js?v=1"], fin);
+      A.ld(["ms_geo.js?v=1", "i18n_" + lg() + ".js?v=1", "ms_kit.js?v=1", "menu_" + lg() + ".js?v=1"], fin);
     }
   };
 })(window);
