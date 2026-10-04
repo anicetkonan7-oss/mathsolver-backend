@@ -1,7 +1,7 @@
 /* MathSolver - navigation sans rechargement : Accueil, Historique et Menu, depuis l'accueil comme depuis une solution */
 (function (w) {
   "use strict";
-  var D = document, BASE = "https://mathsolver-backend-gray.vercel.app/", busy = 0, tm = 0, ob = null, cur = "", nx = "", nc = null, mb = 0, mq = 0, mw = 0;
+  var D = document, BASE = "https://mathsolver-backend-gray.vercel.app/", busy = 0, tm = 0, ob = null, cur = "", nx = "", nc = null, mb = 0, mq = 0, mw = 0, cx = null;
   if (w.MSGO) { return; }
 
   // fin de la bascule (réussie ou non)
@@ -11,10 +11,12 @@
     busy = 0;
     nx = "";
     nc = null;
+    cx = null;
   }
 
-  // retire ce qui appartient à la page solution (barre du bas)
+  // retire ce qui appartient à la page solution (barre du bas, contexte qui affiche les onglets Énoncé / Correction)
   function clean() {
+    w.MS_CTX = null;
     var b = D.querySelector("body > .bar");
     if (b) { b.parentNode.removeChild(b); }
     D.body.className = D.body.className.replace(/\s*\bhasbar\b/g, "");
@@ -31,6 +33,12 @@
     s.src = BASE + u;
     s.onload = s.onerror = cb;
     D.head.appendChild(s);
+  }
+
+  // échec : la solution reste, avec ses onglets
+  function back() {
+    if (cx && !w.MSHOME) { w.MS_CTX = cx; }
+    end();
   }
 
   // la page solution n'a pas les styles de l'accueil : on les attend avant de toucher à l'écran
@@ -50,6 +58,8 @@
     var app = D.getElementById("app"), s;
     busy = 1;
     cur = k;
+    // les onglets disparaissent dès la demande ; rendus si l'accueil ne se charge pas
+    if (w.MS_CTX) { cx = w.MS_CTX; w.MS_CTX = null; }
     ob = new MutationObserver(function () {
       var t = nx, c2 = nc;
       clean();
@@ -58,13 +68,13 @@
       if (t && t !== cur) { w.MSGO(t, c2); }
     });
     ob.observe(app, { childList: true });
-    tm = setTimeout(end, 15000);
+    tm = setTimeout(back, 15000);
     css(function () {
       w.MS_HOME = { mode: k };
       s = D.createElement("script");
       s.src = BASE + "ms_home.js?v=1";
       s.onerror = function () {
-        end();
+        back();
         try { w.MSLib.toast("Connexion impossible. Réessaie."); } catch (e) { }
       };
       D.head.appendChild(s);
