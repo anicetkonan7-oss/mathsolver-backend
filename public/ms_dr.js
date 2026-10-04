@@ -1,19 +1,24 @@
-/* MathSolver - panneau plein écran qui glisse depuis la gauche (menu) et icônes du menu */
+/* MathSolver - menu : panneau latéral (85 %) qui glisse depuis la gauche, voile sombre, icônes du menu */
 (function (w) {
   "use strict";
-  var D = document, ov = null, fn = null, shut = 0, tm = 0;
+  var D = document, ov = null, sc = null, fn = null, shut = 0, tm = 0;
   if (w.MSDR) { return; }
 
   function gone() {
     clearTimeout(tm);
     if (ov && ov.parentNode) { ov.parentNode.removeChild(ov); }
-    ov = null; fn = null; shut = 0;
+    if (sc && sc.parentNode) { sc.parentNode.removeChild(sc); }
+    ov = null; sc = null; fn = null; shut = 0;
   }
 
   // affiche html dans le panneau (le crée et le fait glisser s'il n'existe pas) ; f(action) reçoit les clics sur [data-o]
+  // à droite, un voile sombre : le toucher referme (action "x")
   function put(html, f) {
     var nw = !ov;
     if (nw) {
+      sc = D.createElement("div");
+      sc.className = "mns";
+      sc.addEventListener("click", function () { if (fn && !shut) { fn("x"); } });
       ov = D.createElement("div");
       ov.className = "mnd";
       ov.setAttribute("role", "dialog");
@@ -28,8 +33,9 @@
     fn = f;
     ov.innerHTML = html;
     ov.scrollTop = 0;
-    if (nw) { D.body.appendChild(ov); void ov.offsetWidth; }
+    if (nw) { D.body.appendChild(sc); D.body.appendChild(ov); void ov.offsetWidth; }
     ov.className = "mnd mdo";
+    sc.className = "mns mdo";
   }
 
   // referme : le panneau repart vers la gauche, puis disparaît ; son bouton retour (id mnb) cède la place à celui de la page dessous
@@ -38,6 +44,7 @@
     if (!ov || shut) { return; }
     shut = 1;
     ov.className = "mnd";
+    sc.className = "mns";
     b = ov.querySelector("#mnb");
     if (b) { b.removeAttribute("id"); }
     tm = setTimeout(gone, 350);
