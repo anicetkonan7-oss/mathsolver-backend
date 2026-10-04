@@ -97,20 +97,20 @@
     return api({ a: "del", email: em, password: pw }).then(function (r) { if (r.ok) { out(); } return r; });
   }
 
-  // chargement des écrans (une seule fois chacun)
+  // chargement des écrans : téléchargés en parallèle, exécutés dans l'ordre, une seule fois chacun
   function need(a, cb) {
-    var i = 0;
-    (function nx() {
-      var u, s;
-      if (i >= a.length) { cb(); return; }
-      u = a[i++];
-      if (got[u]) { nx(); return; }
-      s = D.createElement("script");
+    var todo = [], n, i;
+    for (i = 0; i < a.length; i++) { if (!got[a[i]]) { todo.push(a[i]); } }
+    n = todo.length;
+    if (!n) { cb(); return; }
+    todo.forEach(function (u) {
+      var s = D.createElement("script");
+      s.async = false;
       s.src = BASE + u;
-      s.onload = function () { got[u] = 1; nx(); };
-      s.onerror = nx;
+      s.onload = function () { got[u] = 1; if (!--n) { cb(); } };
+      s.onerror = function () { if (!--n) { cb(); } };
       D.head.appendChild(s);
-    })();
+    });
   }
   function setLang(l, cb) {
     save({ l: l });
