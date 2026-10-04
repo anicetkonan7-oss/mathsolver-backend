@@ -27,11 +27,9 @@
   w.msTheme = theme;
 
   function pick() {
-    var c = [], out = [], i, j, t;
-    for (i = 0; i < EX.length; i++) { c.push(i); }
-    for (i = c.length - 1; i > 0; i--) { j = Math.floor(Math.random() * (i + 1)); t = c[i]; c[i] = c[j]; c[j] = t; }
-    for (i = 0; i < Math.min(5, EX.length); i++) { t = EX[c[i]]; out.push(t[Math.floor(Math.random() * t.length)]); }
-    return out;
+    var c = EX.slice(), o = [], t;
+    while (c.length && o.length < 5) { t = c.splice(Math.floor(Math.random() * c.length), 1)[0]; o.push(t[Math.floor(Math.random() * t.length)]); }
+    return o;
   }
 
   function list() {
@@ -131,7 +129,7 @@
     if (i >= a.length) { cb(); return; }
     load(a[i], function () { seq(a, i + 1, cb); });
   }
-  var wait = 5;
+  var wait = 6;
   function start() {
     if (--wait) { return; }
     if (w.MS_EX && w.MS_EX.length > 4) { EX = w.MS_EX; }
@@ -140,7 +138,7 @@
     seq(["ed_model.js?v=2", "ed_parse.js?v=2", "ed_seg.js?v=2", "ms_fx.js?v=2"], 0, function () { ready = 1; w.MSLB.type(app); });
     w.MS_OK = true;
     if (w.MSAC && w.MSAC.need()) { w.MSAC.open("onb"); return; }
-    if (mode === "menu") { mode = "home"; load("ms_menu.js?v=1", function () { if (w.MSMENU) { w.MSMENU.show("menu"); } else { sh(); render(); } }); return; }
+    if (mode === "menu") { mode = "home"; if (w.MSHOME.menu) { w.MSHOME.menu(); return; } }
     render();
   }
   w.MSHOME = { home: function (m, b) { mode = m === "history" ? "history" : "home"; tab = b === "sav" ? "sav" : "rec"; cf = ""; render(); } };
@@ -150,4 +148,5 @@
   load("ms_acct.js?v=1", start);
   load("ms_spaces.js?v=1", start);
   load("ms_exl.js?v=1", start);
+  load("ms_mopen.js?v=1", start);
 })(window);
