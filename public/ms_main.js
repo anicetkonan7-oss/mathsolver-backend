@@ -107,7 +107,7 @@
       S = P.parse(d.a);
       html += V.cards(S);
       if (S.funcs.length) { html += '<div id="extras"></div>'; }
-      if (S.titles.length) { html += '<div id="rep"></div>'; }
+      html += '<div id="rep"></div>';
     }
     app.innerHTML = html;
     if (d.o) { var ic = app.querySelector(".err .ic"); if (ic) { ic.textContent = "∑"; ic.style.background = "#e4edff"; ic.style.color = "#1a4db5"; } }
@@ -120,7 +120,7 @@
     if (S) {
       w.MS_CTX = { q: String(D.q || ""), a: d.a };
       try { if (w.MSStore.get("pend") === String(D.q || "").trim()) { w.MSStore.del("pend"); } } catch (e) { }
-      loadSeq([BASE + "ms_ui.js?v=1"].concat(w.MSVoice ? [BASE + "ms_fr.js?v=1", BASE + "ms_say.js?v=1"] : [], S.titles.length ? [BASE + "report.js?v=1"] : []), 0);
+      loadSeq([BASE + "ms_ui.js?v=1"].concat(w.MSVoice ? [BASE + "ms_fr.js?v=1", BASE + "ms_say.js?v=1"] : [], [BASE + "report.js?v=1"]), 0);
     }
     w.MS_OK = true;
     loadSeq([BASE + "ms_go.js?v=1", BASE + "ed_model.js?v=2", BASE + "ed_parse.js?v=2", BASE + "ed_seg.js?v=2", BASE + "ms_fx.js?v=1"], 0);
