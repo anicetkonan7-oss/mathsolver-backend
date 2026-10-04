@@ -14,7 +14,7 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;margin:0;-w
 .pill{width:44px;height:5px;border-radius:3px;background:#9aa6c0;}
 .intro{margin:14px 16px 2px;font-size:15px;line-height:1.6;color:#5b6784;}
 .tb{display:flex;align-items:center;justify-content:space-between;margin:10px 16px 0;font-size:13px;font-weight:600;color:#5b6784;}
-.tb button{height:36px;padding:0 6px;font-size:14px;font-weight:600;color:#1a4db5;}
+.tb button{min-height:44px;padding:0 6px;font-size:14px;font-weight:600;color:#1a4db5;}
 .card{margin:10px 12px;background:#fff;border:1px solid #e1e7f2;border-radius:16px;overflow:hidden;}
 .head{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:0 14px;text-align:left;}
 .num{flex:none;width:28px;height:28px;border-radius:50%;background:#e4edff;color:#1a4db5;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;}
@@ -51,7 +51,7 @@ body.hasbar{padding-bottom:84px;}
 .err .et{font-size:18px;font-weight:bold;color:#111827;margin:0 0 6px;}
 .err .em{margin:0;font-size:15px;line-height:1.5;color:#4b5563;}
 .err .eh{margin:14px 0 0;padding:10px 12px;border-radius:12px;background:#eef2fa;color:#334155;font-size:14px;line-height:1.45;}
-.err .ed{margin:12px 0 0;font-size:12px;color:#9aa3b5;}
+.err .ed{margin:12px 0 0;font-size:12px;color:#68728c;}
 .katex{font-size:1.08em;display:inline-block;white-space:nowrap;}
 .katex-display{--c:#f4f6fb;margin:.55em 0;padding:6px 10px;border-radius:10px;font-size:1.04em;overflow-x:auto;overflow-y:hidden;}
 .answer .katex-display{--c:#dcf1e4;}
