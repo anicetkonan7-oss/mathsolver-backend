@@ -58,6 +58,7 @@
     fn = f;
     app.innerHTML = '<div class="ac">' + html + "</div>";
     w.scrollTo(0, 0);
+    w.MS_RDY = true;
   }
 
   app.addEventListener("click", function (ev) {
