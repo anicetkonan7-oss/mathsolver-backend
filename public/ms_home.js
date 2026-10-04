@@ -50,7 +50,7 @@
       }
       s += '<button class="lk bk" id="home">Retour &agrave; l\'accueil</button>';
     } else {
-      s = (w.MSAC ? w.MSAC.chip() : "") + (w.MSSP ? w.MSSP.grid() : "");
+      s = (w.MSNET ? w.MSNET.card(B) : "") + (w.MSAC ? w.MSAC.chip() : "") + (w.MSSP ? w.MSSP.grid() : "");
       if (r.length) {
         s += B.head("R&eacute;cents", r.length > 3 ? "all" : "", "Tout voir");
         for (i = 0; i < Math.min(3, r.length); i++) { s += B.rc("rc", esc(r[i]), r[i]); }
@@ -129,7 +129,7 @@
     if (i >= a.length) { cb(); return; }
     load(a[i], function () { seq(a, i + 1, cb); });
   }
-  var wait = 7;
+  var wait = 8;
   function start() {
     if (--wait) { return; }
     if (w.MS_EX && w.MS_EX.length > 4) { EX = w.MS_EX; }
@@ -150,4 +150,5 @@
   load("ms_exl.js?v=1", start);
   load("ms_mopen.js?v=1", start);
   load("ms_go.js?v=1", start);
+  load("ms_net.js?v=1", start);
 })(window);
