@@ -8,7 +8,7 @@
     en: { gu: "Guest", fill: "Complete your profile", net: "No Internet connection. Try again." }
   };
   var COL = ["#1a62e8", "#e8590c", "#2b8a3e", "#9c36b5", "#c2255c", "#0b7285"];
-  if (!S) { return; }
+  if (!S || w.MSAC) { return; }
 
   function rd(k) { try { var v = S.get(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
   function wr(k, v) { try { S.set(k, JSON.stringify(v)); } catch (e) { } }
