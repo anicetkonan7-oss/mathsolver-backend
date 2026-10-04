@@ -37,7 +37,7 @@
       if (!f || !f.html) { return; }
       els = root.querySelectorAll(".it[data-q]");
       for (i = 0; i < els.length; i++) {
-        try { els[i].innerHTML = f.html(els[i].getAttribute("data-q")).replace(/\n+/g, " · "); } catch (e) { }
+        try { els[i].innerHTML = f.html(els[i].getAttribute("data-q").replace(/\s*\n+\s*/g, " · ")); } catch (e) { }
       }
     }
   };
