@@ -2,6 +2,8 @@
 (function (w) {
   "use strict";
   var A = w.MSApp, N = w.MSNav, D = document;
+  // chargé en retard alors que l'élève a déjà quitté la correction : rien à afficher
+  if (!w.MS_CTX) { return; }
   function $(id) { return D.getElementById(id); }
   function svg(p) { return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + "</svg>"; }
   var IC = {
