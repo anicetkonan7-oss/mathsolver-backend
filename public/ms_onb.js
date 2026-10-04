@@ -28,14 +28,14 @@
     }
   };
 
-  function show(v, ed) {
+  function show(v, ed, nf) {
     var P = A.P();
-    if (v === "onb") { v = P.l ? "welcome" : "lang"; st.ed = 0; st.d = {}; }
+    if (v === "onb") { v = P.l ? "welcome" : "lang"; st.ed = 0; st.d = {}; try { w.MSStore.set("onb", "1"); } catch (x) { } }
     if (ed !== undefined) { st.ed = ed ? 1 : 0; }
     if (st.ed || !st.d.k) { st.d = { k: 1, c: P.c, lv: P.lv, n: P.n, ot: P.ot }; }
     st.v = v;
     K.show(V[v](), on);
-    if (v === "done" && w.MSFUN) { w.MSFUN.confetti(); }
+    if (v === "done" && w.MSFUN && !nf) { w.MSFUN.confetti(); }
     if (v === "name") { setTimeout(function () { var i = D.getElementById("nm"); if (i && st.v === "name") { i.focus(); } }, 350); }
   }
   function commit() {
@@ -58,7 +58,7 @@
   }
   function back() {
     var p = { welcome: "lang", country: "welcome", level: "country", cando: "level", name: st.d.ot ? "cando" : "level" }[st.v];
-    if (st.v === "lang") { guest(); }
+    if (st.v === "lang") { try { w.MSNav.quit(); } catch (x) { } }
     else if (st.ed) { if (st.v === "cando") { show("level"); } else { w.MSPROF.show("prof"); } }
     else if (p) { show(p); }
   }
@@ -76,7 +76,7 @@
     if (o === "back") { back(); }
     else if (o === "lang") { A.setLang(v, function () { show("welcome"); }); }
     else if (o === "go") { show("country"); }
-    else if (o === "in") { w.MSPROF.show("in"); }
+    else if (o === "in") { w.MSPROF.show("in", "welcome"); }
     else if (o === "later") { guest(); }
     else if (o === "c") { st.d.c = v; next("country"); }
     else if (o === "lv") { if (v === "ot") { show("cando"); } else { st.d.lv = v; st.d.ot = 0; next("level"); } }
@@ -84,7 +84,7 @@
     else if (o === "nm") { name(); }
     else if (o === "skip") { if (st.v === "name") { st.d.n = ""; } next(st.v); }
     else if (o === "fin") { A.close(); }
-    else if (o === "up") { w.MSPROF.show("up"); }
+    else if (o === "up") { w.MSPROF.show("up", "done"); }
   }
   w.MSONB = { show: show };
 })(window);
