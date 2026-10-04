@@ -15,6 +15,7 @@
   function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
   P = rd("prof") || {};
   SS = rd("sess");
+  if (P.ok) { try { S.del("onb"); } catch (e) { } }
 
   function lang() { return P.l === "en" || P.l === "fr" ? P.l : (String(navigator.language || "fr").slice(0, 2) === "en" ? "en" : "fr"); }
   function t(k, v) {
@@ -117,6 +118,7 @@
     need(["i18n_" + l + ".js?v=1"], function () { labels(); if (cb) { cb(); } });
   }
   function close() {
+    try { S.del("onb"); } catch (e) { }
     try { N.show(); } catch (e) { }
     if (w.MSHOME) { w.MSHOME.home(); }
   }
@@ -124,6 +126,7 @@
     var l;
     if (busy) { return; }
     busy = 1;
+    if (v === "onb") { try { S.set("onb", "1"); } catch (e) { } }
     try { if (N && N.solved) { N.solved(); } } catch (e) { }
     w.MS_OK = true;
     if (!D.getElementById("accss")) {
