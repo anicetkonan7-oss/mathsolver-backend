@@ -2,7 +2,7 @@
 (function (w) {
   "use strict";
   var D = document, app = D.getElementById("app"), A = w.MSAC, BASE = "https://mathsolver-backend-gray.vercel.app/";
-  // à compléter à la publication : e-mail, pages légales, rate = 1 pour « Noter »
+  // à remplir avant publication (rate = 1 : « Noter »)
   var CFG = { mail: "", privacy: "", terms: "", rate: 0 };
   var K, T, I, cur = "menu";
   if (w.MSMENU || !A || !app) { return; }
@@ -93,7 +93,8 @@
     if (w.MSHOME || !w.MSGO) { run(); } else { w.MSGO("home", run); }
   }
   function on(o) {
-    if (o === "back") { if (cur === "menu") { shut(1); } else { show("menu"); } }
+    if (o === "x" || (o === "back" && cur === "menu")) { shut(1); }
+    else if (o === "back") { show("menu"); }
     else if (o === "home") { try { w.MSNav.show(); } catch (x) { } nav("home"); }
     else if (o === "hi") { nav("history"); }
     else if (o === "sv") { nav("history", function () { w.MSHOME.home("history", "sav"); }); }
