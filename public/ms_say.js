@@ -31,7 +31,7 @@
     btn.className = "lbtn" + (on ? " on" : "");
     btn.innerHTML = on ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>' : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>';
     lab = D.createElement("span");
-    lab.appendChild(D.createTextNode(on ? "Arrêter la lecture" : "Écouter la correction"));
+    lab.appendChild(D.createTextNode(btn.parentNode === box ? (on ? "Arrêter la lecture" : "Écouter la correction") : (on ? "Arrêter" : "Écouter")));
     btn.appendChild(lab);
   }
 
@@ -73,15 +73,15 @@
   w.msVoiceErr = done;
 
   var st0 = D.createElement("style");
-  st0.appendChild(D.createTextNode(".lsn{margin:10px 12px 0}.lbtn{width:100%;height:46px;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;background:#e4edff;color:#1741a6;font-size:15px;font-weight:600}.lbtn.on{background:#1a62e8;color:#fff}.card.say,.answer.say{box-shadow:0 0 0 2px #1a62e8}.dk .lbtn{background:#1f2c4a;color:#a9c4ff}.dk .lbtn.on{background:#2f6df0;color:#fff}.dk .card.say,.dk .answer.say{box-shadow:0 0 0 2px #5b8ff5}"));
+  st0.appendChild(D.createTextNode(".lsn{margin:10px 12px 0}.lbtn{width:100%;height:46px;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;background:#e4edff;color:#1741a6;font-size:15px;font-weight:600}.lbtn.on{background:#1a62e8;color:#fff}.card.say,.answer.say{box-shadow:0 0 0 2px #1a62e8}.dk .lbtn{background:#1f2c4a;color:#a9c4ff}.dk .lbtn.on{background:#2f6df0;color:#fff}.dk .card.say,.dk .answer.say{box-shadow:0 0 0 2px #5b8ff5}.tb .lbtn{width:auto;height:44px;padding:0 10px;gap:6px;background:none;color:#1a4db5;font-size:14px;font-weight:700;border-radius:12px}.tb .lbtn svg{width:18px;height:18px}.dk .tb .lbtn{background:none;color:#8fb4ff}.tb .lbtn.on,.dk .tb .lbtn.on{background:#1a62e8;color:#fff}"));
   D.head.appendChild(st0);
-  var first = D.querySelector(".card"), box = D.createElement("div");
+  // « Écouter » dans la ligne « n étapes », sinon un bouton au-dessus des étapes
+  var first = D.querySelector(".tl2") || D.querySelector(".card"), box = D.createElement("div"), tbr = D.querySelector(".tb span:last-child");
   if (first) {
     box.className = "lsn";
     btn = D.createElement("button");
     btn.id = "blisten";
-    box.appendChild(btn);
-    first.parentNode.insertBefore(box, first);
+    if (tbr) { tbr.insertBefore(btn, tbr.firstChild); } else { box.appendChild(btn); first.parentNode.insertBefore(box, first); }
     ui();
   }
   D.addEventListener("click", function (e) {
