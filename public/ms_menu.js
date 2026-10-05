@@ -17,7 +17,7 @@
     l.onload = l.onerror = cb;
     D.head.appendChild(l);
   }
-  function libs() { return ["ms_geo.js?v=1", "i18n_" + lg() + ".js?v=1", "ms_kit.js?v=1", "menu_" + lg() + ".js?v=1", "ms_dr.js?v=1"]; }
+  function libs() { return ["ms_geo.js?v=1", "i18n_" + lg() + ".js?v=1", "ms_kit.js?v=1", "menu_" + lg() + ".js?v=1", "ms_dr.js?v=2"]; }
   function pre() {
     ["menu.css", "acct.css"].forEach(function (f) {
       var l = D.createElement("link");
@@ -60,7 +60,6 @@
   function show(v) {
     var d = w.MSDR;
     cur = v === "how" || v === "faq" || v === "ab" ? v : "menu";
-    if (!d.is()) { try { w.MSNav.solved(); } catch (x) { } }
     if (!app.firstChild && w.MSHOME) { w.MSHOME.home(); }
     d.put('<div class="ac">' + (cur === "how" ? how() : cur === "faq" ? faq() : cur === "ab" ? about() : menu()) + "</div>", on);
   }
@@ -93,6 +92,8 @@
     if (w.MSHOME || !w.MSGO) { run(); } else { w.MSGO("home", run); }
   }
   function on(o) {
+    // vers un autre écran : la zone de saisie de l'accueil s'efface
+    if (/^(hi|sv|fm|pf|ac)$/.test(o) && w.MSDR.hand) { w.MSDR.hand(); }
     if (o === "x" || (o === "back" && cur === "menu")) { shut(1); }
     else if (o === "back") { show("menu"); }
     else if (o === "home") { try { w.MSNav.show(); } catch (x) { } nav("home"); }
