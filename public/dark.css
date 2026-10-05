@@ -76,3 +76,6 @@ html.dk{color-scheme:dark;}
 .dk .er{color:#ff8787;}
 .dk .ok{color:#7fe0a8;}
 .dk .fn{color:#7f8db0;}
+.dk .stp:before{background:#2b3856;}
+.dk .dot:not(.ok){background:#2f6df0;}
+.dk .dot.ok{background-color:#22a05b;}
