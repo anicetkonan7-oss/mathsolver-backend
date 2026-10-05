@@ -19,13 +19,13 @@
 .csec li{margin:0 0 6px;}
 .cm{margin:6px 0;overflow-x:auto;overflow-y:hidden;}
 .cb{margin:0 0 12px;padding:12px 14px;border-radius:14px;border-left:4px solid;}
-.cb b{display:block;margin-bottom:4px;font-size:15px;font-weight:800;}
+.cb>b{display:block;margin-bottom:4px;font-size:15px;font-weight:800;}
 .cb p{margin:0;font-size:15.5px;}
-.cd{background:#eef4ff;border-color:#1a62e8;}.cd b{color:#1741a6;}
-.cp{background:#f3efff;border-color:#7048e8;}.cp b{color:#5233b8;}
-.ck{background:#eaf7ef;border-color:#1f9d55;}.ck b{color:#0e5a31;}
-.cw{background:#fff4e6;border-color:#e8590c;}.cw b{color:#a33d00;}
-.cr{background:#f1f3f8;border-color:#8492b1;}.cr b{color:#3d4866;}
+.cd{background:#eef4ff;border-color:#1a62e8;}.cd>b{color:#1741a6;}
+.cp{background:#f3efff;border-color:#7048e8;}.cp>b{color:#5233b8;}
+.ck{background:#eaf7ef;border-color:#1f9d55;}.ck>b{color:#0e5a31;}
+.cw{background:#fff4e6;border-color:#e8590c;}.cw>b{color:#a33d00;}
+.cr{background:#f1f3f8;border-color:#8492b1;}.cr>b{color:#3d4866;}
 .cop{margin:0 0 14px;padding:10px 14px;border-radius:12px;background:#fff;border:1px solid #e1e7f2;}
 .cop p{margin:0 0 6px;}.cop p:last-child{margin:0;}
 .coq{margin:0 0 12px;padding:12px 14px;border-radius:14px;background:#fff;border:1px solid #e1e7f2;}
@@ -42,11 +42,11 @@
 .dk .csec h2{border-bottom-color:#26324a;}
 .dk .csec h3{color:#8fb4ff;}
 .dk .csec p,.dk .csec li{color:#d5ddee;}
-.dk .cd{background:#16264a;}.dk .cd b{color:#8fb4ff;}
-.dk .cp{background:#221a3d;}.dk .cp b{color:#b9a6ff;}
-.dk .ck{background:#10261b;}.dk .ck b{color:#7fe0a8;}
-.dk .cw{background:#33210f;}.dk .cw b{color:#ffb070;}
-.dk .cr{background:#1b2235;}.dk .cr b{color:#c9d4ec;}
+.dk .cd{background:#16264a;}.dk .cd>b{color:#8fb4ff;}
+.dk .cp{background:#221a3d;}.dk .cp>b{color:#b9a6ff;}
+.dk .ck{background:#10261b;}.dk .ck>b{color:#7fe0a8;}
+.dk .cw{background:#33210f;}.dk .cw>b{color:#ffb070;}
+.dk .cr{background:#1b2235;}.dk .cr>b{color:#c9d4ec;}
 .dk .cqn{color:#ff9a5c;}
 .dk .coq summary{color:#8fb4ff;}
 /* formules en ligne : elles peuvent passer à la ligne après =, + ou − au lieu de sortir de l'écran */
@@ -68,12 +68,13 @@
 .qtl{font:600 13px system-ui,sans-serif;fill:currentColor;stroke:none;}
 .qtg{font:500 11px system-ui,sans-serif;fill:#68728c;}
 .qk1{color:#1a62e8;}.qk2{color:#e8590c;}.qk3{color:#1f9d55;}.qk4{color:#7048e8;}
-.cfz{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(15,27,51,.55);opacity:0;transition:opacity .18s;touch-action:none;cursor:zoom-out;}
+.cfz{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(15,27,51,.55);opacity:0;transition:opacity .18s;touch-action:none;}
 .cfz.on{opacity:1;}
 .cfb{box-sizing:border-box;width:100%;max-height:92vh;padding:14px 10px 14px;border-radius:18px;background:#fff;color:#0f1b33;transform:scale(.94);transition:transform .18s;}
 .cfz.on .cfb{transform:none;}
-.cfw{overflow:auto;max-height:72vh;touch-action:pan-x pan-y;overscroll-behavior:contain;}
-.cfb .cfw svg{width:190%;max-width:none;}
+.cfw{overflow:auto;max-height:70vh;touch-action:pan-x pan-y;overscroll-behavior:contain;}
+.cfb .cfw svg{max-width:none;cursor:zoom-in;}
+.cfh{display:block;margin-top:8px;font-size:12px;text-align:center;color:#8a94ad;}
 .cfb p{margin:10px 4px 0;font-size:15px;line-height:1.5;text-align:center;color:#4a5573;}
 .cfx{position:absolute;top:14px;right:14px;width:40px;height:40px;border-radius:20px;background:rgba(255,255,255,.95) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='%230f1b33' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") center/18px no-repeat;}
 .dk .cfg,.dk .cfb{background:#172033;border-color:#26324a;color:#e3e9f6;}
