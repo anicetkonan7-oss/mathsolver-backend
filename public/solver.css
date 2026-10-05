@@ -1,4 +1,4 @@
-body{margin:0;background:#f3f6fc;font-family:system-ui,Roboto,"Segoe UI",Arial,sans-serif;color:#1f2a44;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;}
+body{margin:0;background:transparent;font-family:system-ui,Roboto,"Segoe UI",Arial,sans-serif;color:#1f2a44;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;}
 button{font:inherit;color:inherit;border:0;background:none;padding:0;margin:0;-webkit-appearance:none;appearance:none;}
 .photo{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #e1e7f2;box-shadow:0 2px 8px rgba(16,24,40,.07);}
 .pview{height:32vh;overflow:auto;-webkit-overflow-scrolling:touch;background:#fff;}
