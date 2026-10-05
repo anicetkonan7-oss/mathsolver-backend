@@ -35,17 +35,11 @@ p:last-child{margin-bottom:0;}
 .rn{flex:none;min-width:24px;height:24px;margin-top:1px;border-radius:12px;background:#fff;border:1px solid #a8ddbb;color:#0e5a31;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
 .rt{flex:1;min-width:0;overflow-wrap:break-word;}
 .res.one .rn{display:none;}
-.acts{display:flex;gap:10px;margin-top:8px;}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
 .acts:empty{display:none;}
 .acts.solo{margin:12px 12px 0;}
 .solo .act{border-color:#d3dbea;color:#1741a6;}
-.act{flex:1;height:44px;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid #a8ddbb;border-radius:12px;background:#fff;color:#0e5a31;font-size:15px;font-weight:600;}
-.bar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;gap:10px;padding:12px 16px;background:#fff;border-top:1px solid #e1e7f2;}
-.bar button{height:52px;border-radius:14px;font-size:16px;font-weight:600;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:8px;}
-.b2{flex:none;padding:0 20px;background:#e6eeff;color:#1741a6;}
-.b1{flex:1;background:#1a62e8;color:#fff;font-weight:700;}
-body.hasbar{padding-bottom:84px;}
-@media(max-width:350px){.bar svg{display:none;}.b2{padding:0 16px;}}
+.act{flex:none;height:44px;padding:0 14px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid #a8ddbb;border-radius:12px;background:#fff;color:#0e5a31;font-size:14px;font-weight:700;}
 .err{margin:16px 12px;padding:22px 18px 18px;background:#fff;border:1px solid #e1e7f2;border-radius:18px;text-align:center;box-shadow:0 6px 18px rgba(16,24,40,.06);}
 .err .ic{width:48px;height:48px;line-height:48px;margin:0 auto 12px;border-radius:50%;background:#fff3e0;color:#c2410c;font-size:26px;font-weight:bold;}
 .err .et{font-size:18px;font-weight:bold;color:#111827;margin:0 0 6px;}
@@ -60,3 +54,15 @@ body.hasbar{padding-bottom:84px;}
 .katex-display,.hs{-webkit-overflow-scrolling:touch;scrollbar-width:none;background:linear-gradient(to right,var(--c),transparent) left center/26px 100% no-repeat local,linear-gradient(to left,var(--c),transparent) right center/26px 100% no-repeat local,radial-gradient(farthest-side at 0 50%,#0f172a38,transparent) left center/9px 100% no-repeat scroll,radial-gradient(farthest-side at 100% 50%,#0f172a38,transparent) right center/9px 100% no-repeat scroll,var(--c);}
 .katex-display::-webkit-scrollbar,.hs::-webkit-scrollbar{display:none;}
 .nb{white-space:nowrap;}
+/* frise des étapes et réponse finale au bout */
+.tb span:last-child{display:flex;align-items:center;}
+.tl2{margin:6px 16px 0 12px;}
+.stp{position:relative;display:flex;gap:10px;}
+.stp:before{content:"";position:absolute;left:14px;top:46px;bottom:-8px;width:2px;background:#c9d6f2;}
+.stp.fin:before,.stp:last-child:before{display:none;}
+.dot{flex:none;z-index:1;width:30px;height:30px;margin-top:11px;border-radius:50%;background:#1a62e8;color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.dot.ok{margin-top:16px;background:#1f9d55 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12l5 5 9-10'/></svg>") center/16px no-repeat;}
+.stp .card,.stp .answer{flex:1;min-width:0;margin:0 0 12px;}
+.stp .num,.stp .chk{display:none;}
+.stp .alabel{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;}
+.res.one li{font-size:22px;padding:4px 0 2px;}
