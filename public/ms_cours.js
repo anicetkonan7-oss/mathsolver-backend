@@ -65,7 +65,7 @@
   }
   function list() {
     cur = -1;
-    try { V().shut(); } catch (x) { }
+    try { w.MSCOZ.shut(); } catch (x) { }
     app.innerHTML = '<div class="ac co"><div class="ach"><button class="bkb" id="home" aria-label="' + e(T.b) + '"></button><b class="ht">' + e(T.t) + '</b></div><div class="fmc">' + badge() + '</div><input class="si fmq" id="coq" type="search" autocomplete="off" placeholder="' + e(T.q) + '" value="' + e(q) + '"><div id="col">' + rows() + "</div></div>";
     w.scrollTo(0, sy);
   }
@@ -123,10 +123,10 @@
   function open() {
     css("accss", "acct.css?v=1");
     css("fmcss", "fm.css?v=1");
-    css("cocss", "cours.css?v=2");
+    css("cocss", "cours.css?v=3");
     try { w.MSNav.solved(); } catch (x) { }
     lv = A.P().lv || ""; q = ""; sy = 0;
-    ld(["ms_geo.js?v=1", "ms_co_fig.js?v=1", "ms_co_view.js?v=2", "co_idx.js?v=2"].concat(FL[lv] ? ["fm_" + FL[lv] + ".js?v=1"] : []), list);
+    ld(["ms_geo.js?v=1", "ms_co_fig.js?v=1", "ms_co_zoom.js?v=1", "ms_co_view.js?v=3", "co_idx.js?v=2"].concat(FL[lv] ? ["fm_" + FL[lv] + ".js?v=1"] : []), list);
   }
   SP.live.cours = open;
   w.MSCOURS = { open: open };
