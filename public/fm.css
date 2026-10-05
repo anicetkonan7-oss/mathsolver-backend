@@ -31,3 +31,10 @@
 .dk .fno,.dk .fe{color:#93a2c4;}
 .dk .fx{background:#1f2c4a;color:#a9c4ff;}
 .dk .fst:not(.on){opacity:.8;}
+/* niveau du profil (fixe) : il se change dans le profil */
+.fml{flex:1;min-width:0;height:44px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 12px 0 14px;border:1.5px solid #d3dbea;border-radius:14px;background:#fff;font-size:15px;color:#0f1b33;text-align:left;}
+.fml span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.fml b{font-weight:800;}
+.fml i{flex:none;font-style:normal;font-size:13px;font-weight:700;color:#1a4db5;}
+.dk .fml{background:#172033;border-color:#33415f;color:#eef2fb;}
+.dk .fml i{color:#8fb4ff;}
