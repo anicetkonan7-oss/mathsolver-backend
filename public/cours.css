@@ -52,3 +52,34 @@
 /* formules en ligne : elles peuvent passer à la ligne après =, + ou − au lieu de sortir de l'écran */
 .co .katex{display:inline;white-space:normal;}
 .co .katex .base{margin:1px 0;}
+/* figures : dessin SVG + légende ; toucher = plein écran */
+.cfg{margin:4px 0 14px;padding:10px 10px 8px;border:1px solid #e1e7f2;border-radius:14px;background:#fff;color:#0f1b33;cursor:zoom-in;-webkit-tap-highlight-color:transparent;}
+.cfg:active{background:#f6f8fd;}
+.cfd{position:relative;}
+.cfg svg,.cfb svg{display:block;width:100%;height:auto;max-width:420px;margin:0 auto;overflow:visible;}
+.cfi{position:absolute;right:0;bottom:0;width:26px;height:26px;border-radius:13px;background:#eef3ff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231a4db5' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5M10.5 8v5M8 10.5h5'/%3E%3C/svg%3E") center/16px no-repeat;}
+.cfg figcaption{margin-top:6px;font-size:14px;line-height:1.45;color:#4a5573;text-align:center;}
+.qs{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.qs.qb{stroke-width:3.4;}.qs.qd{stroke-dasharray:6 5;}.qs.qra{stroke-width:1.6;}.qs.qax{stroke-width:1.6;}
+.qg{fill:currentColor;fill-opacity:.13;}
+.qgr{stroke:#dbe2ef;stroke-width:1;}
+.qpt{fill:currentColor;}
+.qtp{font:700 15px system-ui,sans-serif;fill:currentColor;}
+.qtl{font:600 13px system-ui,sans-serif;fill:currentColor;stroke:none;}
+.qtg{font:500 11px system-ui,sans-serif;fill:#68728c;}
+.qk1{color:#1a62e8;}.qk2{color:#e8590c;}.qk3{color:#1f9d55;}.qk4{color:#7048e8;}
+.cfz{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(15,27,51,.55);opacity:0;transition:opacity .18s;touch-action:none;cursor:zoom-out;}
+.cfz.on{opacity:1;}
+.cfb{box-sizing:border-box;width:100%;max-height:92vh;padding:14px 10px 14px;border-radius:18px;background:#fff;color:#0f1b33;transform:scale(.94);transition:transform .18s;}
+.cfz.on .cfb{transform:none;}
+.cfw{overflow:auto;max-height:72vh;touch-action:pan-x pan-y;overscroll-behavior:contain;}
+.cfb .cfw svg{width:190%;max-width:none;}
+.cfb p{margin:10px 4px 0;font-size:15px;line-height:1.5;text-align:center;color:#4a5573;}
+.cfx{position:absolute;top:14px;right:14px;width:40px;height:40px;border-radius:20px;background:rgba(255,255,255,.95) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='%230f1b33' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") center/18px no-repeat;}
+.dk .cfg,.dk .cfb{background:#172033;border-color:#26324a;color:#e3e9f6;}
+.dk .cfg:active{background:#1b2640;}
+.dk .cfi{background-color:#1f2c4a;}
+.dk .cfg figcaption,.dk .cfb p{color:#a9b5cf;}
+.dk .qgr{stroke:#2a3651;}.dk .qtg{fill:#8a97b5;}
+.dk .qk1{color:#6ea0ff;}.dk .qk2{color:#ff9a5c;}.dk .qk3{color:#5fd394;}.dk .qk4{color:#b9a6ff;}
+.dk .cfz{background:rgba(0,0,0,.7);}
