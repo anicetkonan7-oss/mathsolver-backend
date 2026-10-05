@@ -1,4 +1,4 @@
-/* MathSolver - Cours : mise en forme d'une leçon (formules, encadrés, étapes, rédaction) */
+/* MathSolver - Cours : mise en forme d'une leçon (formules, encadrés, figures, étapes, rédaction) */
 (function (w) {
   "use strict";
   if (w.MSCOV) { return; }
@@ -20,13 +20,19 @@
   }
   // corps d'une partie, ligne par ligne :
   // [D] définition, [P] propriété, [K] à retenir, [!] attention, [R] remarque (« Titre :: texte », // = retour à la ligne),
-  // ## sous-titre, 1) étape, - puce, > ligne de rédaction, sinon paragraphe
+  // [F] figure (« Légende :: dessin »), ## sous-titre, 1) étape, - puce, > ligne de rédaction, sinon paragraphe
   function body(src) {
     var L = String(src).split("\n"), o = "", i, l, m, g = "", G = { ol: "</ol>", ul: "</ul>", cp: "</div>" };
     function grp(t, open) { if (g !== t) { o += g ? G[g] : ""; g = t; o += t ? open : ""; } }
     for (i = 0; i < L.length; i++) {
       l = L[i].trim();
       if (!l) { grp(""); continue; }
+      if ((m = l.match(/^\[F\]\s*(.*)$/))) {
+        grp("");
+        m = m[1].split("::");
+        o += m.length > 1 ? fig(m.slice(1).join("::"), m[0].trim()) : fig(m[0], "");
+        continue;
+      }
       if ((m = l.match(/^\[([DPK!R])\]\s*(.*)$/))) {
         grp("");
         var p = m[2].split("::"), h = p.length > 1 ? p[0].trim() : "", t = (p.length > 1 ? p.slice(1).join("::") : p[0]).trim();
@@ -40,6 +46,45 @@
     grp("");
     return o;
   }
+
+  // figure : dessin + légende ; toucher = plein écran
+  function fig(src, cap) {
+    var g = w.MSCOF ? w.MSCOF.svg(src) : "";
+    if (!g) { return ""; }
+    return '<figure class="cfg" data-cf tabindex="0" role="button" aria-label="' + e(cap.replace(/\$|\*\*|\\/g, "")) + '"><div class="cfd">' + g + '<i class="cfi"></i></div>' + (cap ? "<figcaption>" + tx(cap) + "</figcaption>" : "") + "</figure>";
+  }
+  // plein écran posé sur body, figure agrandie (le doigt la déplace) ; il se ferme tout seul si la leçon quitte l'écran
+  var Z = null, D = document, MO = null;
+  function zoom(f) {
+    var o, c = f.querySelector("figcaption"), a = D.getElementById("app");
+    if (Z) { return; }
+    Z = o = D.createElement("div");
+    o.className = "cfz";
+    o.innerHTML = '<button class="cfx" aria-label="Fermer"></button><div class="cfb"><div class="cfw">' + f.querySelector("svg").outerHTML + "</div>" + (c ? "<p>" + c.innerHTML + "</p>" : "") + "</div>";
+    D.body.appendChild(o);
+    c = o.querySelector(".cfw");
+    c.scrollLeft = (c.scrollWidth - c.clientWidth) / 2;
+    c.scrollTop = (c.scrollHeight - c.clientHeight) / 2;
+    o.className = "cfz on";
+    if (a && w.MutationObserver) { MO = new MutationObserver(function () { if (!D.body.contains(f)) { shut(); } }); MO.observe(a, { childList: true }); }
+  }
+  function shut() {
+    var o = Z;
+    Z = null;
+    if (MO) { MO.disconnect(); MO = null; }
+    if (!o) { return; }
+    o.className = "cfz";
+    setTimeout(function () { if (o.parentNode) { o.parentNode.removeChild(o); } }, 180);
+  }
+  // retour (flèche ou bouton du téléphone) : ferme d'abord la figure agrandie
+  w.addEventListener("click", function (ev) {
+    var t = ev.target.closest ? ev.target.closest("#home") : null;
+    if (t && Z) { ev.stopImmediatePropagation(); ev.preventDefault(); shut(); }
+  }, true);
+  D.addEventListener("click", function (ev) {
+    var f = ev.target.closest ? ev.target.closest(".cfz,[data-cf]") : null;
+    if (f) { if (f.className.indexOf("cfz") === 0) { shut(); } else { zoom(f); } }
+  });
 
   // page complète d'une leçon : en-tête, sommaire, parties, exercices avec corrections dépliables, liens
   function page(c, ttl, n, T, sv) {
@@ -58,5 +103,5 @@
     }
     return s + '<div class="coa"><button class="sb2" data-co="fm">' + e(T.fm) + "</button>" + (sv ? '<button class="pb" data-co="sv">' + e(T.sv) + "</button>" : "") + "</div></div>";
   }
-  w.MSCOV = { tx: tx, body: body, page: page };
+  w.MSCOV = { tx: tx, body: body, page: page, shut: shut };
 })(window);
