@@ -10,7 +10,9 @@
 
   var st = document.createElement("style");
   st.textContent =
-    ".rp-card{margin:12px 12px 28px;background:#fff;border:1px solid #e2e7f1;border-radius:16px;padding:14px 16px;box-shadow:0 1px 2px rgba(16,24,40,.05),0 3px 10px rgba(16,24,40,.04);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#1f2937}" +
+    ".rp-card{margin:12px 12px 28px;background:#fff;border:1px solid #e2e7f1;border-radius:16px;padding:14px 16px;box-shadow:0 1px 2px rgba(16,24,40,.05),0 3px 10px rgba(16,24,40,.04);color:#1f2937}" +
+    ".rp-min,.dk .rp-min{background:none;border-color:transparent;box-shadow:none;padding:0 12px}.rp-min .rp-row{justify-content:center;gap:4px}.rp-min .rp-q{flex:none;min-width:0}" +
+    ".rp-min .rp-btn,.dk .rp-min .rp-btn{border:0;background:none;padding:0 8px;color:#b42318}.dk .rp-min .rp-btn{color:#ff8a80}.rp-min .rp-btn:before{content:\"⚑ \"}" +
     ".rp-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}" +
     ".rp-q{font-size:14px;line-height:1.4;color:#5b6784;flex:1;min-width:150px}" +
     ".rp-btn{font:inherit;font-size:14px;font-weight:bold;border-radius:999px;min-height:44px;padding:9px 14px;border:1.5px solid #dc2626;background:#fff;color:#b91c1c}" +
@@ -48,17 +50,20 @@
   var card = mk("div", "rp-card", "", host);
   var kind = "";
 
+  // en temps normal : une ligne discrète ; le formulaire s'ouvre au toucher
   function showButton() {
     card.innerHTML = "";
+    card.className = "rp-card rp-min";
     var row = mk("div", "rp-row", "", card);
-    mk("div", "rp-q", "Cette solution te semble fausse ou incomplète ?", row);
-    var b = mk("button", "rp-btn", "⚠ Signaler une erreur", row);
+    mk("span", "rp-q", "Une erreur dans la correction ?", row);
+    var b = mk("button", "rp-btn", "Signaler", row);
     b.type = "button";
     b.onclick = showForm;
   }
 
   function showForm() {
     card.innerHTML = "";
+    card.className = "rp-card";
     kind = "";
     mk("p", "rp-lab", "Quel est le problème ?", card).style.margin = "0 0 10px";
     var chips = mk("div", "rp-chips", "", card), btns = [];
@@ -104,28 +109,4 @@
           return r.json().catch(function () { return {}; }).then(function (j) {
             clearTimeout(timer);
             if (r.ok && j && j.ok) { done(); return; }
-            fail(msg, send, cancel, (j && j.error) ? r.status + " " + j.error : String(r.status));
-          });
-        })
-        .catch(function (e) {
-          clearTimeout(timer);
-          fail(msg, send, cancel, e && e.name === "AbortError" ? "délai dépassé" : "réseau");
-        });
-    };
-    try { card.scrollIntoView({ block: "nearest" }); } catch (e) { }
-  }
-
-  function fail(msg, send, cancel, why) {
-    msg.className = "rp-msg rp-err";
-    msg.textContent = "Envoi impossible pour le moment. Vérifie ta connexion puis réessaie. (" + why + ")";
-    send.disabled = false; cancel.disabled = false;
-    send.textContent = "Réessayer";
-  }
-
-  function done() {
-    card.innerHTML = "";
-    mk("div", "rp-ok", "✓ Merci ! Ton signalement a bien été envoyé. Il va aider à corriger l'appli.", card);
-  }
-
-  showButton();
-})();
+            fail(msg, send, cancel, (j && j.error) ? r.status + " " + j
