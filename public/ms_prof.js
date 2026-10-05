@@ -9,9 +9,15 @@
   function row(k, v, o) {
     return '<button class="row" data-o="' + o + '"><span class="k">' + e(k) + '</span><span class="v">' + e(v) + '</span><span class="chv"></span></button>';
   }
-  // pays choisi : verrouillé (cadenas à la place de la flèche)
+  // pays verrouillé : cadenas à la place de la flèche
   function lock(r) {
-    return r.replace('<span class="chv"></span>', '<span class="chv" aria-hidden="true" style="background:url(&quot;data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%238492b1%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27><rect x=%275%27 y=%2711%27 width=%2714%27 height=%2710%27 rx=%272%27/><path d=%27M8 11V7a4 4 0 0 1 8 0v4%27/></svg>&quot;) center/18px no-repeat"></span>');
+    return r.replace('<span class="chv"></span>', '<span class="chv" aria-hidden="true" style="background:url(&quot;data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%238492b1%27 stroke-width=%272%27><rect x=%275%27 y=%2711%27 width=%2714%27 height=%2710%27 rx=%272%27/><path d=%27M8 11V7a4 4 0 0 1 8 0v4%27/></svg>&quot;) center/18px no-repeat"></span>');
+  }
+  // pseudo : 30 jours entre deux changements
+  function nick(P) {
+    var N = w.MSNICK, k = N && P.n ? N.lock(P, A.lang() === "en") : null;
+    if (!k) { return row(t("p_n"), P.n || t("p_fill"), "n"); }
+    return lock(row(t("p_n"), P.n, "nl")).replace('</span><span class="v">', '<small style="display:block;font-size:12px;color:#8492b1">' + e(k[0]) + '</small></span><span class="v">');
   }
   function lb(k) { return '<label class="lb">' + e(t(k)) + "</label>"; }
   function seg(l, id, n) { return '<button data-o="l" data-v="' + id + '"' + (l === id ? ' class="on"' : "") + ">" + n + "</button>"; }
@@ -19,7 +25,7 @@
   function prof() {
     var P = A.P(), S = A.sess(), n = P.n || t("gu"), l = A.lang(), s;
     s = K.head(1, 0, t("p_t")) + '<div class="pc">' + A.av(n, 1) + "<b>" + e(n) + "</b><i>" + e(P.ln ? P.ln + (P.cn ? " · " + P.cn : "") : t("p_fill")) + '</i><span class="pill2' + (S ? "" : " g") + '">' + e(t(S ? "p_on" : "p_gs")) + "</span></div>";
-    s += '<div class="rows">' + row(t("p_n"), P.n || t("p_fill"), "n") + row(t("p_l"), P.ln || t("p_fill"), "lv") + (P.c ? lock(row(t("p_c"), G.flag(P.c) + " " + (P.cn || ""), "cl")) : row(t("p_c"), t("p_fill"), "c")) + "</div>";
+    s += '<div class="rows">' + nick(P) + row(t("p_l"), P.ln || t("p_fill"), "lv") + (P.c ? lock(row(t("p_c"), G.flag(P.c) + " " + (P.cn || ""), "cl")) : row(t("p_c"), t("p_fill"), "c")) + "</div>";
     s += lb("p_g") + '<div class="sg">' + seg(l, "fr", "Français") + seg(l, "en", "English") + "</div>" + lb("p_a");
     if (S) {
       return s + '<div class="rows"><div class="row"><span class="k">' + e(t("a_em")) + '</span><span class="v">' + e(S.em) + '</span></div></div><button class="sb2" data-o="out">' + e(t("p_out")) + '</button><button class="tl red" data-o="del">' + e(t("p_del")) + "</button>";
@@ -37,7 +43,6 @@
     if (k === "up") { s += '<button class="tl" data-o="in">' + e(t("a_hv")) + '</button><p class="fn">' + e(t("a_pv")) + "</p>"; }
     return s;
   }
-  // from : écran d'où l'on vient quand c'est l'accueil de départ (welcome, done) ; org : où ramène la flèche des formulaires
   function show(v, from) {
     if (v === "del" && !A.sess()) { v = "prof"; }
     if (from) { org = from; }
@@ -87,11 +92,13 @@
   function on(o, v) {
     if (o === "back") { back(); }
     else if (o === "go") { go(); }
+    else if (o === "nl") { var k = w.MSNICK && w.MSNICK.lock(A.P(), A.lang() === "en"); if (k) { A.toast(k[1]); } else { w.MSONB.show("name", 1); } }
     else if (o === "cl" || (o === "c" && A.P().c)) { A.toast(A.lang() === "en" ? "The country chosen at sign-up can't be changed." : "Le pays choisi à l'inscription ne peut plus être modifié."); }
     else if (o === "n" || o === "lv" || o === "c") { w.MSONB.show(o === "n" ? "name" : o === "lv" ? "level" : "country", 1); }
     else if (o === "l") { A.setLang(v, function () { show("prof"); }); }
     else if (o === "out") { A.out(1); A.toast(t("m_out")); w.MSONB.show("onb"); }
     else if (F[o]) { show(o); }
   }
+  if (!w.MSNICK) { A.ld(["ms_nick.js?v=1"], function () { if (cur === "prof") { show("prof"); } }); }
   w.MSPROF = { show: show };
 })(window);
