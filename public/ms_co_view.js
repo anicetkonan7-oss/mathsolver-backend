@@ -20,7 +20,7 @@
   }
   // corps d'une partie, ligne par ligne :
   // [D] définition, [P] propriété, [K] à retenir, [!] attention, [R] remarque (« Titre :: texte », // = retour à la ligne),
-  // [F] figure (« Légende :: dessin »), ## sous-titre, 1) étape, - puce, > ligne de rédaction, sinon paragraphe
+  // [F] figure (« Légende :: dessin »), ## sous-titre, 1) étape, - puce, > ligne de rédaction, $$…$$ seul = formule centrée, sinon paragraphe
   function body(src) {
     var L = String(src).split("\n"), o = "", i, l, m, g = "", G = { ol: "</ol>", ul: "</ul>", cp: "</div>" };
     function grp(t, open) { if (g !== t) { o += g ? G[g] : ""; g = t; o += t ? open : ""; } }
@@ -41,6 +41,7 @@
       else if ((m = l.match(/^\d+\)\s*(.*)$/))) { grp("ol", "<ol>"); o += "<li>" + tx(m[1]) + "</li>"; }
       else if ((m = l.match(/^-\s+(.*)$/))) { grp("ul", "<ul>"); o += "<li>" + tx(m[1]) + "</li>"; }
       else if ((m = l.match(/^>\s?(.*)$/))) { grp("cp", '<div class="cop">'); o += "<p>" + tx(m[1]) + "</p>"; }
+      else if (/^\$\$[\s\S]+\$\$$/.test(l)) { grp(""); o += tx(l); }
       else { grp(""); o += "<p>" + tx(l) + "</p>"; }
     }
     grp("");
