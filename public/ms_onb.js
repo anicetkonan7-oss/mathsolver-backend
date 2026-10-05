@@ -1,7 +1,7 @@
 /* MathSolver - premier lancement et modification du profil : langue, bienvenue, pays, niveau, pseudo, fin */
 (function (w) {
   "use strict";
-  var A = w.MSAC, K = w.MSKIT, D = document, st = { v: "", ed: 0, d: {} }, pc = "";
+  var A = w.MSAC, K = w.MSKIT, D = document, st = { v: "", ed: 0, d: {} }, pc = "", nl = 0;
   if (w.MSONB || !A || !K) { return; }
   var t = A.t, e = A.esc;
   function skip() { return st.ed ? "" : '<button class="tl" data-o="skip">' + e(t("lt")) + "</button>"; }
@@ -42,10 +42,13 @@
     st.v = v;
     K.show(V[v](), on);
     if (v === "done" && w.MSFUN && !nf) { w.MSFUN.confetti(); }
+    if (v === "name" && !w.MSNICK) { A.ld(["ms_nick.js?v=1"], function () { }); }
     if (v === "name") { setTimeout(function () { var i = D.getElementById("nm"); if (i && st.v === "name") { i.focus(); } }, 350); }
   }
   function commit() {
-    var d = st.d;
+    var d = st.d, P = A.P();
+    // un pseudo existant qui change : le délai de 30 jours démarre
+    if (P.n && (d.n || "") !== P.n) { A.save({ nt: Date.now() }); }
     A.save({ c: d.c || "", lv: d.lv || "", ot: d.ot ? 1 : 0, n: d.n || "" });
     A.labels();
     A.toast(t("m_sv"));
@@ -72,9 +75,13 @@
     var n = { country: "level", level: "name", cando: "name" }[from];
     if (st.ed) { commit(); } else if (n) { show(n); } else { finish(); }
   }
+  // pseudo nettoyé et vérifié (longueur, caractères, mots interdits)
   function name() {
-    var i = D.getElementById("nm"), v = i ? i.value.trim() : "", r = D.getElementById("ner");
-    if (v.length < 2 || v.length > 24) { if (r) { r.textContent = t("n_e"); } return; }
+    var i = D.getElementById("nm"), N = w.MSNICK, v, r = D.getElementById("ner"), c;
+    if (!N && !nl) { nl = 1; A.ld(["ms_nick.js?v=1"], name); return; }
+    v = i ? (N ? N.clean(i.value) : i.value.trim()) : "";
+    c = N ? N.check(v) : (v.length < 2 || v.length > 24 ? "len" : "");
+    if (c) { if (r) { r.textContent = N ? N.msg(c, A.lang() === "en") : t("n_e"); } return; }
     st.d.n = v;
     next("name");
   }
