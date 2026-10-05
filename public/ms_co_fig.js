@@ -43,9 +43,9 @@
       var a = c.a, g = c.c, s, p, u, v, m, d, f, i, L;
       try {
       if (g === "X") {
-        for (i = M.ceil(+a[0]); i <= +a[1]; i++) { o += pa("qgr", "M" + X(i) + " " + Y(+a[2]) + "V" + Y(+a[3])); if (i) { o += tx(X(i), Y(0) + 15, i, "qtg", "middle"); } }
-        for (i = M.ceil(+a[2]); i <= +a[3]; i++) { o += pa("qgr", "M" + X(+a[0]) + " " + Y(i) + "H" + X(+a[1])); if (i) { o += tx(X(0) - 6, Y(i) + 4, i, "qtg", "end"); } }
-        o += pa("qs qax", "M" + X(+a[0]) + " " + Y(0) + "H" + X(+a[1]) + "M" + X(0) + " " + Y(+a[2]) + "V" + Y(+a[3])) + tx(X(0) - 6, Y(0) + 15, "O", "qtg", "end");
+        for (i = M.ceil(+a[0]); i <= +a[1]; i++) { o += pa("qgr", "M" + X(i) + " " + Y(+a[2]) + "V" + Y(+a[3])); if (i) { z += tx(X(i), Y(0) + 15, i, "qtg", "middle"); } }
+        for (i = M.ceil(+a[2]); i <= +a[3]; i++) { o += pa("qgr", "M" + X(+a[0]) + " " + Y(i) + "H" + X(+a[1])); if (i) { z += tx(X(0) - 6, Y(i) + 4, i, "qtg", "end"); } }
+        o += pa("qs qax", "M" + X(+a[0]) + " " + Y(0) + "H" + X(+a[1]) + "M" + X(0) + " " + Y(+a[2]) + "V" + Y(+a[3])); z += tx(X(0) - 6, Y(0) + 15, "O", "qtg", "end");
       } else if (g === "F") {
         f = fx(q(a[0])); s = st(a.slice(3)); d = "";
         for (i = 0; f && i <= 120; i++) { u = +a[1] + (a[2] - a[1]) * i / 120; v = f(u); m = isFinite(v) && v >= b[1] && v <= b[3]; d += m ? (d && L ? "L" : "M") + X(u) + " " + Y(v) : ""; L = m; }
