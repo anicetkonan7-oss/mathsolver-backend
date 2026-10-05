@@ -1,0 +1,18 @@
+/* MathSolver - Cours Terminale, chapitre 12 : Géométrie dans l'espace (1/3) */
+MSCOP("lt.11", { t: "Géométrie dans l'espace", s: [
+["Introduction", String.raw`Dans l'espace, on repère chaque point par **trois coordonnées** $(x \,;\, y \,;\, z)$. Les vecteurs, le **produit scalaire** et les **équations** permettent de décrire droites, plans et sphères, de calculer des distances et des angles, et d'étudier les positions relatives.
+[R] Dans la vie courante :: Architecture, modélisation 3D, jeux vidéo, GPS, robotique et imagerie médicale utilisent la géométrie analytique de l'espace.`],
+["Définitions", String.raw`[D] Repère orthonormé :: $(O \,;\, \vec{i}, \vec{j}, \vec{k})$, avec trois vecteurs unitaires deux à deux orthogonaux. Un point $M$ a pour coordonnées $(x \,;\, y \,;\, z)$ si $\overrightarrow{OM} = x\vec{i} + y\vec{j} + z\vec{k}$.
+[F] Le point $M(2 \,;\, 3 \,;\, 2)$ dans un repère de l'espace, et son projeté $m$ sur le plan $(xOy)$. :: p O 0 0 ; p X -2 -1.67 ; p Y 4.2 0 ; p Z 0 3.4 ; V O X c1 ; V O Y c1 ; V O Z c1 ; L -2.2 -1.25 "x" c1 ; L 4.2 0.35 "y" c1 ; L 0.35 3.3 "z" c1 ; P M 1.8 1 ne ; P m 1.8 -1 se ; p a -1.2 -1 ; p b 3 0 ; S a m d ; S b m d ; S m M c2 d ; S O M c2 b ; L -0.4 -0.1 "O"
+[D] Vecteurs :: $\overrightarrow{AB}$ a pour coordonnées $(x_B - x_A \,;\, y_B - y_A \,;\, z_B - z_A)$. $\vec{u}$ et $\vec{v}$ sont **colinéaires** si $\vec{v} = \lambda\vec{u}$. Trois vecteurs sont **coplanaires** si l'un s'écrit avec les deux autres.
+[D] Produit scalaire et norme :: $\vec{u} \cdot \vec{v} = xx' + yy' + zz'$ ; $\|\vec{u}\| = \sqrt{x^2 + y^2 + z^2}$.
+[D] Vecteur normal :: $\vec{n} \neq \vec{0}$ est normal au plan $\mathcal{P}$ s'il est orthogonal à tous les vecteurs de $\mathcal{P}$.
+[F] Le vecteur $\vec{n}$ est normal au plan $\mathcal{P}$ : il est orthogonal à toutes les droites du plan. :: p a 0 0 ; p b 4 0 ; p c 5 1.6 ; p d 1 1.6 ; G a b c d c1 ; P A 2.5 0.8 so ; p N 2.5 3 ; p B 3.7 0.8 ; V A N c2 b ; S A B ; R N A B ; L 2.9 2.7 "n" c2 ; L 4.1 1.25 "(P)" c1
+[D] Représentation paramétrique d'une droite :: La droite passant par $A(x_A \,;\, y_A \,;\, z_A)$ et dirigée par $\vec{u}(\alpha \,;\, \beta \,;\, \gamma)$ : $x = x_A + t\alpha$, $y = y_A + t\beta$, $z = z_A + t\gamma$, avec $t$ réel.`],
+["Propriétés", String.raw`[P] Orthogonalité :: $\vec{u} \perp \vec{v} \iff \vec{u} \cdot \vec{v} = 0$. // Distance : $AB = \sqrt{(x_B - x_A)^2 + (y_B - y_A)^2 + (z_B - z_A)^2}$.
+[P] Équation cartésienne d'un plan :: Le plan de vecteur normal $\vec{n}(a \,;\, b \,;\, c)$ a une équation $ax + by + cz + d = 0$. Réciproquement, une telle équation définit un plan de vecteur normal $\vec{n}(a \,;\, b \,;\, c)$.
+[P] Distance d'un point à un plan :: La distance de $M_0(x_0 \,;\, y_0 \,;\, z_0)$ au plan $ax + by + cz + d = 0$ est : // $d = \dfrac{|ax_0 + by_0 + cz_0 + d|}{\sqrt{a^2 + b^2 + c^2}}$.
+[F] La distance de $M$ au plan est la longueur $MH$, où $H$ est le projeté orthogonal de $M$ sur le plan. :: p a 0 0 ; p b 4 0 ; p c 5 1.6 ; p d 1 1.6 ; G a b c d c1 ; P H 2.5 0.8 so ; P M 2.5 3 n ; p B 3.7 0.8 ; S M H c2 b d ; S H B ; R M H B ; L 2.85 1.9 "d" c2
+[P] Positions relatives :: Deux plans de vecteurs normaux $\vec{n}$ et $\vec{n'}$ sont parallèles si $\vec{n}$ et $\vec{n'}$ sont colinéaires, perpendiculaires si $\vec{n} \cdot \vec{n'} = 0$. // Une droite de vecteur directeur $\vec{u}$ est parallèle au plan si $\vec{u} \cdot \vec{n} = 0$, et orthogonale au plan si $\vec{u}$ et $\vec{n}$ sont colinéaires.
+[P] Sphère :: La sphère de centre $\Omega(a \,;\, b \,;\, c)$ et de rayon $R$ a pour équation $(x - a)^2 + (y - b)^2 + (z - c)^2 = R^2$.`]
+] });

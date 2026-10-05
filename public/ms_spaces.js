@@ -1,7 +1,7 @@
 /* MathSolver - les espaces de l'accueil (Cours, Formules, Exercices, Évaluation, Examens, Progression) et les exemples du niveau */
 (function (w) {
   "use strict";
-  var D = document, sel = "", LIVE = {}, SRC = { formules: "ms_form.js?v=1", cours: "ms_cours.js?v=1" }, FMOK = { l3: 1, l2: 1 }, busy = {}, K = ["cours", "formules", "exercices", "eval", "examens", "progres"];
+  var D = document, sel = "", LIVE = {}, SRC = { formules: "ms_form.js?v=1", cours: "ms_cours.js?v=1" }, FMOK = { l3: 1, l2: 1, lt: 1 }, busy = {}, K = ["cours", "formules", "exercices", "eval", "examens", "progres"];
   var CO = ["#1a62e8", "#7048e8", "#e8590c", "#2b8a3e", "#c2255c", "#0b7285"];
   var IC = [
     '<path d="M12 6c-2-1.3-4.5-2-8-2v13c3.5 0 6 .7 8 2 2-1.3 4.5-2 8-2V4c-3.5 0-6 .7-8 2zM12 6v13"/>',

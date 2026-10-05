@@ -1,0 +1,18 @@
+/* MathSolver - Cours Terminale, chapitre 15 : Coniques, série C (1/3) */
+MSCOP("lt.14", { t: "Coniques (série C)", s: [
+["Introduction", String.raw`Les **coniques** (parabole, ellipse, hyperbole) sont les courbes obtenues en coupant un cône par un plan. On les définit aussi avec un **foyer**, une **directrice** et une **excentricité**. Leurs équations réduites permettent de les reconnaître et de les tracer.
+[R] Dans la vie courante :: Les planètes décrivent des ellipses autour du Soleil ; les antennes paraboliques et les phares utilisent la propriété du foyer de la parabole ; la trajectoire d'un ballon lancé est une parabole.`],
+["Définitions", String.raw`[D] Conique :: Soit $F$ un point (foyer), $\mathcal{D}$ une droite (directrice) ne passant pas par $F$, et $e > 0$ (excentricité). La conique est l'ensemble des points $M$ tels que $MF = e \times MH$, où $H$ est le projeté orthogonal de $M$ sur $\mathcal{D}$.
+[D] Nature :: $e = 1$ : **parabole** ; $e < 1$ : **ellipse** ; $e > 1$ : **hyperbole**.
+[D] Parabole :: Équation réduite $y^2 = 2px$ ($p > 0$) : foyer $F\left(\dfrac{p}{2} \,;\, 0\right)$, directrice $x = -\dfrac{p}{2}$, sommet $O$.
+[F] Parabole $y^2 = 4x$ : foyer $F(1 \,;\, 0)$, directrice $x = -1$. Pour tout point $M$ de la courbe, $MF = MH$. :: X -2 3 -3 3 ; F "2*sqrt(x)" 0 3 c1 b ; F "-2*sqrt(x)" 0 3 c1 b ; p d1 -1 -3 ; p d2 -1 3 ; S d1 d2 c3 b ; P F 1 0 s ; P M 2 2.83 e ; P H -1 2.83 n ; S M F c2 ; S M H c2 ; R M H d1 ; K M F 1 ; K M H 1 ; L -1.5 -2.6 "D" c3
+[D] Ellipse :: Équation réduite $\dfrac{x^2}{a^2} + \dfrac{y^2}{b^2} = 1$ ($a > b > 0$), avec $c^2 = a^2 - b^2$. // Foyers $F(c \,;\, 0)$ et $F'(-c \,;\, 0)$ ; $e = \dfrac{c}{a}$ ; directrices $x = \pm\dfrac{a^2}{c}$ ; sommets $(\pm a \,;\, 0)$ et $(0 \,;\, \pm b)$.
+[F] Ellipse $\dfrac{x^2}{25} + \dfrac{y^2}{9} = 1$ : foyers $F(4 \,;\, 0)$ et $F'(-4 \,;\, 0)$. Pour $M$ sur l'ellipse, $MF + MF' = 2a = 10$. :: p x1 -6 0 ; p x2 6 0 ; p y1 0 -3.5 ; p y2 0 3.5 ; S x1 x2 ; S y1 y2 ; F "3*sqrt(1-x^2/25)" -5 5 c1 b ; F "-3*sqrt(1-x^2/25)" -5 5 c1 b ; P F 4 0 s ; P F' -4 0 s ; P M 3 2.4 ne ; S M F c2 b ; S M F' c2 b ; T M F "2,6" c2 - ; T F' M "7,4" c2
+[D] Hyperbole :: Équation réduite $\dfrac{x^2}{a^2} - \dfrac{y^2}{b^2} = 1$, avec $c^2 = a^2 + b^2$. // Foyers $(\pm c \,;\, 0)$ ; $e = \dfrac{c}{a}$ ; directrices $x = \pm\dfrac{a^2}{c}$ ; asymptotes $y = \pm\dfrac{b}{a}x$.`],
+["Propriétés", String.raw`[P] Définition bifocale de l'ellipse :: $M$ est sur l'ellipse de foyers $F$, $F'$ si et seulement si $MF + MF' = 2a$.
+[P] Définition bifocale de l'hyperbole :: $M$ est sur l'hyperbole si et seulement si $|MF - MF'| = 2a$.
+[F] Hyperbole $\dfrac{x^2}{4} - y^2 = 1$ : deux branches, foyers $(\pm\sqrt{5} \,;\, 0)$ et asymptotes $y = \pm\dfrac{x}{2}$. :: p x1 -6 0 ; p x2 6 0 ; p y1 0 -3.5 ; p y2 0 3.5 ; S x1 x2 ; S y1 y2 ; F "0.5*sqrt(x^2-4)" 2 5 c1 b ; F "-0.5*sqrt(x^2-4)" 2 5 c1 b ; F "0.5*sqrt(x^2-4)" -5 -2 c1 b ; F "-0.5*sqrt(x^2-4)" -5 -2 c1 b ; F "0.5*x" -5 5 c2 d ; F "-0.5*x" -5 5 c2 d ; P F 2.24 0 e ; P F' -2.24 0 o
+[P] Tangente :: Tangente en $M_0(x_0 \,;\, y_0)$ : ellipse $\dfrac{xx_0}{a^2} + \dfrac{yy_0}{b^2} = 1$ ; hyperbole $\dfrac{xx_0}{a^2} - \dfrac{yy_0}{b^2} = 1$ ; parabole $yy_0 = p(x + x_0)$.
+[P] Axe focal vertical :: $x^2 = 2py$ est une parabole de foyer $\left(0 \,;\, \dfrac{p}{2}\right)$. Si $b > a$ dans $\dfrac{x^2}{a^2} + \dfrac{y^2}{b^2} = 1$, les foyers sont sur $(Oy)$, avec $c^2 = b^2 - a^2$.
+[P] Changement de repère :: $\dfrac{(x - x_0)^2}{a^2} + \dfrac{(y - y_0)^2}{b^2} = 1$ est une ellipse de centre $\Omega(x_0 \,;\, y_0)$ : on se ramène à l'équation réduite avec $X = x - x_0$, $Y = y - y_0$.`]
+] });

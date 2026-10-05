@@ -5,7 +5,7 @@
   var BASE = "https://mathsolver-backend-gray.vercel.app/";
   if (w.MSCOURS || !A || !app || !SP) { return; }
   // niveaux qui ont des cours (même découpage en chapitres que les Formules)
-  var FL = { l3: "c", l2: "d" };
+  var FL = { l3: "c", l2: "d", lt: "f" };
   var T = {
     t: "Cours", q: "Rechercher un chapitre", b: "Retour", lv: "Niveau", md: "Modifier", no: "à choisir", ch: "Chapitre",
     nl: "Choisis ton niveau dans ton profil pour voir tes cours.", go: "Choisir mon niveau", s: "Les cours de ce niveau arrivent bientôt.",
@@ -126,7 +126,7 @@
     css("cocss", "cours.css?v=6");
     try { w.MSNav.solved(); } catch (x) { }
     lv = A.P().lv || ""; q = ""; sy = 0;
-    ld(["ms_geo.js?v=1", "ms_co_fig.js?v=3", "ms_co_chart.js?v=1", "ms_co_zoom.js?v=1", "ms_co_view.js?v=4", "co_idx.js?v=2"].concat(FL[lv] ? ["fm_" + FL[lv] + ".js?v=1"] : []), list);
+    ld(["ms_geo.js?v=1", "ms_co_fig.js?v=3", "ms_co_chart.js?v=1", "ms_co_plus.js?v=1", "ms_co_zoom.js?v=1", "ms_co_view.js?v=4", "co_idx.js?v=2"].concat(FL[lv] ? ["fm_" + FL[lv] + ".js?v=1"] : []), list);
   }
   SP.live.cours = open;
   w.MSCOURS = { open: open };
