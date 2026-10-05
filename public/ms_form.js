@@ -99,12 +99,18 @@
     if (ev.target.id === "fmq") { q = ev.target.value; redraw(); }
   });
 
-  function open() {
+  // ch : chapitre à ouvrir directement (lien « Voir les formules » d'un cours)
+  function open(ch) {
     css("accss", "acct.css?v=1");
     css("fmcss", "fm.css?v=1");
     try { w.MSNav.solved(); } catch (x) { }
     lv = FL[A.P().lv] ? A.P().lv : ""; q = ""; fv = 0; op = {}; fa = rd();
-    ld(["ms_geo.js?v=1"].concat(lv ? ["fm_" + FL[lv] + ".js?v=1"] : []), view);
+    if (ch >= 0) { op[ch] = true; }
+    ld(["ms_geo.js?v=1"].concat(lv ? ["fm_" + FL[lv] + ".js?v=1"] : []), function () {
+      view();
+      var b = ch >= 0 ? D.querySelector('[data-fm="ch"][data-v="' + ch + '"]') : null;
+      if (b) { w.scrollTo(0, b.getBoundingClientRect().top + w.pageYOffset - 8); }
+    });
   }
   SP.live.formules = open;
   w.MSFOR = { open: open };
