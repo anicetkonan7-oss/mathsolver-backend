@@ -53,3 +53,8 @@
 .dk .mnd{background:#0e1424;}
 .dk .mns{background:rgba(0,0,0,.55);}
 @media (prefers-reduced-motion:reduce){.mnd,.mns{transition:none;}}
+/* en-tête du menu fixé en haut ; fine ombre quand la liste défile */
+.mnd .ach{position:sticky;top:0;z-index:3;box-sizing:content-box;margin:-8px -16px 4px;padding:4px 16px;background:#f3f6fc;transition:box-shadow .2s;}
+.mnd.sc .ach{box-shadow:0 1px 0 #e1e7f2,0 8px 14px -10px rgba(15,27,51,.3);}
+.dk .mnd .ach{background:#0e1424;}
+.dk .mnd.sc .ach{box-shadow:0 1px 0 #26324a,0 8px 14px -10px rgba(0,0,0,.6);}
