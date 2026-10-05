@@ -8,7 +8,7 @@
   function draw() {
     W.innerHTML = ask
       ? '<div class="cfm"><span>Retirer des enregistr&eacute;es&nbsp;?</span><button class="cn" id="sno">Annuler</button><button class="cy" id="syes">Retirer</button></div>'
-      : '<button class="act wide' + (sid ? " on" : "") + '" id="bsave">' + BM + (sid ? "Correction enregistrée" : "Enregistrer la correction") + "</button>";
+      : '<button class="act wide' + (sid ? " on" : "") + '" id="bsave">' + BM + (sid ? "Enregistrée" : "Enregistrer") + "</button>";
   }
   function stop() { ask = 0; clearTimeout(tm); draw(); }
 
@@ -41,6 +41,6 @@
   try { sid = String(L.find(String(C.q || "")) || ""); } catch (x) { }
   draw();
   st = D.createElement("style");
-  st.textContent = ".acts{flex-wrap:wrap}.svw{flex:1 1 100%}.svw .act{width:100%}.act.on{background:#e6f6ec;border-color:#34a06a}.solo .act.on{background:#e6eeff;border-color:#1a62e8}.act.on svg{fill:currentColor}.cfm{display:flex;align-items:center;gap:8px;min-height:44px}.cfm span{flex:1;font-size:14px;font-weight:600;line-height:1.3}.cfm button{flex:none;height:44px;padding:0 14px;border-radius:12px;font-size:14px;font-weight:700}.cfm .cn{background:#e6eeff;color:#1741a6}.cfm .cy{background:#dc2626;color:#fff}.dk .act.on{background:#17301f}.dk .solo .act.on{background:#1f2c4a}.dk .cfm .cn{background:#1f2c4a;color:#c9d4ec}";
+  st.textContent = ".acts{flex-wrap:wrap}.svw{flex:1 1 100%}#bsave{background:#1f9d55;border-color:#1f9d55;color:#fff}.solo #bsave{background:#1a62e8;border-color:#1a62e8}#bsave.on{background:#e6f6ec;border-color:#34a06a;color:#0e5a31}.solo #bsave.on{background:#e6eeff;border-color:#1a62e8;color:#1741a6}.act.on svg{fill:currentColor}.cfm{display:flex;align-items:center;gap:8px;min-height:44px}.cfm span{flex:1;font-size:14px;font-weight:600;line-height:1.3}.cfm button{flex:none;height:44px;padding:0 14px;border-radius:12px;font-size:14px;font-weight:700}.cfm .cn{background:#e6eeff;color:#1741a6}.cfm .cy{background:#dc2626;color:#fff}.dk #bsave{background:#22a05b;border-color:#22a05b;color:#fff}.dk .solo #bsave{background:#2f6df0;border-color:#2f6df0}.dk #bsave.on{background:#17301f;color:#8fe0b2}.dk .solo #bsave.on{background:#1f2c4a;color:#a9c4ff}.dk .cfm .cn{background:#1f2c4a;color:#c9d4ec}";
   D.head.appendChild(st);
 })(window);
