@@ -34,19 +34,22 @@
 
   // Solution : étapes repliables (les premières ouvertes) puis réponse finale
   function cards(P) {
-    var r = P.raws, s = "", n = P.titles.length, i, shut, ttl;
+    var r = P.raws, s = "", n = P.titles.length, i, shut, ttl, a;
     if (!n) { return '<div class="card"><div class="body">' + r[0] + "</div></div>"; }
     if (r[0]) { s += '<div class="intro">' + r[0] + "</div>"; }
     if (n > 2) {
-      s += '<div class="tb"><span>' + n + ' &eacute;tapes</span><span><button id="fold">Tout replier</button>' + (P.hasAnswer ? '<button id="goans">R&eacute;ponse &#8595;</button>' : "") + "</span></div>";
+      s += '<div class="tb"><span>' + n + ' &eacute;tapes</span><span><button id="fold">Tout replier</button></span></div>';
     }
+    // frise : un numéro par étape, relié au suivant, la réponse finale au bout
+    s += '<div class="tl2">';
     for (i = 0; i < n; i++) {
       ttl = esc(P.titles[i].replace(/^\d+\s*[:.)-]\s*/, "").replace(/\*\*/g, ""));
       shut = n > 3 && i > 1;
-      s += '<div class="card' + (shut ? " shut" : "") + '"><button class="head" aria-expanded="' + (shut ? "false" : "true") + '"><span class="num">' + (i + 1) + '</span><span class="ttl">' + ttl + '</span><span class="chev"></span></button><div class="body">' + r[i + 1] + "</div></div>";
+      s += '<div class="stp"><span class="dot">' + (i + 1) + '</span><div class="card' + (shut ? " shut" : "") + '"><button class="head" aria-expanded="' + (shut ? "false" : "true") + '"><span class="num">' + (i + 1) + '</span><span class="ttl">' + ttl + '</span><span class="chev"></span></button><div class="body">' + r[i + 1] + "</div></div></div>";
     }
-    if (P.hasAnswer) { s += answer(r[r.length - 1]); }
-    return s;
+    a = P.hasAnswer ? answer(r[r.length - 1]) : "";
+    if (a) { s += '<div class="stp fin"><span class="dot ok"></span>' + a + "</div>"; }
+    return s + "</div>";
   }
 
   // Exercice (texte et/ou photo) : fixe en haut, poignée pour agrandir ou réduire ; le texte défile à l'intérieur
