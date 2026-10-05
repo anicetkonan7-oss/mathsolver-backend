@@ -1,7 +1,7 @@
 /* MathSolver - les espaces de l'accueil (Cours, Formules, Exercices, Évaluation, Examens, Progression) et les exemples du niveau */
 (function (w) {
   "use strict";
-  var D = document, sel = "", LIVE = {}, SRC = { formules: "ms_form.js?v=1" }, FMOK = { l3: 1, l2: 1 }, busy = {}, K = ["cours", "formules", "exercices", "eval", "examens", "progres"];
+  var D = document, sel = "", LIVE = {}, SRC = { formules: "ms_form.js?v=1", cours: "ms_cours.js?v=1" }, FMOK = { l3: 1, l2: 1 }, busy = {}, K = ["cours", "formules", "exercices", "eval", "examens", "progres"];
   var CO = ["#1a62e8", "#7048e8", "#e8590c", "#2b8a3e", "#c2255c", "#0b7285"];
   var IC = [
     '<path d="M12 6c-2-1.3-4.5-2-8-2v13c3.5 0 6 .7 8 2 2-1.3 4.5-2 8-2V4c-3.5 0-6 .7-8 2zM12 6v13"/>',
@@ -13,12 +13,12 @@
   ];
   var TX = {
     fr: {
-      h: "Tes espaces", s: "Bientôt", w: "Nouveau", p: "Bientôt disponible",
+      h: "Tes espaces", s: "Bientôt", o: "Ouvert", w: "Nouveau", p: "Bientôt disponible",
       n: ["Cours", "Formules", "Exercices", "Évaluation", "Examens", "Progression"],
       d: ["Les leçons de ton niveau{l}, expliquées simplement, avec des exemples.", "Toutes les formules de ton niveau{l}, classées par chapitre, à retrouver en un instant.", "Des exercices de ton niveau{l}, du plus facile au plus difficile, avec correction détaillée.", "Un test noté avec un temps limité, puis une correction comme sur une copie.", "Des sujets d'examens blancs pour t'entraîner dans les conditions réelles.", "Suis tes points, tes séries de jours et tes badges."]
     },
     en: {
-      h: "Your spaces", s: "Soon", w: "New", p: "Coming soon",
+      h: "Your spaces", s: "Soon", o: "Open", w: "New", p: "Coming soon",
       n: ["Lessons", "Formulas", "Exercises", "Assessment", "Mock exams", "Progress"],
       d: ["Lessons for your level{l}, explained simply, with examples.", "All the formulas for your level{l}, by chapter, in one tap.", "Exercises for your level{l}, from easy to hard, with detailed solutions.", "A timed, graded test, then a correction like on a real paper.", "Mock exam papers to practise in real conditions.", "Follow your points, your day streaks and your badges."]
     }
@@ -28,7 +28,7 @@
     ".sp button:active{background:#eef3ff;}.sp button.on{border-color:#1a62e8;box-shadow:0 0 0 2px #cfe0ff;}" +
     ".sp i{display:flex;align-items:center;justify-content:center;width:44px;height:44px;margin-bottom:2px;border-radius:12px;}" +
     ".sp svg{width:25px;height:25px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}" +
-    ".sp small{font-size:11px;font-weight:600;color:#5b6784;}.sp small.nw{padding:1px 8px;border-radius:9px;background:#fff1cc;color:#7a4f00;font-weight:800;}" +
+    ".sp small{font-size:11px;font-weight:600;color:#5b6784;}.sp small.lv{color:#1a4db5;font-weight:700;}.dk .sp small.lv{color:#8fb4ff;}.sp small.nw{padding:1px 8px;border-radius:9px;background:#fff1cc;color:#7a4f00;font-weight:800;}" +
     ".spi{margin:10px 12px 0;padding:14px 16px;border-radius:16px;background:#e8f0ff;color:#1741a6;font-size:14px;line-height:1.5;}" +
     ".spi b{display:block;margin-bottom:2px;font-size:16px;color:#0f1b33;}" +
     ".spi em{display:inline-block;margin-top:8px;padding:3px 10px;border-radius:99px;background:#fff;font-style:normal;font-size:12px;font-weight:700;color:#1a4db5;}" +
@@ -41,13 +41,13 @@
 
   function rs(k) { try { return w.MSStore.get(k) || ""; } catch (x) { return ""; } }
   // un espace est ouvert seulement s'il a du contenu pour le niveau de l'élève
-  function on(k) { var P = pf(); return !!(LIVE[k] || SRC[k]) && (k !== "formules" || !P.lv || !!FMOK[P.lv]); }
+  function on(k) { var P = pf(); return !!(LIVE[k] || SRC[k]) && ((k !== "formules" && k !== "cours") || !P.lv || !!FMOK[P.lv]); }
 
   function inner() {
     var T = TX[lg()], P = pf(), s = "", i, k, b;
     s += '<div class="sp">';
     for (i = 0; i < K.length; i++) {
-      b = on(K[i]) ? (rs("seen_" + K[i]) ? "" : '<small class="nw">' + T.w + "</small>") : "<small>" + T.s + "</small>";
+      b = on(K[i]) ? (rs("seen_" + K[i]) ? '<small class="lv">' + w.MSAC.esc(P.ln || T.o) + "</small>" : '<small class="nw">' + T.w + "</small>") : "<small>" + T.s + "</small>";
       s += '<button data-sp="' + K[i] + '"' + (sel === K[i] ? ' class="on"' : "") + '><i style="background:' + CO[i] + '"><svg viewBox="0 0 24 24">' + IC[i] + "</svg></i>" + T.n[i] + b + "</button>";
     }
     s += "</div>";
@@ -58,12 +58,11 @@
     return s;
   }
 
-  // la grille des espaces, avec son titre
   function grid() {
     return '<div class="hh"><span class="st">' + TX[lg()].h + '</span></div><div id="spg">' + inner() + "</div>";
   }
 
-  // jusqu'à n exemples du niveau de l'élève : [affichage, texte envoyé] ; null si le niveau est inconnu
+  // n exemples du niveau : [affichage, texte envoyé] ; null si niveau inconnu
   function ex(n) {
     var P = pf(), a = w.MS_EXL && P.lv ? w.MS_EXL[P.lv] : null, c = [], o = [], i, j, t;
     if (!a || !a.length) { return null; }
@@ -76,7 +75,7 @@
     return o;
   }
 
-  // espace actif : son script est téléchargé au premier appui, puis il s'ouvre
+  // espace actif : script chargé au 1er appui, puis ouvert
   function go(k) {
     var c;
     if (busy[k]) { return; }
