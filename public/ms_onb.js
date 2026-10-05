@@ -1,7 +1,7 @@
 /* MathSolver - premier lancement et modification du profil : langue, bienvenue, pays, niveau, pseudo, fin */
 (function (w) {
   "use strict";
-  var A = w.MSAC, K = w.MSKIT, D = document, st = { v: "", ed: 0, d: {} };
+  var A = w.MSAC, K = w.MSKIT, D = document, st = { v: "", ed: 0, d: {} }, pc = "";
   if (w.MSONB || !A || !K) { return; }
   var t = A.t, e = A.esc;
   function skip() { return st.ed ? "" : '<button class="tl" data-o="skip">' + e(t("lt")) + "</button>"; }
@@ -15,6 +15,12 @@
     },
     country: function () {
       return hd(1) + K.title("c_t", "c_s") + '<input class="si" id="cq" type="search" placeholder="' + e(t("c_q")) + '" autocomplete="off"><div id="cl">' + K.country("", st.d.c) + "</div>" + skip();
+    },
+    // confirmation du pays : il ne pourra plus être changé ensuite
+    cfm: function () {
+      var G = w.MSGEO, en = A.lang() === "en", a = G ? G.countries(A.lang()) : [], n = pc === "OT" ? t("c_o") : pc, i;
+      for (i = 0; i < a.length; i++) { if (a[i][0] === pc) { n = a[i][1]; } }
+      return hd(1) + "<h1>" + e(en ? "Confirm your country" : "Confirme ton pays") + '</h1><p class="sub">' + e(en ? "This choice can't be changed later." : "Ce choix ne pourra plus être modifié ensuite.") + '</p><div class="opt on">' + (pc !== "OT" && G ? '<span class="fl">' + G.flag(pc) + "</span>" : "") + '<span class="tx">' + e(n) + '</span></div><button class="pb" data-o="cy">' + e(en ? "Confirm" : "Confirmer") + '</button><button class="tl" data-o="cn">' + e(en ? "Change country" : "Changer de pays") + "</button>";
     },
     level: function () { return hd(2) + K.title("v_t", "v_s") + K.level(st.d.lv, st.d.ot) + skip(); },
     cando: function () { return hd(2) + K.title("d_t", "d_s") + K.cando(st.d.lv, st.d.ot); },
@@ -57,9 +63,9 @@
     A.close();
   }
   function back() {
-    var p = { welcome: "lang", country: "welcome", level: "country", cando: "level", name: st.d.ot ? "cando" : "level" }[st.v];
+    var p = { welcome: "lang", country: "welcome", cfm: "country", level: "country", cando: "level", name: st.d.ot ? "cando" : "level" }[st.v];
     if (st.v === "lang") { try { w.MSNav.quit(); } catch (x) { } }
-    else if (st.ed) { if (st.v === "cando") { show("level"); } else { w.MSPROF.show("prof"); } }
+    else if (st.ed) { if (st.v === "cando") { show("level"); } else if (st.v === "cfm") { show("country"); } else { w.MSPROF.show("prof"); } }
     else if (p) { show(p); }
   }
   function next(from) {
@@ -78,7 +84,9 @@
     else if (o === "go") { show("country"); }
     else if (o === "in") { w.MSPROF.show("in", "welcome"); }
     else if (o === "later") { guest(); }
-    else if (o === "c") { st.d.c = v; next("country"); }
+    else if (o === "c") { pc = v; show("cfm"); }
+    else if (o === "cy") { st.d.c = pc; next("country"); }
+    else if (o === "cn") { show("country"); }
     else if (o === "lv") { if (v === "ot") { show("cando"); } else { st.d.lv = v; st.d.ot = 0; next("level"); } }
     else if (o === "cd") { st.d.lv = v; st.d.ot = 1; next("cando"); }
     else if (o === "nm") { name(); }
