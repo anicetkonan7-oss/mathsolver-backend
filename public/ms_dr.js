@@ -1,102 +1,34 @@
 /* MathSolver - menu : panneau latéral (85 %) qui glisse depuis la gauche, voile sombre, icônes du menu */
 (function (w) {
   "use strict";
-  var D = document, R = D.documentElement, ov = null, sc = null, fn = null, shut = 0, tm = 0;
-  // lf : 1 = la page s'étend sur la zone de saisie (accueil), 2 = elle reprend sa place ; ex : hauteur de la zone
-  var lf = 0, h0 = 0, ex = 0, lt = 0, wt = null;
+  var D = document, ov = null, sc = null, fn = null, shut = 0, tm = 0, lay = 0;
   if (w.MSDR) { return; }
-  var st = D.createElement("style");
-  st.textContent = "html.mov,html.mov body{background:transparent!important}";
-  D.head.appendChild(st);
+  // page rechargée pendant que le menu était ouvert dans la couche : on la referme
+  try { if (w.MSMo) { w.MSMo.close(); } } catch (e) { }
 
-  // la page grandit vers le haut : un espace en haut garde le contenu immobile, le voile commence sous la zone
-  function pad() {
-    var p = lf ? Math.max(0, Math.min(ex, w.innerHeight - h0)) : 0;
-    R.style.paddingTop = p ? p + "px" : "";
-    if (sc) { sc.style.top = p ? p + "px" : ""; }
-    return p;
-  }
-  function off() {
-    lf = 0;
-    clearTimeout(lt);
-    w.removeEventListener("resize", rs);
-    R.style.paddingTop = "";
-    if (sc) { sc.style.top = ""; }
-    R.classList.remove("mov");
-  }
-  function ready() {
-    var f = wt;
-    wt = null;
-    clearTimeout(lt);
-    if (!f) { return; }
-    // la page n'a pas grandi : on revient à l'ancienne façon (la zone s'efface) pour ne rien couper
-    if (lf === 1 && pad() < ex - 1) {
-      try { w.MSOv.over(0); } catch (e) { }
-      off();
-      try { w.MSNav.solved(); } catch (e) { }
-      setTimeout(f, 200);
-      return;
-    }
-    f();
-  }
-  function rs() {
-    var p = pad();
-    if (lf === 1 && p >= ex - 1) { ready(); }
-    if (lf === 2 && p <= 0) { off(); }
-  }
-  // accueil : la zone de saisie reste en place (assombrie) sous le menu ; sinon elle s'efface comme avant
-  function lift(cb) {
-    var x = 0;
-    clearTimeout(lt);
-    try { x = w.MSOv ? +w.MSOv.over(1) || 0 : 0; } catch (e) { x = 0; }
-    if (x <= 0) {
-      try { w.MSNav.solved(); } catch (e) { }
-      cb();
-      return;
-    }
-    // fermeture précédente pas encore finie : la hauteur normale reste celle mesurée avant
-    if (lf !== 2) { h0 = w.innerHeight; }
-    ex = x;
-    lf = 1;
-    wt = cb;
-    R.classList.add("mov");
-    w.addEventListener("resize", rs);
-    if (pad() >= ex - 1) { ready(); return; }
-    lt = setTimeout(ready, 500);
-  }
-  // l'écran choisi dans le menu remplace l'accueil : la zone de saisie disparaît (j : déjà fait côté appli)
-  function hand(j) {
-    if (!lf) { return; }
-    if (!j) { try { w.MSOv.over(3); } catch (e) { } }
-    off();
-  }
+  // couche de l'appli (au-dessus de l'écran) : l'accueil dessous ne bouge pas ; sinon, panneau dans la page comme avant
+  function couche() { try { return !!(w.MSMo && w.MSMo.ok()); } catch (e) { return false; } }
 
   function gone() {
     clearTimeout(tm);
     if (ov && ov.parentNode) { ov.parentNode.removeChild(ov); }
     if (sc && sc.parentNode) { sc.parentNode.removeChild(sc); }
     ov = null; sc = null; fn = null; shut = 0;
-    if (lf === 1) {
-      lf = 2;
-      try { w.MSOv.over(0); } catch (e) { }
-      clearTimeout(lt);
-      lt = setTimeout(off, 500);
-    }
-  }
-
-  function slide() {
-    D.body.appendChild(ov);
-    void ov.offsetWidth;
-    ov.classList.add("mdo");
   }
 
   // affiche html dans le panneau (le crée et le fait glisser s'il n'existe pas) ; f(action) reçoit les clics sur [data-o]
   // à droite, un voile sombre : le toucher referme (action "x")
   function put(html, f) {
-    // rouvert pendant qu'il se refermait : on termine la fermeture puis on repart de zéro
-    if (sc && shut) { gone(); }
-    var nw = !sc;
+    var nw = !ov;
+    if (nw && (lay || couche())) {
+      try {
+        w.MSMo.open(html, D.documentElement.classList.contains("dk"));
+        lay = 1; shut = 0; fn = f;
+        return;
+      } catch (e) { lay = 0; }
+    }
     if (nw) {
+      try { w.MSNav.solved(); } catch (e) { }
       sc = D.createElement("div");
       sc.className = "mns";
       sc.addEventListener("click", function () { if (fn && !shut) { fn("x"); } });
@@ -108,7 +40,6 @@
         var b = ev.target.closest ? ev.target.closest("[data-o]") : null;
         if (b && fn && !shut) { ev.stopPropagation(); fn(b.getAttribute("data-o")); }
       });
-      // en-tête fixe : une fine ombre dès que la liste défile
       ov.addEventListener("scroll", function () { ov.classList.toggle("sc", ov.scrollTop > 2); }, { passive: true });
     }
     clearTimeout(tm);
@@ -116,34 +47,32 @@
     fn = f;
     ov.innerHTML = html;
     ov.scrollTop = 0;
-    ov.classList.remove("sc");
-    if (nw) {
-      D.body.appendChild(sc);
-      void sc.offsetWidth;
-      sc.classList.add("mdo");
-      lift(function () { if (ov && !shut) { slide(); } });
-    } else if (!ov.parentNode) {
-      return;
-    } else {
-      ov.classList.add("mdo");
-      sc.classList.add("mdo");
-    }
+    if (nw) { D.body.appendChild(sc); D.body.appendChild(ov); void ov.offsetWidth; }
+    ov.className = "mnd mdo";
+    sc.className = "mns mdo";
   }
 
   // referme : le panneau repart vers la gauche, puis disparaît ; son bouton retour (id mnb) cède la place à celui de la page dessous
   function hide() {
     var b;
-    if (!sc || shut) { return; }
+    if (lay) {
+      lay = 0; fn = null; shut = 0;
+      try { w.MSMo.close(); } catch (e) { }
+      return;
+    }
+    if (!ov || shut) { return; }
     shut = 1;
-    // fermé avant même d'avoir glissé : tout disparaît tout de suite
-    if (wt || (ov && !ov.parentNode)) { wt = null; gone(); return; }
-    if (ov) { ov.classList.remove("mdo"); }
-    sc.classList.remove("mdo");
-    if (lf === 1) { try { w.MSOv.over(2); } catch (e) { } }
-    b = ov ? ov.querySelector("#mnb") : null;
+    ov.className = "mnd";
+    sc.className = "mns";
+    b = ov.querySelector("#mnb");
     if (b) { b.removeAttribute("id"); }
     tm = setTimeout(gone, 350);
   }
+
+  // clic reçu de la couche (ligne du menu, voile, retour)
+  function act(o) { if (lay && fn) { fn(o); } }
+  // vers un autre écran : sous la couche, la zone de saisie s'efface (dans la page, c'est déjà fait à l'ouverture)
+  function hand() { if (lay) { try { w.MSNav.solved(); } catch (e) { } } }
 
   // icônes du menu (tracés 24x24)
   var P = function (d) { return '<path d="' + d + '"/>'; };
@@ -165,5 +94,5 @@
     doc: P("M7 3h8l4 4v14H7zM15 3v4h4M10 13h6M10 17h6")
   };
 
-  w.MSDR = { put: put, hide: hide, hand: hand, is: function () { return !!sc && !shut; } };
+  w.MSDR = { put: put, hide: hide, act: act, hand: hand, is: function () { return lay ? !!fn : !!ov && !shut; } };
 })(window);
