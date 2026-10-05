@@ -53,37 +53,10 @@
     if (!g) { return ""; }
     return '<figure class="cfg" data-cf tabindex="0" role="button" aria-label="' + e(cap.replace(/\$|\*\*|\\/g, "")) + '"><div class="cfd">' + g + '<i class="cfi"></i></div>' + (cap ? "<figcaption>" + tx(cap) + "</figcaption>" : "") + "</figure>";
   }
-  // plein écran posé sur body, figure agrandie (le doigt la déplace) ; il se ferme tout seul si la leçon quitte l'écran
-  var Z = null, D = document, MO = null;
-  function zoom(f) {
-    var o, c = f.querySelector("figcaption"), a = D.getElementById("app");
-    if (Z) { return; }
-    Z = o = D.createElement("div");
-    o.className = "cfz";
-    o.innerHTML = '<button class="cfx" aria-label="Fermer"></button><div class="cfb"><div class="cfw">' + f.querySelector("svg").outerHTML + "</div>" + (c ? "<p>" + c.innerHTML + "</p>" : "") + "</div>";
-    D.body.appendChild(o);
-    c = o.querySelector(".cfw");
-    c.scrollLeft = (c.scrollWidth - c.clientWidth) / 2;
-    c.scrollTop = (c.scrollHeight - c.clientHeight) / 2;
-    o.className = "cfz on";
-    if (a && w.MutationObserver) { MO = new MutationObserver(function () { if (!D.body.contains(f)) { shut(); } }); MO.observe(a, { childList: true }); }
-  }
-  function shut() {
-    var o = Z;
-    Z = null;
-    if (MO) { MO.disconnect(); MO = null; }
-    if (!o) { return; }
-    o.className = "cfz";
-    setTimeout(function () { if (o.parentNode) { o.parentNode.removeChild(o); } }, 180);
-  }
-  // retour (flèche ou bouton du téléphone) : ferme d'abord la figure agrandie
-  w.addEventListener("click", function (ev) {
-    var t = ev.target.closest ? ev.target.closest("#home") : null;
-    if (t && Z) { ev.stopImmediatePropagation(); ev.preventDefault(); shut(); }
-  }, true);
-  D.addEventListener("click", function (ev) {
-    var f = ev.target.closest ? ev.target.closest(".cfz,[data-cf]") : null;
-    if (f) { if (f.className.indexOf("cfz") === 0) { shut(); } else { zoom(f); } }
+  // toucher une figure : plein écran (ms_co_zoom.js)
+  document.addEventListener("click", function (ev) {
+    var f = ev.target.closest ? ev.target.closest("[data-cf]") : null;
+    if (f && w.MSCOZ) { w.MSCOZ.open(f); }
   });
 
   // page complète d'une leçon : en-tête, sommaire, parties, exercices avec corrections dépliables, liens
@@ -103,5 +76,5 @@
     }
     return s + '<div class="coa"><button class="sb2" data-co="fm">' + e(T.fm) + "</button>" + (sv ? '<button class="pb" data-co="sv">' + e(T.sv) + "</button>" : "") + "</div></div>";
   }
-  w.MSCOV = { tx: tx, body: body, page: page, shut: shut };
+  w.MSCOV = { tx: tx, body: body, page: page };
 })(window);
