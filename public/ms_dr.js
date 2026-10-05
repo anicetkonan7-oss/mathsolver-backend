@@ -28,7 +28,16 @@
     var f = wt;
     wt = null;
     clearTimeout(lt);
-    if (f) { f(); }
+    if (!f) { return; }
+    // la page n'a pas grandi : on revient à l'ancienne façon (la zone s'efface) pour ne rien couper
+    if (lf === 1 && pad() < ex - 1) {
+      try { w.MSOv.over(0); } catch (e) { }
+      off();
+      try { w.MSNav.solved(); } catch (e) { }
+      setTimeout(f, 200);
+      return;
+    }
+    f();
   }
   function rs() {
     var p = pad();
@@ -53,7 +62,7 @@
     R.classList.add("mov");
     w.addEventListener("resize", rs);
     if (pad() >= ex - 1) { ready(); return; }
-    lt = setTimeout(ready, 400);
+    lt = setTimeout(ready, 500);
   }
   // l'écran choisi dans le menu remplace l'accueil : la zone de saisie disparaît (j : déjà fait côté appli)
   function hand(j) {
