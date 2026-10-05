@@ -123,10 +123,10 @@
   function open() {
     css("accss", "acct.css?v=1");
     css("fmcss", "fm.css?v=1");
-    css("cocss", "cours.css?v=5");
+    css("cocss", "cours.css?v=6");
     try { w.MSNav.solved(); } catch (x) { }
     lv = A.P().lv || ""; q = ""; sy = 0;
-    ld(["ms_geo.js?v=1", "ms_co_fig.js?v=3", "ms_co_zoom.js?v=1", "ms_co_view.js?v=4", "co_idx.js?v=2"].concat(FL[lv] ? ["fm_" + FL[lv] + ".js?v=1"] : []), list);
+    ld(["ms_geo.js?v=1", "ms_co_fig.js?v=3", "ms_co_chart.js?v=1", "ms_co_zoom.js?v=1", "ms_co_view.js?v=4", "co_idx.js?v=2"].concat(FL[lv] ? ["fm_" + FL[lv] + ".js?v=1"] : []), list);
   }
   SP.live.cours = open;
   w.MSCOURS = { open: open };
