@@ -80,6 +80,7 @@
   if (!box && lc && A && A.copy && A.share) {
     box = D.createElement("div");
     box.className = "acts solo";
+    lc = (lc.closest && lc.closest(".tl2")) || lc;
     lc.parentNode.insertBefore(box, lc.nextSibling);
   }
   if (box && A && A.copy && A.share) {
@@ -93,6 +94,9 @@
   if (N && N.newEx) {
     bar = D.createElement("div");
     bar.className = "bar";
+    st = D.createElement("style");
+    st.textContent = ".bar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;gap:10px;padding:12px 16px;background:#fff;border-top:1px solid #e1e7f2;}.bar button{height:52px;border-radius:12px;font-size:16px;font-weight:700;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:8px;}.b2{flex:none;padding:0 18px;background:#e6eeff;color:#1741a6;}.b1{flex:1;background:#1a62e8;color:#fff;font-weight:800;box-shadow:0 6px 16px rgba(26,98,232,.28);}body.hasbar{padding-bottom:84px;}@media(max-width:350px){.bar svg{display:none;}.b2{padding:0 16px;}}";
+    D.head.appendChild(st);
     bar.innerHTML = '<button class="b2" id="bedit">' + IC.pen + 'Modifier</button><button class="b1" id="bnew">' + IC.plus + "Nouvel exercice</button>";
     D.body.appendChild(bar);
     D.body.className += " hasbar";
