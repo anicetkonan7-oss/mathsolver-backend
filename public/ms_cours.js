@@ -1,4 +1,4 @@
-/* MathSolver - espace Cours : chapitres du niveau du profil, leçon complète (sommaire, encadrés, exemples, exercices corrigés) */
+/* MathSolver - espace Cours : chapitres du niveau du profil, leçon complète (sommaire, encadrés, figures, exemples, exercices corrigés) */
 (function (w) {
   "use strict";
   var D = document, app = D.getElementById("app"), A = w.MSAC, S = w.MSStore, SP = w.MSSP, got = {};
@@ -39,10 +39,10 @@
     });
   }
   function seen() { try { var a = JSON.parse(S.get("co_seen")); return a instanceof Array ? a : []; } catch (x) { return []; } }
-  // fichiers d'un chapitre prêt (co_l3_4a.js, co_l3_4b.js…) ; [] s'il n'est pas encore écrit
+  // fichiers d'un chapitre prêt (co_l3_4a.js?v=2, co_l3_4b.js?v=2…) ; [] s'il n'est pas encore écrit
   function files(i) {
-    var n = ((w.MSCOI || {})[lv] || {})[i] || 0, a = [], j;
-    for (j = 0; j < n; j++) { a.push("co_" + lv + "_" + i + "abcdefgh".charAt(j) + ".js?v=1"); }
+    var x = ((w.MSCOI || {})[lv] || {})[i] || 0, n = x[0] || +x || 0, a = [], j;
+    for (j = 0; j < n; j++) { a.push("co_" + lv + "_" + i + "abcdefgh".charAt(j) + ".js?v=" + (x[1] || 1)); }
     return a;
   }
 
@@ -65,6 +65,7 @@
   }
   function list() {
     cur = -1;
+    try { V().shut(); } catch (x) { }
     app.innerHTML = '<div class="ac co"><div class="ach"><button class="bkb" id="home" aria-label="' + e(T.b) + '"></button><b class="ht">' + e(T.t) + '</b></div><div class="fmc">' + badge() + '</div><input class="si fmq" id="coq" type="search" autocomplete="off" placeholder="' + e(T.q) + '" value="' + e(q) + '"><div id="col">' + rows() + "</div></div>";
     w.scrollTo(0, sy);
   }
@@ -122,10 +123,10 @@
   function open() {
     css("accss", "acct.css?v=1");
     css("fmcss", "fm.css?v=1");
-    css("cocss", "cours.css?v=1");
+    css("cocss", "cours.css?v=2");
     try { w.MSNav.solved(); } catch (x) { }
     lv = A.P().lv || ""; q = ""; sy = 0;
-    ld(["ms_geo.js?v=1", "ms_co_view.js?v=1", "co_idx.js?v=1"].concat(FL[lv] ? ["fm_" + FL[lv] + ".js?v=1"] : []), list);
+    ld(["ms_geo.js?v=1", "ms_co_fig.js?v=1", "ms_co_view.js?v=2", "co_idx.js?v=2"].concat(FL[lv] ? ["fm_" + FL[lv] + ".js?v=1"] : []), list);
   }
   SP.live.cours = open;
   w.MSCOURS = { open: open };
