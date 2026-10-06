@@ -81,10 +81,12 @@
       var a = A(i), ok = a.f >= 0 && w.MSCK.check(it.a, a.L[a.f]);
       res.push({ g: it.g.id, ch: dv.qs[i].ch, ok: ok, p: dv.qs[i].p });
       if (ok) { n += dv.qs[i].p; }
-      w.MSPRG.rec(it.g.id, ok, 2);
+      w.MSPRG.rec(it.g.id, ok, 2, it.g.n);
     });
     dv.done = 1; dv.note = n; dv.res = res; dv.late = late ? 1 : 0; dv.paused = false;
     H.done(dv);
+    try { w.MSPRG.xp(n); } catch (x) { }
+    if (w.MSYAY) { setTimeout(function () { if (n >= 14) { w.MSYAY.go(n >= 18 ? "Excellent : " + n + "/20 ! 🎉" : "Bravo : " + n + "/20 !"); } w.MSYAY.check(); }, 400); }
     bulletin();
   }
   function bulletin() {

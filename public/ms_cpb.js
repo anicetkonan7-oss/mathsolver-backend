@@ -45,6 +45,18 @@
       if (cu && cu.s === s && cu.i === i) { (g || x).appendChild(sh("xcar")); }
       if (i === a.length) { break; }
       n = a[i];
+      // « lim » suivi d'un indice : l'indice (x → +∞) s'écrit sous lim
+      if (n.t === "c" && n.k === "f" && n.v === "lim" && a[i + 1] && a[i + 1].t === "sub") {
+        y = sh("xflm", '<span class="xflt"></span><span class="xflb"></span>');
+        n.el = rn(n, 0, cu);
+        y.firstChild.appendChild(n.el);
+        if (cu && cu.s === s && cu.i === i + 1) { y.firstChild.appendChild(sh("xcar")); }
+        a[i + 1].el = y.lastChild;
+        y.lastChild.appendChild(rs(a[i + 1].f[0], false, cu));
+        if (top) { if (!g) { g = sh("xfw"); x.appendChild(g); } g.appendChild(y); } else { x.appendChild(y); }
+        i++;
+        continue;
+      }
       y = rn(n, wd[i], cu);
       if (n.t === "c" && n.v === "," && a[i - 1] && a[i - 1].k === "n" && a[i + 1] && a[i + 1].k === "n") { y.className = "xfc xfkn"; }
       // signe « − » ou « + » d'un nombre (en début ou après =, <, une parenthèse…) : collé au nombre
@@ -160,6 +172,8 @@
     }
     if (a === "NL") {
       while (c.s.p) { p = c.s.p; c.s = p.q; c.i = p.q.n.indexOf(p) + 1; }
+      // pas de ligne vide : on écrit d'abord quelque chose sur la ligne en cours
+      if (!r.n.slice(0, c.i).some(function (n) { return !(n.t === "c" && n.k === "s"); })) { work(); toast("Écris d'abord sur cette ligne avant d'aller à la ligne."); return; }
       rest = r.n.splice(c.i);
       nr = { n: rest, p: null };
       rest.forEach(function (n) { n.q = nr; });

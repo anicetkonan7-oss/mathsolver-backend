@@ -1,7 +1,7 @@
 /* MathSolver - les espaces de l'accueil (Cours, Formules, Exercices, Évaluation, Examens, Progression) et les exemples du niveau */
 (function (w) {
   "use strict";
-  var D = document, sel = "", LIVE = {}, SRC = { formules: "ms_form.js?v=1", cours: "ms_cours.js?v=1", exercices: "ms_exo.js?v=1", eval: "ms_eval.js?v=1" }, FMOK = { l3: 1, l2: 1, lt: 1 }, EXOK = { l3: 1, lt: 1 }, busy = {}, K = ["cours", "formules", "exercices", "eval", "examens", "progres"];
+  var D = document, sel = "", LIVE = {}, SRC = { formules: "ms_form.js?v=1", cours: "ms_cours.js?v=1", exercices: "ms_exo.js?v=1", eval: "ms_eval.js?v=1", progres: "ms_prog.js?v=1" }, FMOK = { l3: 1, l2: 1, lt: 1 }, EXOK = { l3: 1, lt: 1 }, busy = {}, K = ["cours", "formules", "exercices", "eval", "examens", "progres"];
   var CO = ["#1a62e8", "#7048e8", "#e8590c", "#2b8a3e", "#c2255c", "#0b7285"];
   var IC = [
     '<path d="M12 6c-2-1.3-4.5-2-8-2v13c3.5 0 6 .7 8 2 2-1.3 4.5-2 8-2V4c-3.5 0-6 .7-8 2zM12 6v13"/>',
@@ -58,6 +58,7 @@
     var T = TX[lg()], P = pf(), s = "", i, k, b, d = on("eval") ? dv() : null, r = on("exercices") ? serie() : null, z;
     // devoir ou série en cours : un bandeau en haut, et une pastille sur la tuile
     if (d) { z = left(d); s += '<button class="spd" data-sp="eval"><i class="spk" id="spdt"' + (z > 0 ? "" : ' data-x="1"') + ">" + (z > 0 ? mm(z) : "0:00") + "</i><span><b>" + (z > 0 ? "Devoir en cours" : "Temps écoulé") + "</b>" + w.MSAC.esc(d.ttl || "") + "</span><em>" + (z > 0 ? "Reprendre" : "Voir ma note") + "</em></button>"; }
+    if (d && z > 0) { s += '<button id="home" class="splk" hidden aria-hidden="true"></button>'; }
     if (r && r.i < 5) { s += '<button class="spd s" data-sp="exercices" data-r="1"><i class="spk">' + (r.i + 1) + "/5</i><span><b>Série d'exercices en cours</b>" + w.MSAC.esc(r.ttl || "") + "</span><em>Reprendre</em></button>"; }
     s += '<div class="sp">';
     for (i = 0; i < K.length; i++) {
@@ -73,9 +74,15 @@
     return s;
   }
 
+  function devoir() { var d = on("eval") ? dv() : null; return !!(d && left(d) > 0); }
+  // pendant un devoir : la barre « Résoudre » est cachée, et le retour du téléphone propose de quitter l'appli
+  function lock() { if (!devoir()) { return; } [60, 450].forEach(function (t) { setTimeout(function () { if (devoir() && D.querySelector("#app .sp")) { try { w.MSNav.solved(); } catch (x) { } } }, t); }); }
   function grid() {
+    var P = pf(), h = on("exercices") && w.MSHUB ? w.MSHUB.html(P.lv || "") : on("exercices") ? '<div id="hub0"></div>' : "";
     ret = null;
-    return '<div class="hh"><span class="st">' + TX[lg()].h + '</span></div><div id="spg">' + inner() + "</div>";
+    lock();
+    setTimeout(function () { if (w.MSTOUR) { w.MSTOUR.auto(); } }, 700);
+    return '<div class="hh"><span class="st">' + TX[lg()].h + "</span></div>" + h + '<div id="spg">' + inner() + "</div>";
   }
 
   // n exemples du niveau : [affichage, texte envoyé] ; null si niveau inconnu
@@ -103,6 +110,23 @@
     D.head.appendChild(c);
   }
 
+  // carte de progression : « Continuer » et « À revoir » ouvrent les exercices
+  function exo(c, id) {
+    if (devoir()) { try { w.MSAC.toast("Tu as un devoir en cours. Rends ta copie d'abord."); } catch (x) { } return; }
+    // une série en cours dans ce chapitre : on la reprend
+    var r = serie();
+    if (r && r.ch === c && !id && r.i < 5) { var b = D.querySelector(".spd.s"); if (b) { b.click(); return; } }
+    if (w.MSEXO) { w.MSEXO.open(c, id); return; }
+    w.MSEXGO = { c: c, id: id || "" };
+    var t = D.querySelector('.sp [data-sp="exercices"]'); if (t) { t.click(); }
+  }
+  D.addEventListener("click", function (e) {
+    var h = e.target.closest ? e.target.closest("[data-hub]") : null;
+    if (h) { exo(+h.getAttribute("data-c"), h.getAttribute("data-hub") === "rv" ? h.getAttribute("data-v") : ""); return; }
+    // pendant un devoir : pas de solution d'un exercice récent ni de correction enregistrée
+    var f = e.target.closest ? e.target.closest('[data-a="fill"],[data-a="open"]') : null;
+    if (f && devoir()) { e.stopImmediatePropagation(); e.preventDefault(); try { w.MSAC.toast("Tu as un devoir en cours. Rends ta copie avant de résoudre un exercice."); } catch (x) { } return; }
+  }, true);
   D.addEventListener("click", function (e) {
     var b = e.target.closest ? e.target.closest("[data-sp]") : null, k, g;
     if (!b) { return; }
@@ -125,6 +149,7 @@
   var ret = null;
   D.body.addEventListener("click", function (e) {
     var t = e.target.closest ? e.target.closest("#home") : null, f = ret;
+    if (t && t.classList.contains("splk")) { e.stopPropagation(); e.preventDefault(); try { w.MSNav.quit(); } catch (x) { } return; }
     if (!t || !f) { return; }
     e.stopPropagation(); e.preventDefault();
     ret = null;
@@ -135,7 +160,7 @@
     var a = D.getElementById("spdt"), b = D.getElementById("spdb"), d;
     if (!a && !b) { return; }
     d = dv(); if (!d) { return; }
-    if (a && left(d) <= 0 && !a.getAttribute("data-x")) { a = D.getElementById("spg"); if (a) { a.innerHTML = inner(); } return; }
+    if (a && left(d) <= 0 && !a.getAttribute("data-x")) { a = D.getElementById("spg"); if (a) { a.innerHTML = inner(); try { w.MSNav.show(); } catch (x) { } } return; }
     if (a) { a.textContent = mm(left(d)); }
     if (b) { b.textContent = mm(left(d)); }
   }, 1000);
@@ -145,5 +170,11 @@
   st.appendChild(D.createTextNode(CSS));
   D.head.appendChild(st);
 
-  w.MSSP = { grid: grid, ex: ex, live: LIVE, from: function (f) { ret = f; } };
+  // au démarrage de l'accueil : progression, carte de l'accueil et guide
+  ["ms_prg.js?v=1", "ms_hub.js?v=1", "ms_tour.js?v=1"].forEach(function (u) {
+    var c = D.createElement("script"); c.async = false; c.src = "https://mathsolver-backend-gray.vercel.app/" + u;
+    c.onload = function () { var z = D.getElementById("hub0"); if (z && w.MSHUB && w.MSPRG) { z.outerHTML = w.MSHUB.html(pf().lv || ""); } if (/tour/.test(u) && w.MSTOUR && D.querySelector("#app .sp")) { setTimeout(w.MSTOUR.auto, 700); } };
+    D.head.appendChild(c);
+  });
+  w.MSSP = { grid: grid, ex: ex, live: LIVE, busy: devoir, from: function (f) { ret = f; } };
 })(window);

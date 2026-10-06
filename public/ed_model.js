@@ -92,7 +92,7 @@
   "use strict";
   var SIM = /^[\w.,À-ÖØ-öø-ÿα-ωΑ-Ω]+$/;
   function one(s) {
-    var m = s.match(/^[\wÀ-ÖØ-öø-ÿ.]*\(/), d = 0, i;
+    var m = s.match(/^[A-Za-zÀ-ÖØ-öø-ÿ]+'*\(/), d = 0, i;
     if (!m) { return false; }
     for (i = m[0].length - 1; i < s.length; i++) {
       if (s.charAt(i) === "(") { d++; } else if (s.charAt(i) === ")" && --d === 0) { return i === s.length - 1; }

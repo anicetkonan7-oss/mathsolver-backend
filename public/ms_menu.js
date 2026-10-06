@@ -38,7 +38,7 @@
     var v = ver(), s = hd("ttl") + '<div class="mm">' + A.chip().replace('data-ac="prof"', 'data-o="pf"') + "</div>";
     s += grp("g1", row("home", I.home, "home") + row("fm", I.fx, "fm") + row("hi", I.clk, "hi") + row("sv", I.bm, "sv"));
     s += grp("g2", row("pf", I.usr, "pf") + (A.sess() ? "" : row("ac", I.inn, "ac", "acs")));
-    s += grp("g3", row("how", I.bulb, "how") + row("faq", I.help, "faq") + (CFG.mail ? row("ml", I.mail, "ml") : ""));
+    s += grp("g3", row("tour", I.bulb, lg() === "en" ? "App tour" : "Revoir le guide de l'appli") + row("how", I.bulb, "how") + row("faq", I.help, "faq") + (CFG.mail ? row("ml", I.mail, "ml") : ""));
     s += grp("g4", row("st", I.set, "st") + row("sh", I.share, "sh") + (CFG.rate ? row("rt", I.star, "rt") : "") + row("ab", I.info, "ab"));
     s += grp("g5", (CFG.privacy ? row("pr", I.shield, "pr") : "") + (CFG.terms ? row("tm", I.doc, "tm") : ""));
     return s + '<p class="mv">MathSolver' + (v ? " · " + e(t("ver", v)) : "") + "</p>";
@@ -92,6 +92,9 @@
     if (w.MSHOME || !w.MSGO) { run(); } else { w.MSGO("home", run); }
   }
   function on(o) {
+    // pendant un devoir : formules, historique et corrections enregistrées restent fermés (comme en classe)
+    if (/^(fm|hi|sv)$/.test(o) && w.MSSP && w.MSSP.busy && w.MSSP.busy()) { A.toast("Tu as un devoir en cours. Rends ta copie avant d'ouvrir " + (o === "fm" ? "les formules." : o === "hi" ? "l'historique." : "tes corrections.")); return; }
+    if (o === "tour") { try { w.MSNav.show(); } catch (x) { } nav("home", function () { w.MSDR.hide(); setTimeout(function () { if (w.MSTOUR) { w.MSTOUR.start(1); } }, 400); }); return; }
     // vers un autre écran : la zone de saisie de l'accueil s'efface
     if (/^(hi|sv|fm|pf|ac)$/.test(o) && w.MSDR.hand) { w.MSDR.hand(); }
     if (o === "x" || (o === "back" && cur === "menu")) { shut(1); }

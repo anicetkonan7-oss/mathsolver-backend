@@ -34,6 +34,18 @@
       if (c.s === s && c.i === i) { (w || l).appendChild(sh("cr")); }
       if (i === a.length) { break; }
       n = a[i];
+      // « lim » suivi d'un indice : l'indice s'écrit sous lim
+      if (n.t === "c" && n.k === "f" && n.v === "lim" && a[i + 1] && a[i + 1].t === "sub") {
+        x = sh("lm", "<span class=lmt></span><span class=lmb></span>");
+        n.el = rn(n);
+        x.firstChild.appendChild(n.el);
+        if (c.s === s && c.i === i + 1) { x.firstChild.appendChild(sh("cr")); }
+        a[i + 1].el = x.lastChild;
+        x.lastChild.appendChild(rs(a[i + 1].f[0], false));
+        if (top) { if (!w) { w = sh("wd"); l.appendChild(w); } w.appendChild(x); } else { l.appendChild(x); }
+        i++;
+        continue;
+      }
       x = rn(n);
       if (n.t === "c" && n.v === "," && a[i - 1] && a[i - 1].k === "n" && a[i + 1] && a[i + 1].k === "n") { x.className = "c kn"; }
       n.el = x;

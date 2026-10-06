@@ -43,6 +43,7 @@
   // 2. un chapitre : série mixte ou une compétence
   function chap(c) {
     scr = "chap"; ch = c;
+    try { w.MSPRG.last(lv, c, names()[c] || ""); } catch (x) { }
     ld(["gx_" + lv + "_" + c + ".js?v=1"], function (ok) {
       var g = gens(c), s;
       if (!ok || !g.length) { A.toast(A.t("net")); list(); return; }
@@ -117,7 +118,12 @@
         run();
       } });
   }
-  function finish(q, ok) { if (q.done) { return; } q.done = 1; w.MSPRG.rec(R.items[R.i].g.id, ok && !q.cor, 1); }
+  function finish(q, ok) {
+    if (q.done) { return; }
+    q.done = 1;
+    w.MSPRG.rec(R.items[R.i].g.id, ok && !q.cor, 1, R.items[R.i].g.n);
+    if (w.MSYAY) { if (ok && !q.cor) { w.MSYAY.buzz(); } w.MSYAY.check(); }
+  }
   function next() {
     var q = cur(), ids;
     if (R.i >= N - 1) { end(); return; }
@@ -132,6 +138,7 @@
   function end() {
     scr = "end";
     wr(null);
+    if (w.MSYAY && R.st.filter(function (q) { return q.ok && !q.cor; }).length === N) { setTimeout(function () { w.MSYAY.go("Série parfaite ! 🎉", "5 réponses justes sur 5"); }, 300); }
     var k = R.st.filter(function (q) { return q.ok && !q.cor; }).length, ids = [], s = head("Bilan");
     R.items.forEach(function (o) { if (ids.indexOf(o.g.id) < 0) { ids.push(o.g.id); } });
     s += '<div class="eend"><div class="escore">' + k + "<small>/" + N + "</small></div><p>" + (k === N ? "Parfait, toutes tes réponses sont justes !" : k >= 3 ? "Bon travail, continue comme ça." : "Courage : relis les corrections, puis refais une série.") + '</p><div class="epts">+' + R.pts + " points</div></div><h3 class=\"gh\">Ton niveau maintenant</h3>";
@@ -175,6 +182,6 @@
       if (c >= 0) { ch = c; ld(["gx_" + lv + "_" + c + ".js?v=1"], function () { if (id) { start(id); } else { chap(c); } }); } else if (r && rd()) { sy = 0; resume(); } else { sy = 0; list(); }
     });
   }
-  SP.live.exercices = function () { boot(-1); };
+  SP.live.exercices = function () { var g = w.MSEXGO; w.MSEXGO = null; if (g) { boot(g.c, g.id || undefined); } else { boot(-1); } };
   w.MSEXO = { open: boot };
 })(window);

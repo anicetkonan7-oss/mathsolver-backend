@@ -89,6 +89,8 @@
 .xfsu,.xfsb,.xfss{font-size:.68em;}
 .xfsu{align-self:flex-start;margin-top:-.15em;}
 .xfsb{align-self:flex-end;}
+.xflm{display:inline-flex;flex-direction:column;align-items:center;margin-right:.18em;}.xflt{display:inline-flex;align-items:center;}.xflb{display:flex;font-size:.62em;line-height:1.15;}
+.xmk.fn sub{font-size:.7em;}
 .xfss{display:inline-flex;flex-direction:column;justify-content:space-between;align-self:stretch;}
 .xfsa,.xfsz{display:flex;}
 .xfsr{display:inline-flex;align-items:stretch;margin:0 .1em;}

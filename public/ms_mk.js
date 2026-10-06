@@ -27,7 +27,7 @@
     ] },
     { n: "f(x)", c: "repeat(6,1fr)", r: [
       [F("sin"), F("cos"), F("tan"), F("ln"), F("log"), F("exp")],
-      [F("arcsin"), F("arccos"), F("arctan"), X("e<sup>" + PS + "</sup>", function () { E().put("e"); E().sup(); }), X("10<sup>" + PS + "</sup>", function () { E().put("1"); E().put("0"); E().sup(); }), X("<sup>" + PS + "</sup>√", function () { E().box("root", 2); })],
+      [X("lim<sub>+∞</sub>", function () { E().fl("lim"); E().sub("x→+∞"); E().right(); }, "fn"), X("lim<sub>−∞</sub>", function () { E().fl("lim"); E().sub("x→−∞"); E().right(); }, "fn"), X(PB + "<sub>" + PS + "</sub>", function () { E().sub(); }), X("e<sup>" + PS + "</sup>", function () { E().put("e"); E().sup(); }), X("10<sup>" + PS + "</sup>", function () { E().put("1"); E().put("0"); E().sup(); }), X("<sup>" + PS + "</sup>√", function () { E().box("root", 2); })],
       [X("lim", function () { E().fl("lim"); E().sub("x→"); }, "fn"), X("∑", function () { E().big("∑"); }), O("∫"), X('∫<span class="xms"><span>b</span><span>a</span></span>', function () { E().big("∫"); }), X("n!", function () { E().put("n"); E().put("!"); }, "it"), C("'", "′", "op")],
       [G("f( )", "f"), G("g( )", "g"), X("u<sub>n</sub>", function () { E().put("u"); E().sub(); }, "it"), X("x<sub>n</sub>", function () { E().put("x"); E().sub(); }, "it"), G("C( )", "C"), G("A( )", "A")]
     ] },

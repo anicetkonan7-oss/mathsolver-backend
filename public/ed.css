@@ -29,6 +29,7 @@ html,body{margin:0;height:100%;overflow:hidden;font-family:Roboto,"Segoe UI",sys
 .su,.sb,.ss{font-size:.68em}
 .su{align-self:flex-start;margin-top:-.15em}
 .sb{align-self:flex-end}
+.lm{display:inline-flex;flex-direction:column;align-items:center;margin-right:.18em}.lmt{display:inline-flex;align-items:center}.lmb{display:flex;font-size:.62em;line-height:1.15}
 .ss{display:inline-flex;flex-direction:column;justify-content:space-between;align-self:stretch}
 .ssu,.ssb{display:flex}
 .sr{display:inline-flex;align-items:stretch;margin:0 .1em}

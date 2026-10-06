@@ -20,16 +20,29 @@
     y = Math.max(4, Math.min(w.innerHeight - el.offsetHeight - 4, y));
     el.style.left = x + "px"; el.style.top = y + "px"; pos = [x, y];
   }
+  // le résultat se calcule pendant la frappe (parenthèses fermées automatiquement), sans appuyer sur =
+  function calc() {
+    var s = ex, o = (s.match(/\(/g) || []).length - (s.match(/\)/g) || []).length, v;
+    if (!s) { return ""; }
+    while (o-- > 0) { s += ")"; }
+    try { v = w.MSCK.compile(s, deg)({}); } catch (x) { return ""; }
+    if (typeof v !== "number" || !isFinite(v)) { return ""; }
+    return w.MSCK.fmt(v);
+  }
   function key(k) {
-    if (k === "C") { ex = ""; res = ""; }
+    if (k === "C") { ex = ""; }
     else if (k === "BS") { ex = ex.replace(/(asin\(|acos\(|atan\(|sin\(|cos\(|tan\(|ln\(|√\(|.)$/, ""); }
-    else if (k === "=") { try { res = w.MSCK.fmt(w.MSCK.compile(ex, deg)({})); } catch (x) { res = "Calcul incomplet"; } }
+    else if (k === "=") { res = calc(); if (res) { ex = res.replace(/−/g, "-"); } else if (ex) { try { w.MSAC.toast("Calcul incomplet : vérifie ton opération."); } catch (x) { } } }
     else if (k === "DEG") { deg = !deg; }
     else if (k === "INS") {
-      if (!res || !/^[−0-9]/.test(res) || res === "Erreur") { try { w.MSAC.toast("Appuie d'abord sur = pour obtenir un résultat."); } catch (x) { } return; }
+      res = calc();
+      if (!res) { try { w.MSAC.toast(ex ? "Calcul incomplet : vérifie ton opération." : "Tape d'abord un calcul."); } catch (x) { } return; }
       if (put) { put(res); }
+      close();
+      return;
     }
     else { ex += k; }
+    res = calc();
     show();
   }
   function open(insert) {

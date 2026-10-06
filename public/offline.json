@@ -202,5 +202,13 @@
 "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/fonts/KaTeX_Size3-Regular.woff2",
 "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/fonts/KaTeX_Size4-Regular.woff2",
 "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/fonts/KaTeX_Typewriter-Regular.woff2",
-"https://cdn.jsdelivr.net/npm/mathjs@12.4.2/lib/browser/math.js"
+"https://cdn.jsdelivr.net/npm/mathjs@12.4.2/lib/browser/math.js",
+"ms_hub.js?v=1",
+"ms_tour.js?v=1",
+"ms_prog.js?v=1",
+"editor.html?v=1",
+"ed_model.js?v=1",
+"ed_view.js?v=1",
+"ed_keys.js?v=1",
+"ed.css?v=1"
 ]}

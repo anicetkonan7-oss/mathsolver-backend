@@ -12,11 +12,11 @@
       [X("sq", PB + "<sup>2</sup>", () => E.sup("2")), X("pw", PB + "<sup>" + PS + "</sup>", () => E.sup()), X("inv", PB + "<sup>−1</sup>", () => E.sup("−1")), X("sqrt", "√<span class=rt>" + PB + "</span>", () => E.box("sqrt", 1)), 0, C("7", 0, "dg"), C("8", 0, "dg"), C("9", 0, "dg"), C("×", 0, "op"), C("÷", 0, "op")],
       [F("sin"), F("cos"), F("tan"), C("π", 0, "op it"), 0, C("4", 0, "dg"), C("5", 0, "dg"), C("6", 0, "dg"), C("+", 0, "op"), C("−", 0, "op")],
       [F("ln"), F("log"), X("frac", "<span class=fi>" + PS + "<u></u>" + PS + "</span>", () => E.frac()), X("abs", "|" + PS + "|", () => E.box("abs", 1)), 0, C("1", 0, "dg"), C("2", 0, "dg"), C("3", 0, "dg"), C("=", 0, "op"), X("(", "(", () => E.box("grp", 1))],
-      [C("x", 0, "it"), C("y", 0, "it"), C("n", 0, "it"), C("e", 0, "it"), 0, C("0", 0, "dg"), C(".", 0, "dg"), C(",", 0, "dg"), X(")", ")", () => E.close()), C("%", 0, "op")]
+      [C("x", 0, "it"), C("y", 0, "it"), C("n", 0, "it"), C("e", 0, "it"), 0, C("0", 0, "dg"), C(".", 0, "dg"), C(",", 0, "dg"), C(";", 0, "op"), C("%", 0, "op")]
     ] },
     { n: "f(x)", c: "repeat(6,1fr)", r: [
       [F("sin"), F("cos"), F("tan"), F("ln"), F("log"), F("exp")],
-      [F("arcsin"), F("arccos"), F("arctan"), X("ex", "e<sup>" + PS + "</sup>", () => { E.put("e"); E.sup(); }), X("10x", "10<sup>" + PS + "</sup>", () => { E.put("1"); E.put("0"); E.sup(); }), X("root", "<sup>" + PS + "</sup>√", () => E.box("root", 2))],
+      [X("limp", "lim<sub>+∞</sub>", () => { E.fl("lim"); E.sub("x→+∞"); E.right(); }, "fn"), X("limm", "lim<sub>−∞</sub>", () => { E.fl("lim"); E.sub("x→−∞"); E.right(); }, "fn"), X("sub", PB + "<sub>" + PS + "</sub>", () => E.sub()), X("ex", "e<sup>" + PS + "</sup>", () => { E.put("e"); E.sup(); }), X("10x", "10<sup>" + PS + "</sup>", () => { E.put("1"); E.put("0"); E.sup(); }), X("root", "<sup>" + PS + "</sup>√", () => E.box("root", 2))],
       [X("lim", "lim", () => { E.fl("lim"); E.sub("x→"); }, "fn"), X("sum", "∑", () => E.big("∑")), C("∫", 0, "op"), X("intab", "∫<span class=st><span>b</span><span>a</span></span>", () => E.big("∫")), X("fact", "n!", () => { E.put("n"); E.put("!"); }, "it"), C("'", "′", "op")],
       [G("f(", "f( )", "f"), G("g(", "g( )", "g"), X("un", "u<sub>n</sub>", () => { E.put("u"); E.sub(); }, "it"), X("xn", "x<sub>n</sub>", () => { E.put("x"); E.sub(); }, "it"), G("C(", "C( )", "C"), G("A(", "A( )", "A")]
     ] },
