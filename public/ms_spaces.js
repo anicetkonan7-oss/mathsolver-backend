@@ -1,7 +1,7 @@
 /* MathSolver - les espaces de l'accueil (Cours, Formules, Exercices, Évaluation, Examens, Progression) et les exemples du niveau */
 (function (w) {
   "use strict";
-  var D = document, sel = "", LIVE = {}, SRC = { formules: "ms_form.js?v=1", cours: "ms_cours.js?v=1" }, FMOK = { l3: 1, l2: 1, lt: 1 }, busy = {}, K = ["cours", "formules", "exercices", "eval", "examens", "progres"];
+  var D = document, sel = "", LIVE = {}, SRC = { formules: "ms_form.js?v=1", cours: "ms_cours.js?v=1", exercices: "ms_exo.js?v=1", eval: "ms_eval.js?v=1" }, FMOK = { l3: 1, l2: 1, lt: 1 }, EXOK = { l3: 1, lt: 1 }, busy = {}, K = ["cours", "formules", "exercices", "eval", "examens", "progres"];
   var CO = ["#1a62e8", "#7048e8", "#e8590c", "#2b8a3e", "#c2255c", "#0b7285"];
   var IC = [
     '<path d="M12 6c-2-1.3-4.5-2-8-2v13c3.5 0 6 .7 8 2 2-1.3 4.5-2 8-2V4c-3.5 0-6 .7-8 2zM12 6v13"/>',
@@ -40,8 +40,8 @@
   function pf() { return w.MSAC ? w.MSAC.P() : {}; }
 
   function rs(k) { try { return w.MSStore.get(k) || ""; } catch (x) { return ""; } }
-  // un espace est ouvert seulement s'il a du contenu pour le niveau de l'élève
-  function on(k) { var P = pf(); return !!(LIVE[k] || SRC[k]) && ((k !== "formules" && k !== "cours") || !P.lv || !!FMOK[P.lv]); }
+  // un espace est ouvert seulement s'il a du contenu pour le niveau de l'élève (exercices et évaluations : 3e et Terminale)
+  function on(k) { var P = pf(); return !!(LIVE[k] || SRC[k]) && ((k !== "formules" && k !== "cours") || !P.lv || !!FMOK[P.lv]) && ((k !== "exercices" && k !== "eval") || !!EXOK[P.lv]); }
 
   function inner() {
     var T = TX[lg()], P = pf(), s = "", i, k, b;
