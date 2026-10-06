@@ -109,3 +109,6 @@
 .dk .evq .mk,.dk .evnote b,.dk .evnote em,.dk .evh b,.dk .evko{color:#ff7b70;border-color:#ff6b5f;}
 .dk .evq details{border-color:#26324a;}
 .dk .evw .row2 button{background:#1d2b4d;color:#a9c4ff;}
+.evbar .clk.off{opacity:.6;}
+.evbar .clk.low{color:#c92a2a;border-color:#f3b4b4;}
+.dk .evbar .clk.low{color:#ff7b70;border-color:#6b2a2a;}

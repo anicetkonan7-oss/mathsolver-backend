@@ -34,21 +34,36 @@
     ".spi em{display:inline-block;margin-top:8px;padding:3px 10px;border-radius:99px;background:#fff;font-style:normal;font-size:12px;font-weight:700;color:#1a4db5;}" +
     ".dk .sp button{background:#172033;border-color:#26324a;color:#eef2fb;}.dk .sp button:active{background:#1d2a47;}" +
     ".dk .sp button.on{border-color:#4d8bff;box-shadow:0 0 0 2px #1f3b78;}.dk .sp small{color:#93a2c4;}.dk .sp small.nw{background:#3a2f12;color:#ffd77a;}" +
-    ".dk .spi{background:#16264a;color:#b9cffd;}.dk .spi b{color:#eef2fb;}.dk .spi em{background:#0e1424;color:#8fb4ff;}";
+    ".dk .spi{background:#16264a;color:#b9cffd;}.dk .spi b{color:#eef2fb;}.dk .spi em{background:#0e1424;color:#8fb4ff;}" +
+    ".sp button{position:relative;}.sp .bdg{position:absolute;top:6px;right:6px;padding:1px 7px;border-radius:9px;background:#e03131;color:#fff;font-size:10.5px;font-weight:800;font-variant-numeric:tabular-nums;}.sp .bdg.s{background:#e8590c;}" +
+    ".spd{display:flex;align-items:center;gap:12px;box-sizing:border-box;width:calc(100% - 24px);margin:0 12px 10px;padding:12px 14px;border-radius:16px;background:#fff4f4;border:1.5px solid #f3b4b4;color:#0f1b33;text-align:left;font-size:13.5px;line-height:1.35;}" +
+    ".spd.s{background:#fff7ec;border-color:#f5c99a;}.spd .spk{flex:none;font-style:normal;min-width:58px;padding:6px 8px;border-radius:12px;background:#e03131;color:#fff;font-size:16px;font-weight:800;text-align:center;font-variant-numeric:tabular-nums;}.spd.s .spk{background:#e8590c;font-size:13px;}" +
+    ".spd span{flex:1;min-width:0;}.spd b{display:block;font-size:15px;}.spd em{flex:none;font-style:normal;font-weight:800;color:#c92a2a;}.spd.s em{color:#b4510a;}" +
+    ".dk .spd{background:#2a1618;border-color:#6b2a2a;color:#eef2fb;}.dk .spd.s{background:#2a1f12;border-color:#6b4a22;}.dk .spd em{color:#ff8a80;}.dk .spd.s em{color:#ffb070;}";
 
   function lg() { return w.MSAC && w.MSAC.lang() === "en" ? "en" : "fr"; }
   function pf() { return w.MSAC ? w.MSAC.P() : {}; }
 
   function rs(k) { try { return w.MSStore.get(k) || ""; } catch (x) { return ""; } }
+  function rj(k) { try { return JSON.parse(rs(k) || "null"); } catch (x) { return null; } }
+  function mm(t) { t = Math.max(0, Math.ceil(t)); var m = Math.floor(t / 60), r = t % 60; return (m < 10 ? "0" : "") + m + ":" + (r < 10 ? "0" : "") + r; }
+  // devoir en cours du niveau : temps restant réel (le chrono tourne même appli fermée, sauf pendant une pause)
+  function left(d) { var t = Date.now(); if (d.paused) { return Math.max(0, d.left - (t > d.pend ? (t - d.pend) / 1000 : 0)); } return Math.max(0, d.end ? (d.end - t) / 1000 : d.left); }
+  function dv() { var d = rj("evcur"), P = pf(); return d && !d.done && (!P.lv || d.lv === P.lv) ? d : null; }
+  function serie() { var r = rj("excur"), P = pf(); return r && (!P.lv || r.lv === P.lv) ? r : null; }
   // un espace est ouvert seulement s'il a du contenu pour le niveau de l'élève (exercices et évaluations : 3e et Terminale)
   function on(k) { var P = pf(); return !!(LIVE[k] || SRC[k]) && ((k !== "formules" && k !== "cours") || !P.lv || !!FMOK[P.lv]) && ((k !== "exercices" && k !== "eval") || !!EXOK[P.lv]); }
 
   function inner() {
-    var T = TX[lg()], P = pf(), s = "", i, k, b;
+    var T = TX[lg()], P = pf(), s = "", i, k, b, d = on("eval") ? dv() : null, r = on("exercices") ? serie() : null, z;
+    // devoir ou série en cours : un bandeau en haut, et une pastille sur la tuile
+    if (d) { z = left(d); s += '<button class="spd" data-sp="eval"><i class="spk" id="spdt"' + (z > 0 ? "" : ' data-x="1"') + ">" + (z > 0 ? mm(z) : "0:00") + "</i><span><b>" + (z > 0 ? "Devoir en cours" : "Temps écoulé") + "</b>" + w.MSAC.esc(d.ttl || "") + "</span><em>" + (z > 0 ? "Reprendre" : "Voir ma note") + "</em></button>"; }
+    if (r && r.i < 5) { s += '<button class="spd s" data-sp="exercices" data-r="1"><i class="spk">' + (r.i + 1) + "/5</i><span><b>Série d'exercices en cours</b>" + w.MSAC.esc(r.ttl || "") + "</span><em>Reprendre</em></button>"; }
     s += '<div class="sp">';
     for (i = 0; i < K.length; i++) {
       b = on(K[i]) ? (rs("seen_" + K[i]) ? '<small class="lv">' + w.MSAC.esc(P.ln || T.o) + "</small>" : '<small class="nw">' + T.w + "</small>") : "<small>" + T.s + "</small>";
-      s += '<button data-sp="' + K[i] + '"' + (sel === K[i] ? ' class="on"' : "") + '><i style="background:' + CO[i] + '"><svg viewBox="0 0 24 24">' + IC[i] + "</svg></i>" + T.n[i] + b + "</button>";
+      z = K[i] === "eval" && d ? '<span class="bdg" id="spdb">' + mm(left(d)) + "</span>" : K[i] === "exercices" && r ? '<span class="bdg s">En cours</span>' : "";
+      s += '<button data-sp="' + K[i] + '"' + (sel === K[i] ? ' class="on"' : "") + ">" + z + '<i style="background:' + CO[i] + '"><svg viewBox="0 0 24 24">' + IC[i] + "</svg></i>" + T.n[i] + b + "</button>";
     }
     s += "</div>";
     k = K.indexOf(sel);
@@ -59,6 +74,7 @@
   }
 
   function grid() {
+    ret = null;
     return '<div class="hh"><span class="st">' + TX[lg()].h + '</span></div><div id="spg">' + inner() + "</div>";
   }
 
@@ -91,6 +107,9 @@
     var b = e.target.closest ? e.target.closest("[data-sp]") : null, k, g;
     if (!b) { return; }
     k = b.getAttribute("data-sp");
+    // pendant un devoir : pas de cours, de formules ni d'exercices (comme en classe)
+    if (/^(cours|formules|exercices)$/.test(k) && on("eval") && dv() && left(dv()) > 0) { try { w.MSAC.toast("Tu as un devoir en cours. Rends ta copie avant d'ouvrir " + (k === "cours" ? "le cours." : k === "formules" ? "les formules." : "les exercices.")); } catch (x) { } return; }
+    if (k === "exercices") { w.MSEXR = b.getAttribute("data-r") === "1"; }
     if (on(k)) {
       try { if (!rs("seen_" + k)) { w.MSStore.set("seen_" + k, "1"); } } catch (x) { }
       if (LIVE[k]) { try { LIVE[k](); } catch (x) { } return; }
@@ -102,10 +121,29 @@
     if (g) { g.innerHTML = inner(); }
   });
 
+  // retour vers l'écran d'où l'on vient (ex. : la copie corrigée) au lieu de l'accueil
+  var ret = null;
+  D.body.addEventListener("click", function (e) {
+    var t = e.target.closest ? e.target.closest("#home") : null, f = ret;
+    if (!t || !f) { return; }
+    e.stopPropagation(); e.preventDefault();
+    ret = null;
+    f();
+  });
+  // chrono du bandeau et de la pastille
+  setInterval(function () {
+    var a = D.getElementById("spdt"), b = D.getElementById("spdb"), d;
+    if (!a && !b) { return; }
+    d = dv(); if (!d) { return; }
+    if (a && left(d) <= 0 && !a.getAttribute("data-x")) { a = D.getElementById("spg"); if (a) { a.innerHTML = inner(); } return; }
+    if (a) { a.textContent = mm(left(d)); }
+    if (b) { b.textContent = mm(left(d)); }
+  }, 1000);
+
   var st = D.createElement("style");
   st.id = "spcss";
   st.appendChild(D.createTextNode(CSS));
   D.head.appendChild(st);
 
-  w.MSSP = { grid: grid, ex: ex, live: LIVE };
+  w.MSSP = { grid: grid, ex: ex, live: LIVE, from: function (f) { ret = f; } };
 })(window);

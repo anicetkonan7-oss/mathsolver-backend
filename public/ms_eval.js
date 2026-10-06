@@ -20,7 +20,8 @@
 
   function home() {
     var cur = rd(KEY), n = names(), s = '<div class="ac xs ev"><div class="ach"><button class="bkb" id="home" aria-label="Retour"></button><b class="ht">Évaluation</b></div>', h = w.MSPRG.evals(lv).slice(0, 5);
-    if (cur && cur.lv === lv && !cur.done) { s += '<div class="evw"><b>Devoir en cours : ' + e(cur.ttl) + '</b><div class="row2"><button data-ev="resume">Reprendre (' + Math.ceil(cur.left / 60) + " min restantes)</button></div></div>"; }
+    // un devoir en cours : on ne peut pas en commencer un autre avant de rendre la copie
+    if (cur && cur.lv === lv && !cur.done) { app.innerHTML = s + '<div class="evw"><b>Devoir en cours : ' + e(cur.ttl) + '</b><p class="esub">Il reste ' + Math.ceil(w.MSCPA.rem(cur) / 60) + ' min. Rends ta copie avant de commencer un autre devoir.</p><div class="row2"><button data-ev="resume">Reprendre mon devoir</button></div></div></div>'; return; }
     if (lv === "lt") { s += '<p class="esub">Ta série :</p><div class="evs"><button class="' + (serie() === "C" ? "on" : "") + '" data-ev="serie" data-v="C">Terminale C</button><button class="' + (serie() === "D" ? "on" : "") + '" data-ev="serie" data-v="D">Terminale D</button></div>'; }
     s += '<div class="evm"><button class="evc' + (mode === "i" ? " on" : "") + '" data-ev="mode" data-v="i"><b>Interrogation</b><small>1 chapitre · 5 questions · 20 minutes</small></button><button class="evc' + (mode === "d" ? " on" : "") + '" data-ev="mode" data-v="d"><b>Devoir surveillé</b><small>2 ou 3 chapitres · 6 questions · 50 minutes</small></button></div>';
     s += '<p class="esub">' + (mode === "i" ? "Choisis le chapitre :" : "Choisis 2 ou 3 chapitres :") + "</p>";
@@ -56,13 +57,15 @@
     ld(dv.ch.map(function (c) { return "gx_" + lv + "_" + c + ".js?v=1"; }), function (ok) {
       if (!ok) { A.toast(A.t("net")); return; }
       var items = dv.qs.map(function (q) { return w.MSGX.make(w.MSGX.byId(q.g), q.sd); });
-      wr(KEY, dv);
+      if (!dv.done) { wr(KEY, dv); }
+      // depuis la copie corrigée : « S'entraîner » ou « Revoir le cours », puis retour sur la copie
+      function back() { if (w.MSSP.from) { w.MSSP.from(function () { css("cpcss", "cp.css?v=1"); css("excss", "ex.css?v=1"); try { w.MSNav.solved(); } catch (x) { } launch(dv); }); } }
       w.MSCPA.show(dv, items, {
         save: function (d) { wr(KEY, d); },
         done: function (d) { wr(KEY, null); w.MSPRG.addEval({ lv: lv, t: d.ttl, n: d.note }); },
         quit: function () { home(); w.scrollTo(0, 0); },
-        train: function (c, id) { ld(["ms_exo.js?v=1"], function () { if (w.MSEXO) { w.MSEXO.open(c, id); } }); },
-        cours: function () { var b = D.createElement("button"); b.setAttribute("data-sp", "cours"); b.hidden = true; D.body.appendChild(b); b.click(); b.remove(); }
+        train: function (c, id) { ld(["ms_exo.js?v=1"], function () { if (w.MSEXO) { back(); w.MSEXO.open(c, id); } }); },
+        cours: function () { back(); var b = D.createElement("button"); b.setAttribute("data-sp", "cours"); b.hidden = true; D.body.appendChild(b); b.click(); b.remove(); }
       });
     });
   }
@@ -74,7 +77,7 @@
     else if (a === "mode") { mode = v; pick = mode === "i" ? pick.slice(0, 1) : pick; home(); }
     else if (a === "ch") { v = +v; if (mode === "i") { pick = [v]; } else if (pick.indexOf(v) >= 0) { pick.splice(pick.indexOf(v), 1); } else if (pick.length < 3) { pick.push(v); } else { A.toast("3 chapitres au maximum."); } home(); }
     else if (a === "go" && ready()) { ld(pick.map(function (c) { return "gx_" + lv + "_" + c + ".js?v=1"; }), function (ok) { if (ok) { launch(build()); } else { A.toast(A.t("net")); } }); }
-    else if (a === "resume") { launch(rd(KEY)); }
+    else if (a === "resume") { if (rd(KEY)) { launch(rd(KEY)); } else { home(); } }
   });
   function open() {
     css("accss", "acct.css?v=1"); css("fmcss", "fm.css?v=1"); css("cpcss", "cp.css?v=1"); css("excss", "ex.css?v=1");
@@ -83,6 +86,8 @@
     ld((w.ED && w.ED.parse && w.ED.out ? [] : ["ed_model.js?v=2", "ed_parse.js?v=2"]).concat(["ms_co_view.js?v=4", "ms_cpk.js?v=1", "ms_mk.js?v=1", "ms_cpc.js?v=1", "ms_cpb.js?v=1", "ms_cpa.js?v=1", "ms_prg.js?v=1", "gx_core.js?v=1"]).concat(FL[lv] ? ["fm_" + FL[lv] + ".js?v=1"] : []), function (ok) {
       if (!ok || !w.MSGX) { A.toast(A.t("net")); return; }
       if (!w.MSGX.has(lv)) { app.innerHTML = '<div class="ac xs ev"><div class="ach"><button class="bkb" id="home" aria-label="Retour"></button><b class="ht">Évaluation</b></div><p class="fe">Les évaluations de ton niveau arrivent bientôt. Elles sont déjà prêtes pour la 3e et la Terminale.</p></div>'; return; }
+      var cur = rd(KEY);
+      if (cur && cur.lv === lv && !cur.done) { launch(cur); return; }
       home(); w.scrollTo(0, 0);
     });
   }

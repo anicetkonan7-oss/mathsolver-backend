@@ -223,12 +223,31 @@
     if (cancel) { dshut(); }
   }
   function toast(m) { try { w.MSAC.toast(m); } catch (x) { } }
+  // l'énoncé ne prend jamais la place de la réponse : il reste toujours au moins 2 lignes visibles pour écrire
+  function room() {
+    var c = D.getElementById("xctx"), r = 0, k;
+    for (k = c.parentNode.firstChild; k; k = k.nextSibling) { if (k !== c && k.id !== "xwk") { r += k.offsetHeight; } }
+    return Math.max(48, B.clientHeight - r - 2.6 * FS - 40);
+  }
+  function lim(h) { return Math.max(48, Math.min(room(), h)); }
+  function fit() {
+    var c = D.getElementById("xctx");
+    if (!c) { return; }
+    c.style.height = "auto";
+    c.style.height = lim(ch === null ? Math.min(Math.round(B.clientHeight * 0.4), c.scrollHeight + 2) : ch) + "px";
+    // petit écran : si tout ne tient pas, l'énoncé se réduit (le clavier reste entier)
+    var over = c.parentNode.scrollHeight - B.clientHeight;
+    if (over > 0) { c.style.height = Math.max(40, c.offsetHeight - over) + "px"; }
+  }
+  // taille de l'écriture (A− / A+), retenue pour la prochaine fois
+  var FS = 18;
+  try { FS = Math.max(14, Math.min(28, +w.MSStore.get("cpfs") || 18)); } catch (x) { }
+  function size(d) { FS = Math.max(14, Math.min(28, FS + d)); try { w.MSStore.set("cpfs", String(FS)); } catch (x) { } B.style.setProperty("--xfs", FS + "px"); fit(); work(); }
   function grip() {
     var g = D.getElementById("xgr"), c = D.getElementById("xctx"), y0 = 0, h0 = 0, mv = false;
-    function lim(h) { return Math.max(48, Math.min(B.clientHeight * 0.68, h)); }
     g.onpointerdown = function (ev) { y0 = ev.clientY; h0 = c.offsetHeight; mv = false; g.setPointerCapture(ev.pointerId); };
     g.onpointermove = function (ev) { if (!g.hasPointerCapture(ev.pointerId)) { return; } if (Math.abs(ev.clientY - y0) > 4) { mv = true; } ch = lim(h0 + ev.clientY - y0); c.style.height = ch + "px"; };
-    g.onpointerup = function () { if (mv) { return; } var H = B.clientHeight, st = [48, Math.round(H * 0.24), Math.round(H * 0.55)], i = st.findIndex(function (v) { return Math.abs(v - c.offsetHeight) < 24; }); ch = st[(i + 1) % 3]; c.style.height = ch + "px"; };
+    g.onpointerup = function () { if (mv) { return; } var st = [48, Math.round(room() / 2), room()], i = st.findIndex(function (v) { return Math.abs(v - c.offsetHeight) < 24; }); ch = st[(i + 1) % 3]; c.style.height = lim(ch) + "px"; };
   }
   function sheet(h) { var v = D.createElement("div"); v.className = "xveil"; v.id = "xveil"; v.innerHTML = '<div class="xsh" role="dialog">' + h + "</div>"; v.onclick = function (ev) { if (ev.target === v) { v.remove(); } }; D.body.appendChild(v); }
   function valid() {
@@ -266,12 +285,13 @@
     at(L.length - 1, true);
     B = D.createElement("div"); B.className = "xB"; B.id = "xB";
     B.innerHTML = '<div class="xwr"><div class="xhd"><button class="xbk" data-b="x" aria-label="Revenir"></button><div class="xtt"><b>' + e(o.title) + "</b><small>" + e(o.sub || "") + ' <span class="xsv" id="xsv">Enregistré ✓</span></small></div>' + (o.clock ? '<span class="xclk" id="xclk"></span>' : "") + '</div><div class="xctx" id="xctx">' + o.ctx + '</div><div class="xgr" id="xgr" role="separator" aria-label="Agrandir ou réduire l\'énoncé"><i></i></div><div class="xwk" id="xwk"></div>' +
-      '<div class="xtools"><button class="xtb" data-b="dict" aria-label="Dicter">' + ic("mic") + '</button><button class="xtb" data-b="calc" aria-label="Calculatrice">' + ic("calc") + '</button><button class="xtb val" data-b="val">' + ic("ok") + 'Valider</button></div><div id="xpd" class="xpd"></div></div>';
+      '<div class="xtools"><button class="xtb" data-b="dict" aria-label="Dicter">' + ic("mic") + '</button><button class="xtb" data-b="calc" aria-label="Calculatrice">' + ic("calc") + '</button><span class="xfz"><button class="xtb" data-b="fs-" aria-label="Écrire plus petit">A−</button><button class="xtb" data-b="fs+" aria-label="Écrire plus grand">A+</button></span><button class="xtb val" data-b="val">' + ic("ok") + 'Valider</button></div><div id="xpd" class="xpd"></div></div>';
+    B.style.setProperty("--xfs", FS + "px");
     D.body.appendChild(B);
-    var c = D.getElementById("xctx");
-    // énoncé court : la zone s'ajuste à son contenu pour laisser plus de place à la réponse
-    c.style.height = (ch === null ? Math.max(48, Math.min(Math.round(B.clientHeight * 0.24), c.scrollHeight + 2)) : ch) + "px"; c.scrollTop = c.scrollHeight;
-    work(); pad(); grip();
+    work(); pad(); grip(); fit();
+    // l'énoncé s'ouvre sur la question en cours (son début visible)
+    var c = D.getElementById("xctx"), q = c.querySelector(".xq.cur");
+    c.scrollTop = q ? q.getBoundingClientRect().top - c.getBoundingClientRect().top + c.scrollTop - 6 : 1e6;
     if (o.clock) { tk = setInterval(function () { var k = D.getElementById("xclk"); if (k) { k.textContent = o.clock(); } }, 1000); D.getElementById("xclk").textContent = o.clock(); }
   }
   // retour (flèche ou bouton du téléphone) : ferme d'abord la page de réponse
@@ -286,13 +306,14 @@
     if (a === "x") { close(); }
     else if (a === "ln") { if (ev.target.closest(".xdl")) { return; } hit(ev, i); }
     else if (a === "del") { T.splice(i, 1); L.splice(i, 1); if (!T.length) { T.push({ n: [], p: null }); L.push(""); } at(Math.min(li, T.length - 1), true); work(); chg(); if (abc) { pad(); } }
-    else if (a === "abc") { abc = !abc; if (!abc) { at(li, true); } pad(); work(); }
+    else if (a === "abc") { abc = !abc; if (!abc) { at(li, true); } pad(); work(); fit(); }
     else if (a === "nl") { key("NL"); }
     else if (a === "calc") { w.MSCPC.open(insert); }
     else if (a === "dict") { dict(); }
     else if (a === "dcx") { dstop(true); }
     else if (a === "dok") { dstop(false); var p = D.getElementById("xdt"); if (p) { p.textContent = "Je termine…"; } }
     else if (a === "val") { valid(); }
+    else if (a === "fs-" || a === "fs+") { size(a === "fs+" ? 2 : -2); }
     else if (a === "pk") { D.querySelectorAll("#xveil .xo").forEach(function (o) { o.classList.toggle("on", o === b); }); }
     else if (a === "shx") { D.getElementById("xveil").remove(); }
     else if (a === "ok") { finish(); }

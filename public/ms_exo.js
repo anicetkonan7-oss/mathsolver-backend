@@ -4,7 +4,11 @@
   var D = document, app = D.getElementById("app"), A = w.MSAC, SP = w.MSSP, got = {}, BASE = "https://mathsolver-backend-gray.vercel.app/";
   if (w.MSEXO || !A || !app || !SP) { return; }
   var FL = { l3: "c", lt: "f" }, DL = ["", "Facile", "Moyen", "Difficile"], N = 5;
-  var lv = "", scr = "list", ch = -1, R = null, sy = 0;
+  var lv = "", scr = "list", ch = -1, R = null, sy = 0, KEY = "excur";
+  // nombre de compétences par chapitre (identifiants lt0a, lt0b…) : la maîtrise s'affiche sans charger les exercices
+  var NB = { lt: [3, 4, 4, 4, 5, 5, 5, 4, 5, 5, 3, 5, 5, 4, 5], l3: [4, 4, 4, 2, 3, 3, 3, 4, 4, 4, 4, 4] };
+  function rd() { try { var r = JSON.parse(w.MSStore.get(KEY) || "null"); return r && r.lv === lv ? r : null; } catch (x) { return null; } }
+  function wr(v) { try { if (v) { w.MSStore.set(KEY, JSON.stringify(v)); } else { w.MSStore.del(KEY); } } catch (x) { } }
   function e(s) { return A.esc(s); }
   function tx(s) { return w.MSCOV ? w.MSCOV.tx(s) : e(s); }
   function css(id, f) { if (D.getElementById(id)) { return; } var l = D.createElement("link"); l.id = id; l.rel = "stylesheet"; l.href = BASE + f; D.head.appendChild(l); }
@@ -15,6 +19,7 @@
   }
   function names() { return ((w.MSFM || {})[lv] || []).map(function (c) { return c[0]; }); }
   function gens(c) { return w.MSGX.of(lv, c); }
+  function ids(c) { var g = gens(c), n = (NB[lv] || [])[c] || 0, o = [], i; if (g.length) { return g; } for (i = 0; i < n; i++) { o.push({ id: lv + c + "abcdefgh".charAt(i) }); } return o; }
   function bar(p, t) { return '<span class="ebar"><i style="width:' + p + '%"></i></span><span class="elb' + (p >= 75 ? " xok" : "") + '">' + e(w.MSPRG.label(p, t)) + (t ? " · " + p + " %" : "") + "</span>"; }
   function head(t) { return '<div class="ac xs exo"><div class="ach"><button class="bkb" id="home" aria-label="Retour"></button><b class="ht">' + e(t) + "</b></div>"; }
   function dots(d) { var s = ""; for (var i = 1; i <= 3; i++) { s += "<i" + (i <= d ? ' class="on"' : "") + "></i>"; } return '<span class="edot" aria-label="' + DL[d] + '">' + s + "</span>"; }
@@ -23,11 +28,13 @@
   function list() {
     scr = "list"; ch = -1;
     var n = names(), s = head("Exercices"), all = 0, k = 0, i, g, p, t;
-    for (i = 0; i < w.MSGX.n(lv); i++) { g = gens(i); if (g.length) { all += w.MSPRG.chap(g); k++; } }
+    for (i = 0; i < w.MSGX.n(lv); i++) { g = ids(i); if (g.length) { all += w.MSPRG.chap(g); k++; } }
     s += '<div class="estat"><div><b>' + w.MSPRG.streak() + "</b><small>jour" + (w.MSPRG.streak() > 1 ? "s" : "") + ' d\'affilée</small></div><div><b>' + w.MSPRG.xp() + '</b><small>points</small></div><div><b>' + (k ? Math.round(all / k) : 0) + ' %</b><small>maîtrise du programme</small></div></div>';
+    t = rd();
+    if (t && t.i < N) { s += '<div class="evw"><b>Série en cours : ' + e(t.ttl) + " · exercice " + (t.i + 1) + " sur " + N + '</b><div class="row2"><button data-ex="resume">Reprendre ma série</button></div></div>'; }
     s += '<p class="esub">Choisis un chapitre. Ton niveau se met à jour à chaque exercice.</p>';
     for (i = 0; i < w.MSGX.n(lv); i++) {
-      g = gens(i); p = w.MSPRG.chap(g); t = g.some(function (x) { return w.MSPRG.tried(x.id); });
+      g = ids(i); p = w.MSPRG.chap(g); t = g.some(function (x) { return w.MSPRG.tried(x.id); });
       s += '<button class="ech" data-ex="ch" data-v="' + i + '"><span class="cn">' + (i + 1) + '</span><span class="ect"><b>' + e(n[i] || "Chapitre " + (i + 1)) + "</b>" + bar(p, t) + '</span><span class="chv"></span></button>';
     }
     app.innerHTML = s + "</div>";
@@ -53,12 +60,25 @@
     if (!c.length) { c = g; }
     return c[Math.floor(Math.random() * c.length)];
   }
-  function item(g) { var it, i; for (i = 0; i < 6; i++) { it = w.MSGX.make(g); if (!R.items.some(function (o) { return o.t === it.t; })) { break; } } return it; }
+  function item(g) { var it, i, sd; for (i = 0; i < 6; i++) { sd = Math.floor(Math.random() * 2147483647); it = w.MSGX.make(g, sd); it.sd = sd; if (!R.items.some(function (o) { return o.t === it.t; })) { break; } } return it; }
+  // la série est enregistrée à chaque étape : on la reprend même après avoir quitté l'appli
+  function save() { wr({ lv: lv, ch: ch, ttl: names()[ch] || "Chapitre " + (ch + 1), sk: R.sk, q: R.items.map(function (o) { return { g: o.g.id, sd: o.sd }; }), st: R.st, i: R.i, pts: R.pts, d: R.d }); }
   function start(id) {
     var g = id ? w.MSGX.byId(id) : null;
     R = { sk: id || "", items: [], st: [], i: 0, pts: 0, d: 1 };
     R.items.push(item(g || pickGen(1, [])));
+    save();
     run();
+  }
+  function resume() {
+    var r = rd();
+    if (!r) { list(); return; }
+    ch = r.ch;
+    ld(["gx_" + lv + "_" + r.ch + ".js?v=1"], function (ok) {
+      if (!ok) { A.toast(A.t("net")); list(); return; }
+      try { R = { sk: r.sk, st: r.st, i: r.i, pts: r.pts, d: r.d, items: r.q.map(function (o) { var it = w.MSGX.make(w.MSGX.byId(o.g), o.sd); it.sd = o.sd; return it; }) }; } catch (x) { wr(null); list(); return; }
+      run();
+    });
   }
   function cur() { return R.st[R.i] || (R.st[R.i] = { L: [], f: -1, ok: null, tr: 0, h: 0, cor: 0, done: 0 }); }
   function run() {
@@ -93,6 +113,7 @@
         q.L = L; q.f = f; q.tr++;
         q.ok = f >= 0 && w.MSCK.check(it.a, L[f]);
         if (q.ok) { q.pts = Math.max(2, 10 - 3 * q.h - 3 * (q.tr - 1)); R.pts += q.pts; w.MSPRG.xp(q.pts); finish(q, true); }
+        save();
         run();
       } });
   }
@@ -104,11 +125,13 @@
     ids = R.items.map(function (o) { return o.g.id; });
     R.i++;
     R.items.push(item(R.sk ? w.MSGX.byId(R.sk) : pickGen(R.d, ids)));
+    save();
     run();
   }
   // 4. bilan de la série
   function end() {
     scr = "end";
+    wr(null);
     var k = R.st.filter(function (q) { return q.ok && !q.cor; }).length, ids = [], s = head("Bilan");
     R.items.forEach(function (o) { if (ids.indexOf(o.g.id) < 0) { ids.push(o.g.id); } });
     s += '<div class="eend"><div class="escore">' + k + "<small>/" + N + "</small></div><p>" + (k === N ? "Parfait, toutes tes réponses sont justes !" : k >= 3 ? "Bon travail, continue comme ça." : "Courage : relis les corrections, puis refais une série.") + '</p><div class="epts">+' + R.pts + " points</div></div><h3 class=\"gh\">Ton niveau maintenant</h3>";
@@ -133,8 +156,9 @@
     else if (a === "mix") { start(""); }
     else if (a === "sk") { start(b.getAttribute("data-v")); }
     else if (a === "ans") { answer(); }
-    else if (a === "hint") { cur().h++; run(); }
-    else if (a === "cor") { q = cur(); q.cor = 1; finish(q, false); run(); }
+    else if (a === "hint") { cur().h++; save(); run(); }
+    else if (a === "cor") { q = cur(); q.cor = 1; finish(q, false); save(); run(); }
+    else if (a === "resume") { sy = w.pageYOffset; resume(); }
     else if (a === "next") { next(); }
     else if (a === "again") { start(R.sk); }
     else if (a === "back") { chap(ch); }
@@ -147,7 +171,8 @@
     ld((w.ED && w.ED.parse && w.ED.out ? [] : ["ed_model.js?v=2", "ed_parse.js?v=2"]).concat(["ms_co_view.js?v=4", "ms_cpk.js?v=1", "ms_mk.js?v=1", "ms_cpc.js?v=1", "ms_cpb.js?v=1", "ms_prg.js?v=1", "gx_core.js?v=1"]).concat(FL[lv] ? ["fm_" + FL[lv] + ".js?v=1"] : []), function (ok) {
       if (!ok || !w.MSGX) { A.toast(A.t("net")); return; }
       if (!w.MSGX.has(lv)) { app.innerHTML = head("Exercices") + '<p class="fe">Les exercices de ton niveau arrivent bientôt. Ils sont déjà prêts pour la 3e et la Terminale.</p></div>'; return; }
-      if (c >= 0) { ch = c; ld(["gx_" + lv + "_" + c + ".js?v=1"], function () { if (id) { start(id); } else { chap(c); } }); } else { sy = 0; list(); }
+      var r = w.MSEXR; w.MSEXR = false;
+      if (c >= 0) { ch = c; ld(["gx_" + lv + "_" + c + ".js?v=1"], function () { if (id) { start(id); } else { chap(c); } }); } else if (r && rd()) { sy = 0; resume(); } else { sy = 0; list(); }
     });
   }
   SP.live.exercices = function () { boot(-1); };
