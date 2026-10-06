@@ -80,7 +80,7 @@
     css("accss", "acct.css?v=1"); css("fmcss", "fm.css?v=1"); css("cpcss", "cp.css?v=1"); css("excss", "ex.css?v=1");
     try { w.MSNav.solved(); } catch (x) { }
     lv = A.P().lv || ""; pick = [];
-    ld(["ms_co_view.js?v=4", "ms_cpk.js?v=1", "ms_mk.js?v=1", "ms_cpc.js?v=1", "ms_cpb.js?v=1", "ms_cpa.js?v=1", "ms_prg.js?v=1", "gx_core.js?v=1"].concat(FL[lv] ? ["fm_" + FL[lv] + ".js?v=1"] : []), function (ok) {
+    ld((w.ED && w.ED.parse && w.ED.out ? [] : ["ed_model.js?v=2", "ed_parse.js?v=2"]).concat(["ms_co_view.js?v=4", "ms_cpk.js?v=1", "ms_mk.js?v=1", "ms_cpc.js?v=1", "ms_cpb.js?v=1", "ms_cpa.js?v=1", "ms_prg.js?v=1", "gx_core.js?v=1"]).concat(FL[lv] ? ["fm_" + FL[lv] + ".js?v=1"] : []), function (ok) {
       if (!ok || !w.MSGX) { A.toast(A.t("net")); return; }
       if (!w.MSGX.has(lv)) { app.innerHTML = '<div class="ac xs ev"><div class="ach"><button class="bkb" id="home" aria-label="Retour"></button><b class="ht">Évaluation</b></div><p class="fe">Les évaluations de ton niveau arrivent bientôt. Elles sont déjà prêtes pour la 3e et la Terminale.</p></div>'; return; }
       home(); w.scrollTo(0, 0);

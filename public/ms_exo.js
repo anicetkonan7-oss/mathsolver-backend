@@ -121,7 +121,7 @@
   // retour (flèche ou bouton du téléphone) : on remonte d'un écran
   D.addEventListener("click", function (ev) {
     var t = ev.target.closest ? ev.target.closest("#home") : null;
-    if (!t || scr === "list" || !D.querySelector("#app .exo")) { return; }
+    if (!t || scr === "list" || !D.querySelector("#app .exo") || (w.MSCPB && w.MSCPB.on())) { return; }
     ev.stopImmediatePropagation(); ev.preventDefault();
     if (scr === "chap") { list(); } else { chap(ch); }
   }, true);
@@ -144,7 +144,7 @@
     css("accss", "acct.css?v=1"); css("fmcss", "fm.css?v=1"); css("cpcss", "cp.css?v=1"); css("excss", "ex.css?v=1");
     try { w.MSNav.solved(); } catch (x) { }
     lv = A.P().lv || "";
-    ld(["ms_co_view.js?v=4", "ms_cpk.js?v=1", "ms_mk.js?v=1", "ms_cpc.js?v=1", "ms_cpb.js?v=1", "ms_prg.js?v=1", "gx_core.js?v=1"].concat(FL[lv] ? ["fm_" + FL[lv] + ".js?v=1"] : []), function (ok) {
+    ld((w.ED && w.ED.parse && w.ED.out ? [] : ["ed_model.js?v=2", "ed_parse.js?v=2"]).concat(["ms_co_view.js?v=4", "ms_cpk.js?v=1", "ms_mk.js?v=1", "ms_cpc.js?v=1", "ms_cpb.js?v=1", "ms_prg.js?v=1", "gx_core.js?v=1"]).concat(FL[lv] ? ["fm_" + FL[lv] + ".js?v=1"] : []), function (ok) {
       if (!ok || !w.MSGX) { A.toast(A.t("net")); return; }
       if (!w.MSGX.has(lv)) { app.innerHTML = head("Exercices") + '<p class="fe">Les exercices de ton niveau arrivent bientôt. Ils sont déjà prêts pour la 3e et la Terminale.</p></div>'; return; }
       if (c >= 0) { ch = c; ld(["gx_" + lv + "_" + c + ".js?v=1"], function () { if (id) { start(id); } else { chap(c); } }); } else { sy = 0; list(); }
