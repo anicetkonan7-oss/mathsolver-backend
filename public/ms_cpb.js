@@ -132,7 +132,7 @@
       r.className = "xln" + (c ? " on" : ""); r.setAttribute("data-b", "ln"); r.setAttribute("data-i", i);
       r.innerHTML = '<span class="xno">' + (i + 1) + '</span><div class="xtx"></div>' + (T.length > 1 ? '<button class="xdl" data-b="del" data-i="' + i + '" aria-label="Supprimer la ligne ' + (i + 1) + '">×</button>' : "");
       x = r.children[1];
-      if (!t.n.length && !(c && !abc)) { x.innerHTML = '<span class="xph">' + (i ? "Ligne vide" : "Écris ton raisonnement ici, ligne par ligne.") + "</span>"; }
+      if (!t.n.length && !(c && !abc)) { x.innerHTML = '<span class="xph">' + (i ? "Ligne vide" : O.ph || "Écris ton raisonnement ici, ligne par ligne.") + "</span>"; }
       else { x.appendChild(rs(t, true, c && !abc ? w.ED.cur : null)); }
       wk.appendChild(r);
     });
@@ -272,7 +272,9 @@
       if (z) { abc = false; pad(); at(i, false); w.ED.cur = { s: z, i: 0 }; bad = z; work(); setTimeout(function () { bad = null; if (B) { work(); } }, 1100); toast("Remplis la case vide de la ligne " + (i + 1) + "."); return; }
     }
     L.forEach(function (l, i) { if (l.trim()) { ix.push(i); } });
-    if (!ix.length) { toast("Écris au moins une ligne avant de valider."); return; }
+    if (!ix.length) { toast(O.simple ? "Écris d'abord ton exercice." : "Écris au moins une ligne avant de valider."); return; }
+    // mode simple (barre de l'accueil) : le texte est rendu tel quel, sans choix de réponse finale
+    if (O.simple) { var cb = O.onValid, keep = L.filter(function (l) { return l.trim(); }); shut(); cb(keep, -1); return; }
     pk = ix[ix.length - 1];
     sheet('<h3>Quelle est ta réponse finale ?</h3><p>Elle sera encadrée. Tout ton raisonnement est gardé.</p><div class="xop">' + ix.map(function (i) { return '<button class="xo' + (i === pk ? " on" : "") + '" data-b="pk" data-i="' + i + '"><i></i><span>' + pr(L[i]) + "</span></button>"; }).join("") + '</div><div class="xrow"><button class="xbt sec" data-b="shx">Continuer d\'écrire</button><button class="xbt pri" data-b="ok">' + ic("ok") + "Valider</button></div>");
   }
@@ -293,21 +295,33 @@
   function close() { var cb = O && O.onClose, l = L.slice(); shut(); if (cb) { cb(l); } }
   function open(o) {
     if (!ok()) { toast("Le clavier se prépare. Réessaie dans un instant."); return; }
-    O = o; L = o.lines && o.lines.length ? o.lines.slice() : [""]; abc = false; bad = null;
+    if (B) { kill(); }
+    O = o; L = o.lines && o.lines.length ? o.lines.slice() : [""]; abc = false; bad = null; ch = null;
     R0 = w.ED.root; C0 = w.ED.cur;
     T = L.map(parse);
     at(L.length - 1, true);
     B = D.createElement("div"); B.className = "xB"; B.id = "xB";
     B.innerHTML = '<div class="xwr"><div class="xhd"><button class="xbk" data-b="x" aria-label="Revenir"></button><div class="xtt"><b>' + e(o.title) + "</b><small>" + e(o.sub || "") + ' <span class="xsv" id="xsv">Enregistré ✓</span></small></div>' + (o.clock ? '<span class="xclk" id="xclk"></span>' : "") + '</div><div class="xctx" id="xctx">' + o.ctx + '</div><div class="xgr" id="xgr" role="separator" aria-label="Agrandir ou réduire l\'énoncé"><i></i></div><div class="xwk" id="xwk"></div>' +
-      '<div class="xtools"><button class="xtb" data-b="dict" aria-label="Dicter">' + ic("mic") + '</button><button class="xtb" data-b="calc" aria-label="Calculatrice">' + ic("calc") + '</button><span class="xfz"><button class="xtb" data-b="fs-" aria-label="Écrire plus petit">A−</button><button class="xtb" data-b="fs+" aria-label="Écrire plus grand">A+</button></span><button class="xtb val" data-b="val">' + ic("ok") + 'Valider</button></div><div id="xpd" class="xpd"></div></div>';
+      '<div class="xtools"><button class="xtb" data-b="dict" aria-label="Dicter">' + ic("mic") + '</button><button class="xtb" data-b="calc" aria-label="Calculatrice">' + ic("calc") + '</button><span class="xfz"><button class="xtb" data-b="fs-" aria-label="Écrire plus petit">A−</button><button class="xtb" data-b="fs+" aria-label="Écrire plus grand">A+</button></span><button class="xtb val" data-b="val">' + ic("ok") + e(o.ok || "Valider") + '</button></div><div id="xpd" class="xpd"></div></div>';
+    if (o.simple) { B.classList.add("xsimple"); }
     B.style.setProperty("--xfs", FS + "px");
     D.body.appendChild(B);
-    work(); pad(); grip(); fit();
-    // l'énoncé s'ouvre sur la question en cours (son début visible)
-    var c = D.getElementById("xctx"), q = c.querySelector(".xq.cur");
-    c.scrollTop = q ? q.getBoundingClientRect().top - c.getBoundingClientRect().top + c.scrollTop - 6 : 1e6;
+    work(); pad(); grip(); top();
+    // les formules de l'énoncé s'affichent un peu après : on recalcule la taille (sauf si l'élève a déjà tiré la poignée)
+    [250, 900].forEach(function (t) { setTimeout(function () { if (B && ch === null) { top(); } }, t); });
+    try { if (D.fonts && D.fonts.ready) { D.fonts.ready.then(function () { if (B && ch === null) { top(); } }); } } catch (x) { }
     if (o.clock) { tk = setInterval(function () { var k = D.getElementById("xclk"); if (k) { k.textContent = o.clock(); } }, 1000); D.getElementById("xclk").textContent = o.clock(); }
   }
+  // taille de l'énoncé, ouvert sur la question en cours (son début visible)
+  function top() {
+    var c = D.getElementById("xctx"), q;
+    if (!c) { return; }
+    fit();
+    q = c.querySelector(".xq.cur");
+    c.scrollTop = q ? q.getBoundingClientRect().top - c.getBoundingClientRect().top + c.scrollTop - 6 : 1e6;
+  }
+  // fermeture silencieuse (changement d'écran) : rien n'est perdu, chaque ligne est déjà enregistrée
+  function kill() { shut(); }
   // retour (flèche ou bouton du téléphone) : ferme d'abord la page de réponse
   D.addEventListener("click", function (ev) {
     var t = ev.target.closest ? ev.target.closest("#home") : null;
@@ -332,5 +346,5 @@
     else if (a === "shx") { D.getElementById("xveil").remove(); }
     else if (a === "ok") { finish(); }
   });
-  w.MSCPB = { open: open, close: close, pr: pr, norm: function (t) { return ok() ? txt(parse(t)) : String(t); }, on: function () { return !!B; } };
+  w.MSCPB = { open: open, close: close, kill: kill, pr: pr, norm: function (t) { return ok() ? txt(parse(t)) : String(t); }, on: function () { return !!B; } };
 })(window);

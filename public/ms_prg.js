@@ -100,7 +100,7 @@
   function badges() {
     var d = load(), bs = M.max(d.bs, streak()), e = d.e, n20 = e.some(function (o) { return o.n >= 20; }), n16 = e.some(function (o) { return o.n >= 16; }), lv = level().n, cm = chapMax();
     return [
-      ["b1", "🎯", "Premier pas", "Faire ton premier exercice", d.c.n >= 1],
+      ["b1", "🎯", "Premier pas", "Réussir ton premier exercice", d.c.ok >= 1],
       ["b2", "🔥", "3 jours d'affilée", "Travailler 3 jours de suite", bs >= 3],
       ["b3", "🔥", "Une semaine", "Travailler 7 jours de suite", bs >= 7],
       ["b4", "🏆", "Un mois", "Travailler 30 jours de suite", bs >= 30],

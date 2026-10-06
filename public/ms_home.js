@@ -39,6 +39,7 @@
   function render() {
     var r = A && A.recents ? list() : [], B = w.MSLB, v = B.on ? B.all() : [], s = "", i, n, ex;
     if (mode === "history") {
+      if (w.MSSP) { w.MSSP.clean(); w.MSSP.home(false); }
       s = B.head("Historique", tab === "rec" && r.length ? "clr" : "", "Tout effacer");
       if (B.on) { s += B.tabs(tab, v.length); } else { tab = "rec"; }
       if (tab === "sav") {
@@ -50,17 +51,14 @@
       }
       s += '<button class="lk bk" id="home">Retour &agrave; l\'accueil</button>';
     } else {
+      // accueil : bonjour + barre de saisie, ma journée, tes espaces, 2 exemples, astuce (récents et corrections : menu › Historique)
       s = (w.MSNET ? w.MSNET.card(B) : "") + (w.MSSP ? w.MSSP.grid() : "");
-      if (r.length) {
+      if (!(w.MSBAR && w.MSBAR.on()) && r.length) {
         s += B.head("R&eacute;cents", r.length > 3 ? "all" : "", "Tout voir");
-        for (i = 0; i < Math.min(3, r.length); i++) { s += B.rc("rc", esc(r[i]), r[i]); }
-      }
-      if (v.length) {
-        s += B.head("Enregistr&eacute;es", v.length > 3 ? "allsav" : "", "Tout voir");
-        for (i = 0; i < Math.min(3, v.length); i++) { s += B.row(v[i], cf); }
+        for (i = 0; i < Math.min(2, r.length); i++) { s += B.rc("rc", esc(r[i]), r[i]); }
       }
       s += B.head("Essaie un exemple", "again", "Autres exemples");
-      ex = (w.MSSP && w.MSSP.ex(4)) || pick();
+      ex = (w.MSSP && w.MSSP.ex(2)) || pick().slice(0, 2);
       s += '<div class="exs">';
       for (i = 0; i < ex.length; i++) { s += B.rc("ex", esc(ex[i][0]), ex[i][1]); }
       s += "</div>";
@@ -77,7 +75,8 @@
     done();
   }
   function done() { w.MS_RDY = true; }
-  function sh() { try { N.show(); } catch (e) { } }
+  // la zone de saisie native ne revient pas quand l'accueil a sa propre barre (sinon elle clignote)
+  function sh() { try { if (mode === "home" && w.MSBAR && w.MSBAR.on()) { return; } N.show(); } catch (e) { } }
 
   D.addEventListener("click", function (e) {
     var t = e.target.closest ? e.target.closest("button") : null, a, id;
@@ -131,7 +130,7 @@
     if (i >= a.length) { cb(); return; }
     load(a[i], function () { seq(a, i + 1, cb); });
   }
-  var wait = 8;
+  var wait = 9;
   function start() {
     if (--wait) { return; }
     if (w.MS_EX && w.MS_EX.length > 4) { EX = w.MS_EX; }
@@ -153,4 +152,5 @@
   load("ms_mopen.js?v=1", start);
   load("ms_go.js?v=1", start);
   load("ms_net.js?v=1", start);
+  load("ms_bar.js?v=1", start);
 })(window);

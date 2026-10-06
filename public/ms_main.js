@@ -1,6 +1,8 @@
 /* MathSolver - affichage 3/4 : assemble la page (nécessite ms_parse.js et ms_view.js) */
 (function (w) {
   "use strict";
+  // page de solution : l'icône Accueil de la barre bleue revient
+  try { if (w.MSHome && w.MSHome.mode) { w.MSHome.mode(false); } } catch (x) { }
   var P = w.MSP, V = w.MSV, D = w.MS_DATA || {};
   if (!P || !V) { return; }
   var BASE = "https://mathsolver-backend-gray.vercel.app/";

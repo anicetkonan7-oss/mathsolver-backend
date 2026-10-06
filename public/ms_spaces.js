@@ -39,7 +39,8 @@
     ".spd{display:flex;align-items:center;gap:12px;box-sizing:border-box;width:calc(100% - 24px);margin:0 12px 10px;padding:12px 14px;border-radius:16px;background:#fff4f4;border:1.5px solid #f3b4b4;color:#0f1b33;text-align:left;font-size:13.5px;line-height:1.35;}" +
     ".spd.s{background:#fff7ec;border-color:#f5c99a;}.spd .spk{flex:none;font-style:normal;min-width:58px;padding:6px 8px;border-radius:12px;background:#e03131;color:#fff;font-size:16px;font-weight:800;text-align:center;font-variant-numeric:tabular-nums;}.spd.s .spk{background:#e8590c;font-size:13px;}" +
     ".spd span{flex:1;min-width:0;}.spd b{display:block;font-size:15px;}.spd em{flex:none;font-style:normal;font-weight:800;color:#c92a2a;}.spd.s em{color:#b4510a;}" +
-    ".dk .spd{background:#2a1618;border-color:#6b2a2a;color:#eef2fb;}.dk .spd.s{background:#2a1f12;border-color:#6b4a22;}.dk .spd em{color:#ff8a80;}.dk .spd.s em{color:#ffb070;}";
+    ".dk .spd{background:#2a1618;border-color:#6b2a2a;color:#eef2fb;}.dk .spd.s{background:#2a1f12;border-color:#6b4a22;}.dk .spd em{color:#ff8a80;}.dk .spd.s em{color:#ffb070;}" +
+    ".sp button{min-height:96px;justify-content:center;transition:opacity .25s;}.sp button.tdim{opacity:.22;}.sp small.so{padding:1px 8px;border-radius:9px;background:#eef2fa;}.dk .sp small.so{background:#1f2a42;}";
 
   function lg() { return w.MSAC && w.MSAC.lang() === "en" ? "en" : "fr"; }
   function pf() { return w.MSAC ? w.MSAC.P() : {}; }
@@ -54,15 +55,14 @@
   // un espace est ouvert seulement s'il a du contenu pour le niveau de l'élève (exercices et évaluations : 3e et Terminale)
   function on(k) { var P = pf(); return !!(LIVE[k] || SRC[k]) && ((k !== "formules" && k !== "cours") || !P.lv || !!FMOK[P.lv]) && ((k !== "exercices" && k !== "eval") || !!EXOK[P.lv]); }
 
+  function bar() { return !!(w.MSBAR && w.MSBAR.on()); }
   function inner() {
     var T = TX[lg()], P = pf(), s = "", i, k, b, d = on("eval") ? dv() : null, r = on("exercices") ? serie() : null, z;
-    // devoir ou série en cours : un bandeau en haut, et une pastille sur la tuile
-    if (d) { z = left(d); s += '<button class="spd" data-sp="eval"><i class="spk" id="spdt"' + (z > 0 ? "" : ' data-x="1"') + ">" + (z > 0 ? mm(z) : "0:00") + "</i><span><b>" + (z > 0 ? "Devoir en cours" : "Temps écoulé") + "</b>" + w.MSAC.esc(d.ttl || "") + "</span><em>" + (z > 0 ? "Reprendre" : "Voir ma note") + "</em></button>"; }
-    if (d && z > 0) { s += '<button id="home" class="splk" hidden aria-hidden="true"></button>'; }
-    if (r && r.i < 5) { s += '<button class="spd s" data-sp="exercices" data-r="1"><i class="spk">' + (r.i + 1) + "/5</i><span><b>Série d'exercices en cours</b>" + w.MSAC.esc(r.ttl || "") + "</span><em>Reprendre</em></button>"; }
+    // sans la barre de l'accueil (ancienne version de l'appli) : la zone du haut reste, et le retour propose de quitter pendant un devoir
+    if (d && left(d) > 0 && !bar()) { s += '<button id="home" class="splk" hidden aria-hidden="true"></button>'; }
     s += '<div class="sp">';
     for (i = 0; i < K.length; i++) {
-      b = on(K[i]) ? (rs("seen_" + K[i]) ? '<small class="lv">' + w.MSAC.esc(P.ln || T.o) + "</small>" : '<small class="nw">' + T.w + "</small>") : "<small>" + T.s + "</small>";
+      b = on(K[i]) ? (rs("seen_" + K[i]) ? "" : '<small class="nw">' + T.w + "</small>") : '<small class="so">' + T.s + "</small>";
       z = K[i] === "eval" && d ? '<span class="bdg" id="spdb">' + mm(left(d)) + "</span>" : K[i] === "exercices" && r ? '<span class="bdg s">En cours</span>' : "";
       s += '<button data-sp="' + K[i] + '"' + (sel === K[i] ? ' class="on"' : "") + ">" + z + '<i style="background:' + CO[i] + '"><svg viewBox="0 0 24 24">' + IC[i] + "</svg></i>" + T.n[i] + b + "</button>";
     }
@@ -77,12 +77,32 @@
   function devoir() { var d = on("eval") ? dv() : null; return !!(d && left(d) > 0); }
   // pendant un devoir : la barre « Résoudre » est cachée, et le retour du téléphone propose de quitter l'appli
   function lock() { if (!devoir()) { return; } [60, 450].forEach(function (t) { setTimeout(function () { if (devoir() && D.querySelector("#app .sp")) { try { w.MSNav.solved(); } catch (x) { } } }, t); }); }
+  // la chose la plus importante à faire : devoir en cours, sinon série en cours, sinon dernier chapitre, sinon premier exercice
+  function prio() {
+    var d = on("eval") ? dv() : null, r = serie(), M = w.MSPRG, c = M ? M.last(pf().lv || "") : -1, z;
+    if (d) { z = left(d); return { pill: z > 0 ? mm(z) : "0:00", bg: "#e03131", t: z > 0 ? "Devoir en cours" : "Temps écoulé", s: (z > 0 ? "Reprendre · " : "Voir ma note · ") + (d.ttl || ""), at: 'data-sp="eval"', id: "spdt" }; }
+    if (r && r.i < 5) { return { pill: (r.i + 1) + "/5", bg: "#c2410c", t: "Série en cours", s: "Reprendre · " + (r.ttl || ""), at: 'data-sp="exercices" data-r="1"' }; }
+    if (c >= 0) { return { pill: "▶", bg: "#1a62e8", t: "Continuer", s: (M.lastName(pf().lv || "") || "Chapitre " + (c + 1)), at: 'data-hub="go" data-c="' + c + '"' }; }
+    return { pill: "▶", bg: "#1a62e8", t: "Premier exercice", s: "Chapitre 1 · 5 exercices guidés", at: 'data-hub="go" data-c="0"' };
+  }
+  function hub() { return on("exercices") && w.MSHUB && w.MSPRG ? w.MSHUB.html(pf().lv || "", prio()) : on("exercices") ? '<div id="hub0"></div>' : ""; }
+  // changement d'écran : on referme ce qui pourrait rester ouvert par-dessus (page de réponse, feuilles, pause, calculatrice…)
+  function clean() {
+    try { if (w.MSCPB && w.MSCPB.on()) { w.MSCPB.kill(); } } catch (x) { }
+    try { if (w.MSCPA) { w.MSCPA.stop(); } } catch (x) { }
+    try { if (w.MSCPC) { w.MSCPC.close(); } } catch (x) { }
+    try { if (w.MSBAR) { w.MSBAR.shut(); } } catch (x) { }
+    ["xveil", "xdict", "evcf", "evpz", "msscr", "msdi"].forEach(function (id) { var z = D.getElementById(id); if (z) { z.remove(); } });
+    D.querySelectorAll(".yb,#yay").forEach(function (z) { z.remove(); });
+  }
+  function home(on) { try { if (w.MSHome && w.MSHome.mode) { w.MSHome.mode(!!on); } } catch (x) { } }
   function grid() {
-    var P = pf(), h = on("exercices") && w.MSHUB ? w.MSHUB.html(P.lv || "") : on("exercices") ? '<div id="hub0"></div>' : "";
+    var b = bar(), h = b ? w.MSBAR.html() : "";
     ret = null;
-    lock();
+    clean();
+    if (b) { home(true); [80, 500].forEach(function (t) { setTimeout(function () { if (D.getElementById("msbar")) { home(true); } }, t); }); } else { lock(); }
     setTimeout(function () { if (w.MSTOUR) { w.MSTOUR.auto(); } }, 700);
-    return '<div class="hh"><span class="st">' + TX[lg()].h + "</span></div>" + h + '<div id="spg">' + inner() + "</div>";
+    return h + hub() + '<div class="hh"><span class="st">' + TX[lg()].h + '</span></div><div id="spg">' + inner() + "</div>";
   }
 
   // n exemples du niveau : [affichage, texte envoyé] ; null si niveau inconnu
@@ -115,16 +135,19 @@
     if (devoir()) { try { w.MSAC.toast("Tu as un devoir en cours. Rends ta copie d'abord."); } catch (x) { } return; }
     // une série en cours dans ce chapitre : on la reprend
     var r = serie();
-    if (r && r.ch === c && !id && r.i < 5) { var b = D.querySelector(".spd.s"); if (b) { b.click(); return; } }
+    home(false);
+    if (r && r.ch === c && !id && r.i < 5) { sp("exercices", true); return; }
     if (w.MSEXO) { w.MSEXO.open(c, id); return; }
     w.MSEXGO = { c: c, id: id || "" };
-    var t = D.querySelector('.sp [data-sp="exercices"]'); if (t) { t.click(); }
+    sp("exercices", false);
   }
   D.addEventListener("click", function (e) {
     var h = e.target.closest ? e.target.closest("[data-hub]") : null;
     if (h) { exo(+h.getAttribute("data-c"), h.getAttribute("data-hub") === "rv" ? h.getAttribute("data-v") : ""); return; }
     // pendant un devoir : pas de solution d'un exercice récent ni de correction enregistrée
     var f = e.target.closest ? e.target.closest('[data-a="fill"],[data-a="open"]') : null;
+    // accueil avec sa barre : un exemple remplit la barre (rien ne part avant « Résoudre »)
+    if (f && !devoir() && bar() && f.getAttribute("data-a") === "fill" && D.getElementById("msbar")) { e.stopImmediatePropagation(); e.preventDefault(); w.MSBAR.put(f.getAttribute("data-v") || "", false); return; }
     if (f && devoir()) { e.stopImmediatePropagation(); e.preventDefault(); try { w.MSAC.toast("Tu as un devoir en cours. Rends ta copie avant de résoudre un exercice."); } catch (x) { } return; }
   }, true);
   D.addEventListener("click", function (e) {
@@ -133,18 +156,21 @@
     k = b.getAttribute("data-sp");
     // pendant un devoir : pas de cours, de formules ni d'exercices (comme en classe)
     if (/^(cours|formules|exercices)$/.test(k) && on("eval") && dv() && left(dv()) > 0) { try { w.MSAC.toast("Tu as un devoir en cours. Rends ta copie avant d'ouvrir " + (k === "cours" ? "le cours." : k === "formules" ? "les formules." : "les exercices.")); } catch (x) { } return; }
-    if (k === "exercices") { w.MSEXR = b.getAttribute("data-r") === "1"; }
-    if (on(k)) {
-      try { if (!rs("seen_" + k)) { w.MSStore.set("seen_" + k, "1"); } } catch (x) { }
-      if (LIVE[k]) { try { LIVE[k](); } catch (x) { } return; }
-      go(k);
-      return;
-    }
+    if (on(k)) { sp(k, b.getAttribute("data-r") === "1"); return; }
     sel = sel === k ? "" : k;
     g = D.getElementById("spg");
     if (g) { g.innerHTML = inner(); }
   });
 
+  // ouvrir un espace (r : reprendre la série en cours)
+  function sp(k, r) {
+    if (k === "exercices") { w.MSEXR = !!r; }
+    clean();
+    home(false);
+    try { if (!rs("seen_" + k)) { w.MSStore.set("seen_" + k, "1"); } } catch (x) { }
+    if (LIVE[k]) { try { LIVE[k](); } catch (x) { } return; }
+    go(k);
+  }
   // retour vers l'écran d'où l'on vient (ex. : la copie corrigée) au lieu de l'accueil
   var ret = null;
   D.body.addEventListener("click", function (e) {
@@ -155,16 +181,23 @@
     ret = null;
     f();
   });
-  // chrono du bandeau et de la pastille
+  // chrono de la carte et de la pastille (à la fin du temps, la carte passe à « Temps écoulé », une seule fois)
+  var gone = "";
   setInterval(function () {
     var a = D.getElementById("spdt"), b = D.getElementById("spdb"), d;
     if (!a && !b) { return; }
     d = dv(); if (!d) { return; }
-    if (a && left(d) <= 0 && !a.getAttribute("data-x")) { a = D.getElementById("spg"); if (a) { a.innerHTML = inner(); try { w.MSNav.show(); } catch (x) { } } return; }
+    if (left(d) <= 0) { if (gone !== d.end + "") { gone = d.end + ""; refresh(); if (!bar()) { try { w.MSNav.show(); } catch (x) { } } } return; }
     if (a) { a.textContent = mm(left(d)); }
     if (b) { b.textContent = mm(left(d)); }
   }, 1000);
 
+  // la carte et les tuiles se mettent à jour sans recharger l'accueil
+  function refresh() {
+    var h = D.getElementById("hub"), g = D.getElementById("spg"), z = D.getElementById("hub0");
+    if (h || z) { (h || z).outerHTML = hub(); }
+    if (g) { g.innerHTML = inner(); }
+  }
   var st = D.createElement("style");
   st.id = "spcss";
   st.appendChild(D.createTextNode(CSS));
@@ -173,8 +206,8 @@
   // au démarrage de l'accueil : progression, carte de l'accueil et guide
   ["ms_prg.js?v=1", "ms_hub.js?v=1", "ms_tour.js?v=1"].forEach(function (u) {
     var c = D.createElement("script"); c.async = false; c.src = "https://mathsolver-backend-gray.vercel.app/" + u;
-    c.onload = function () { var z = D.getElementById("hub0"); if (z && w.MSHUB && w.MSPRG) { z.outerHTML = w.MSHUB.html(pf().lv || ""); } if (/tour/.test(u) && w.MSTOUR && D.querySelector("#app .sp")) { setTimeout(w.MSTOUR.auto, 700); } };
+    c.onload = function () { var z = D.getElementById("hub0"); if (z && w.MSHUB && w.MSPRG) { z.outerHTML = hub(); } if (/tour/.test(u) && w.MSTOUR && D.querySelector("#app .sp")) { setTimeout(w.MSTOUR.auto, 700); } };
     D.head.appendChild(c);
   });
-  w.MSSP = { grid: grid, ex: ex, live: LIVE, busy: devoir, from: function (f) { ret = f; } };
+  w.MSSP = { grid: grid, ex: ex, live: LIVE, busy: devoir, clean: clean, refresh: refresh, home: home, from: function (f) { ret = f; } };
 })(window);

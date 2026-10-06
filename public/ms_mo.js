@@ -1,7 +1,7 @@
 /* MathSolver - couche du menu : voile + panneau qui glisse, posés au-dessus de l'écran (l'accueil dessous ne bouge pas) */
 (function (w) {
   "use strict";
-  var D = document, R = D.documentElement, N = w.MSMoN, sc = null, ov = null, shut = 0, lk = 0, tm = 0;
+  var D = document, R = D.documentElement, N = w.MSMoN, sc = null, ov = null, shut = 0, lk = 0, tm = 0, lt = 0;
   if (w.MO) { return; }
   var st = D.createElement("style");
   // fond transparent ; liste sans effet élastique ; en bas, un fondu signale la suite au lieu de couper net
@@ -10,10 +10,10 @@
     ".mnd.mb .mfd{opacity:1}.dk .mfd{background:linear-gradient(rgba(14,20,36,0),#0e1424 85%)}";
   D.head.appendChild(st);
 
-  // une action qui quitte le menu bloque les autres touchers (pas de double ouverture)
+  // une action qui quitte le menu bloque les autres touchers (pas de double ouverture) ; si rien ne se passe, le menu se débloque seul
   function act(o) {
     if (lk || shut) { return; }
-    if (/^(x|home|hi|sv|fm|pf|ac)$/.test(o)) { lk = 1; }
+    if (/^(x|home|hi|sv|fm|pf|ac|tour)$/.test(o)) { lk = 1; clearTimeout(lt); lt = setTimeout(function () { lk = 0; }, 2500); }
     try { N.act(o); } catch (e) { }
   }
   // ombre sous l'en-tête quand la liste a défilé ; fondu en bas tant qu'il reste des lignes dessous

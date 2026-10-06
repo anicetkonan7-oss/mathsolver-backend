@@ -16,7 +16,15 @@
   function names() { return ((w.MSFM || {})[lv] || []).map(function (c) { return c[0]; }); }
   function serie() { return rd("serie") || "D"; }
   function chs() { var a = [], i; for (i = 0; i < w.MSGX.n(lv); i++) { if (lv !== "lt" || serie() === "C" || !ONLYC[i]) { a.push(i); } } return a; }
-  function day(t) { try { return new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short" }); } catch (x) { return ""; } }
+  function day(t) { try { var d = new Date(t); return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" }) + " · " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }); } catch (x) { return ""; } }
+  function chosen() { var n = names(); return pick.map(function (c) { return n[c] || "Chapitre " + (c + 1); }); }
+  function goLabel() { return ready() ? "Commencer · " + (mode === "i" ? chosen()[0] : pick.length + " chapitres") : mode === "i" ? "Choisis un chapitre" : "Choisis 2 ou 3 chapitres"; }
+  // un chapitre touché : on met à jour la liste sur place (pas de saut de la page)
+  function mark() {
+    D.querySelectorAll("#app .evk").forEach(function (b) { b.classList.toggle("on", pick.indexOf(+b.getAttribute("data-v")) >= 0); b.setAttribute("aria-pressed", pick.indexOf(+b.getAttribute("data-v")) >= 0); });
+    var g = D.querySelector('#app [data-ev="go"]');
+    if (g) { g.disabled = !ready(); g.textContent = goLabel(); }
+  }
 
   function home() {
     var cur = rd(KEY), n = names(), s = '<div class="ac xs ev"><div class="ach"><button class="bkb" id="home" aria-label="Retour"></button><b class="ht">Évaluation</b></div>', h = w.MSPRG.evals(lv).slice(0, 5);
@@ -25,8 +33,8 @@
     if (lv === "lt") { s += '<p class="esub">Ta série :</p><div class="evs"><button class="' + (serie() === "C" ? "on" : "") + '" data-ev="serie" data-v="C">Terminale C</button><button class="' + (serie() === "D" ? "on" : "") + '" data-ev="serie" data-v="D">Terminale D</button></div>'; }
     s += '<div class="evm"><button class="evc' + (mode === "i" ? " on" : "") + '" data-ev="mode" data-v="i"><b>Interrogation</b><small>1 chapitre · 5 questions · 20 minutes</small></button><button class="evc' + (mode === "d" ? " on" : "") + '" data-ev="mode" data-v="d"><b>Devoir surveillé</b><small>2 ou 3 chapitres · 6 questions · 50 minutes</small></button></div>';
     s += '<p class="esub">' + (mode === "i" ? "Choisis le chapitre :" : "Choisis 2 ou 3 chapitres :") + "</p>";
-    chs().forEach(function (i) { s += '<button class="evk' + (pick.indexOf(i) >= 0 ? " on" : "") + '" data-ev="ch" data-v="' + i + '"><i></i><span>' + e(n[i] || "Chapitre " + (i + 1)) + "</span></button>"; });
-    s += '<button class="pb" data-ev="go"' + (ready() ? "" : " disabled") + '>Commencer</button><p class="esub">Pendant l\'évaluation : pas d\'indice, une calculatrice, et une pause possible.</p>';
+    chs().forEach(function (i) { s += '<button class="evk' + (pick.indexOf(i) >= 0 ? " on" : "") + '" data-ev="ch" data-v="' + i + '" aria-pressed="' + (pick.indexOf(i) >= 0) + '"><i></i><span>' + e(n[i] || "Chapitre " + (i + 1)) + "</span></button>"; });
+    s += '<button class="pb" data-ev="go"' + (ready() ? "" : " disabled") + ">" + e(goLabel()) + '</button><p class="esub">Pendant l\'évaluation : pas d\'indice, une calculatrice, et une pause possible.</p>';
     if (h.length) { s += '<h3 class="gh">Tes dernières notes</h3>' + h.map(function (o) { return '<div class="evh"><b>' + o.n + '/20</b><span>' + e(o.t) + "<small>" + day(o.d) + "</small></span></div>"; }).join(""); }
     app.innerHTML = s + "</div>";
   }
@@ -63,7 +71,7 @@
       w.MSCPA.show(dv, items, {
         save: function (d) { wr(KEY, d); },
         done: function (d) { wr(KEY, null); w.MSPRG.addEval({ lv: lv, t: d.ttl, n: d.note }); },
-        quit: function () { home(); w.scrollTo(0, 0); },
+        quit: function () { pick = []; home(); w.scrollTo(0, 0); },
         train: function (c, id) { ld(["ms_exo.js?v=1"], function () { if (w.MSEXO) { back(); w.MSEXO.open(c, id); } }); },
         cours: function () { back(); var b = D.createElement("button"); b.setAttribute("data-sp", "cours"); b.hidden = true; D.body.appendChild(b); b.click(); b.remove(); }
       });
@@ -74,11 +82,28 @@
     if (!b || !D.querySelector("#app .ev")) { return; }
     a = b.getAttribute("data-ev"); v = b.getAttribute("data-v");
     if (a === "serie") { wr("serie", v); pick = pick.filter(function (c) { return chs().indexOf(c) >= 0; }); home(); }
-    else if (a === "mode") { mode = v; pick = mode === "i" ? pick.slice(0, 1) : pick; home(); }
-    else if (a === "ch") { v = +v; if (mode === "i") { pick = [v]; } else if (pick.indexOf(v) >= 0) { pick.splice(pick.indexOf(v), 1); } else if (pick.length < 3) { pick.push(v); } else { A.toast("3 chapitres au maximum."); } home(); }
-    else if (a === "go" && ready()) { ld(pick.map(function (c) { return "gx_" + lv + "_" + c + ".js?v=1"; }), function (ok) { if (ok) { launch(build()); } else { A.toast(A.t("net")); } }); }
+    else if (a === "mode") { if (mode !== v) { mode = v; pick = []; } home(); }
+    else if (a === "ch") { v = +v; if (mode === "i") { pick = pick[0] === v ? [] : [v]; } else if (pick.indexOf(v) >= 0) { pick.splice(pick.indexOf(v), 1); } else if (pick.length < 3) { pick.push(v); } else { A.toast("3 chapitres au maximum."); } mark(); }
+    // avant de commencer : on montre clairement le sujet choisi
+    else if (a === "go" && ready()) { confirm(); }
+    else if (a === "ok" && ready() && !starting) {
+      var ch = pick.slice();
+      starting = true; sx();
+      ld(ch.map(function (c) { return "gx_" + lv + "_" + c + ".js?v=1"; }), function (ok) { starting = false; if (ok) { pick = ch; launch(build()); pick = []; } else { A.toast(A.t("net")); } });
+    }
+    else if (a === "no") { sx(); }
     else if (a === "resume") { if (rd(KEY)) { launch(rd(KEY)); } else { home(); } }
   });
+  var starting = false;
+  function sx() { var v = D.getElementById("evcf"); if (v) { v.remove(); } }
+  function confirm() {
+    sx();
+    var v = D.createElement("div"), c = chosen();
+    v.className = "xveil"; v.id = "evcf";
+    v.innerHTML = '<div class="xsh" role="dialog" aria-label="Confirmer"><h3>' + (mode === "i" ? "Interrogation" : "Devoir surveillé") + "</h3><p>" + (mode === "i" ? "Chapitre : <b>" + e(c[0]) + "</b>" : "Chapitres : <b>" + c.map(e).join("</b>, <b>") + "</b>") + "<br>" + (mode === "i" ? "5 questions · 20 minutes" : "6 questions · 50 minutes") + ". Le chrono démarre dès que tu commences, et continue même si tu quittes l'appli.</p><div class=\"xrow\"><button class=\"xbt sec\" data-ev=\"no\">Changer</button><button class=\"xbt pri\" data-ev=\"ok\">Commencer</button></div></div>";
+    v.onclick = function (ev) { if (ev.target === v) { sx(); } };
+    D.body.appendChild(v);
+  }
   function open() {
     css("accss", "acct.css?v=1"); css("fmcss", "fm.css?v=1"); css("cpcss", "cp.css?v=1"); css("excss", "ex.css?v=1");
     try { w.MSNav.solved(); } catch (x) { }

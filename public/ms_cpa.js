@@ -86,6 +86,7 @@
     dv.done = 1; dv.note = n; dv.res = res; dv.late = late ? 1 : 0; dv.paused = false;
     H.done(dv);
     try { w.MSPRG.xp(n); } catch (x) { }
+    if (!late) { try { w.MSAC.toast("Copie rendue ✓"); } catch (x) { } }
     if (w.MSYAY) { setTimeout(function () { if (n >= 14) { w.MSYAY.go(n >= 18 ? "Excellent : " + n + "/20 ! 🎉" : "Bravo : " + n + "/20 !"); } w.MSYAY.check(); }, 400); }
     bulletin();
   }
@@ -160,5 +161,11 @@
     page(); w.scrollTo(0, 0); tick();
     if (dv.paused) { pzShow(); }
   }
-  w.MSCPA = { show: show, rem: rem, stop: function () { on = false; clearInterval(tk); } };
+  // changement d'écran : le chrono de la page s'arrête (le temps réel continue), les fenêtres du devoir se ferment
+  function stop() {
+    on = false; clearInterval(tk);
+    ["evpz", "xveil"].forEach(function (id) { var z = D.getElementById(id); if (z) { z.remove(); } });
+    if (dv && !dv.done) { try { H.save(dv); } catch (x) { } }
+  }
+  w.MSCPA = { show: show, rem: rem, stop: stop, on: function () { return on; } };
 })(window);

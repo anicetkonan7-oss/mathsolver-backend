@@ -71,7 +71,7 @@
   }
   // referme ; z : rend la zone de saisie si l'accueil est dessous
   function shut(z) {
-    if (z && app.querySelector("#again")) { try { w.MSNav.show(); } catch (x) { } }
+    if (z && app.querySelector("#again")) { try { if (w.MSBAR && w.MSBAR.on() && app.querySelector("#msbar")) { w.MSSP.home(true); } else { w.MSNav.show(); } } catch (x) { } }
     w.MSDR.hide();
   }
   // va à l'écran k dessous (caché par le panneau), puis referme
@@ -93,13 +93,16 @@
   }
   function on(o) {
     // pendant un devoir : formules, historique et corrections enregistrées restent fermés (comme en classe)
-    if (/^(fm|hi|sv)$/.test(o) && w.MSSP && w.MSSP.busy && w.MSSP.busy()) { A.toast("Tu as un devoir en cours. Rends ta copie avant d'ouvrir " + (o === "fm" ? "les formules." : o === "hi" ? "l'historique." : "tes corrections.")); return; }
-    if (o === "tour") { try { w.MSNav.show(); } catch (x) { } nav("home", function () { w.MSDR.hide(); setTimeout(function () { if (w.MSTOUR) { w.MSTOUR.start(1); } }, 400); }); return; }
+    if (/^(fm|hi|sv)$/.test(o) && w.MSSP && w.MSSP.busy && w.MSSP.busy()) { A.toast("Tu as un devoir en cours. Rends ta copie avant d'ouvrir " + (o === "fm" ? "les formules." : o === "hi" ? "l'historique." : "tes corrections.")); show(cur); return; }
+    if (o === "tour" && w.MSSP && w.MSSP.busy && w.MSSP.busy()) { A.toast("Termine d'abord ton devoir : le guide sera là après."); show(cur); return; }
+    // vers un autre écran : ce qui était ouvert par-dessus (page de réponse, feuilles…) se referme proprement
+    if (/^(home|hi|sv|fm|pf|ac|tour)$/.test(o) && w.MSSP && w.MSSP.clean) { w.MSSP.clean(); if (o !== "home" && o !== "tour") { w.MSSP.home(false); } }
+    if (o === "tour") { try { if (!(w.MSBAR && w.MSBAR.on())) { w.MSNav.show(); } } catch (x) { } nav("home", function () { w.MSDR.hide(); setTimeout(function () { if (w.MSTOUR) { w.MSTOUR.start(1); } }, 400); }); return; }
     // vers un autre écran : la zone de saisie de l'accueil s'efface
     if (/^(hi|sv|fm|pf|ac)$/.test(o) && w.MSDR.hand) { w.MSDR.hand(); }
     if (o === "x" || (o === "back" && cur === "menu")) { shut(1); }
     else if (o === "back") { show("menu"); }
-    else if (o === "home") { try { w.MSNav.show(); } catch (x) { } nav("home"); }
+    else if (o === "home") { try { if (!(w.MSBAR && w.MSBAR.on())) { w.MSNav.show(); } } catch (x) { } nav("home"); }
     else if (o === "hi") { nav("history"); }
     else if (o === "sv") { nav("history", function () { w.MSHOME.home("history", "sav"); }); }
     else if (o === "fm") { so(fm); }

@@ -88,6 +88,8 @@
   function solve(i) {
     var c = ((w.MSFM || {})[lv] || [])[i];
     if (!c || !c[2]) { return; }
+    // accueil avec sa barre : l'exercice va dans la barre (la zone native y est cachée)
+    if (w.MSBAR && w.MSBAR.on() && w.MSHOME) { w.MSHOME.home(); setTimeout(function () { try { w.MSBAR.put(c[2], false); } catch (x) { } }, 80); return; }
     try { w.MSNav.show(); } catch (x) { }
     try { (w.MSLib && w.MSLib.fill ? w.MSLib : w.MSApp).fill(c[2]); } catch (x) { }
     if (w.MSHOME) { w.MSHOME.home(); }
