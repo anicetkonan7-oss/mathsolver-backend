@@ -48,17 +48,34 @@
   }
   function insert(t) { act("ins", t); if (abc) { var i = D.getElementById("xabi"); if (i) { i.value = L[li]; } } }
   // dictée : pont de l'appli s'il existe, sinon reconnaissance vocale du navigateur
-  function spoken(t) {
-    return " " + String(t).toLowerCase().replace(/ au carré/g, "²").replace(/ au cube/g, "³").replace(/racine carrée de /g, "√").replace(/ plus /g, " + ").replace(/ moins /g, " − ").replace(/ fois /g, " × ").replace(/ divisé par | sur /g, " / ").replace(/ égale? /g, " = ").replace(/ puissance /g, "^").replace(/ virgule /g, ",");
-  }
+  // mots dits → symboles (les expressions longues d'abord)
+  var SPK = [[/inférieur ou égal à/g, " ≤ "], [/supérieur ou égal à/g, " ≥ "], [/inférieur à/g, " < "], [/supérieur à/g, " > "], [/différent de/g, " ≠ "], [/ouvre(z)? la parenthèse/g, "("], [/ferme(z)? la parenthèse/g, ")"],
+    [/racine carrée de /g, "√"], [/racine de /g, "√"], [/f prime de x/g, "f′(x)"], [/f de x/g, "f(x)"], [/ au carré| carré/g, "²"], [/ au cube/g, "³"], [/ puissance | exposant /g, "^"],
+    [/ plus /g, " + "], [/ moins /g, " − "], [/ fois /g, " × "], [/ divisé par | sur /g, " / "], [/ égale? /g, " = "], [/ égale?$/g, " ="], [/point-virgule|point virgule/g, " ; "], [/ virgule /g, ","], [/\bpi\b/g, "π"], [/\bdelta\b/g, "Δ"], [/l'infini|infini/g, "∞"]];
+  function spoken(t) { var s = " " + String(t).toLowerCase() + " "; SPK.forEach(function (r) { s = s.replace(r[0], r[1]); }); return s.replace(/\s+/g, " ").trim(); }
+  // dictée : pont de l'appli (MSDict), sinon reconnaissance vocale du navigateur ; fenêtre « Je t'écoute »
+  function dshut() { var v = D.getElementById("xdict"); if (v) { v.remove(); } }
+  function dmsg(c) { return c === 9 ? "Autorise le micro dans la fenêtre qui s'est ouverte, puis touche à nouveau le micro." : c === 6 || c === 7 ? "Je n'ai rien compris. Réessaie en parlant près du téléphone." : c === 1 || c === 2 || c === 4 ? "La dictée a besoin d'Internet sur ce téléphone. Vérifie ta connexion." : c === -1 ? "La reconnaissance vocale n'est pas disponible sur ce téléphone." : "La dictée n'a pas marché. Réessaie."; }
   function dict() {
-    var R = w.SpeechRecognition || w.webkitSpeechRecognition, r;
-    w.msDictee = function (t) { if (t) { insert(spoken(t).trim()); } };
-    try { if (w.MSDict && typeof w.MSDict.start === "function") { w.MSDict.start("fr-FR"); return; } } catch (x) { }
-    if (R) {
-      try { r = new R(); r.lang = "fr-FR"; r.onresult = function (ev) { w.msDictee(ev.results[0][0].transcript); }; r.start(); toast("Parle maintenant…"); return; } catch (x) { }
-    }
-    toast("La dictée dans la copie arrivera avec la prochaine mise à jour de l'application.");
+    var R = w.SpeechRecognition || w.webkitSpeechRecognition, nat = false, r, v;
+    try { nat = !!(w.MSDict && w.MSDict.start); } catch (x) { }
+    if (!nat && !R) { toast("La dictée arrive avec la prochaine mise à jour de l'application."); return; }
+    if (!D.getElementById("xdcss")) { v = D.createElement("style"); v.id = "xdcss"; v.textContent = ".xmic{width:84px;height:84px;margin:8px auto 10px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#1a62e8;color:#fff;animation:xpu 1.3s ease-in-out infinite}.xmic .xi{width:38px;height:38px}#xdt{min-height:24px;text-align:center;font-family:'Cambria Math','STIX Two Text',serif;font-size:18px;color:inherit}@keyframes xpu{0%,100%{box-shadow:0 0 0 0 rgba(26,98,232,.45)}50%{box-shadow:0 0 0 16px rgba(26,98,232,0)}}@media (prefers-reduced-motion:reduce){.xmic{animation:none}}"; D.head.appendChild(v); }
+    dshut();
+    v = D.createElement("div"); v.className = "xveil"; v.id = "xdict";
+    v.innerHTML = '<div class="xsh" role="dialog" aria-label="Dictée"><h3>Dictée</h3><div class="xmic">' + ic("mic") + '</div><p id="xdt">Prépare-toi…</p><p style="text-align:center">Dis par exemple : « f de x égale x au carré moins 3 ».</p><div class="xrow"><button class="xbt sec" data-b="dcx">Annuler</button><button class="xbt pri" data-b="dok">' + ic("ok") + "Terminer</button></div></div>";
+    D.body.appendChild(v);
+    w.msDicteeOn = function () { var p = D.getElementById("xdt"); if (p) { p.textContent = "Je t'écoute… Parle normalement."; } };
+    w.msDicteePart = function (t) { var p = D.getElementById("xdt"); if (p) { p.textContent = spoken(t); } };
+    w.msDictee = function (t) { dshut(); if (t && B) { insert(spoken(t)); } };
+    w.msDicteeErr = function (c) { dshut(); toast(dmsg(+c)); };
+    if (nat) { try { w.MSDict.start("fr-FR"); } catch (x) { w.msDicteeErr(-2); } return; }
+    try { r = new R(); r.lang = "fr-FR"; r.interimResults = true; r.onstart = w.msDicteeOn; r.onresult = function (ev) { var x = ev.results[ev.results.length - 1]; if (x.isFinal) { w.msDictee(x[0].transcript); } else { w.msDicteePart(x[0].transcript); } }; r.onerror = function () { w.msDicteeErr(7); }; r.start(); w.msDicteeRec = r; } catch (x) { w.msDicteeErr(-2); }
+  }
+  function dstop(cancel) {
+    try { if (w.MSDict && w.MSDict.stop) { if (cancel && w.MSDict.cancel) { w.MSDict.cancel(); } else { w.MSDict.stop(); } } } catch (x) { }
+    try { if (w.msDicteeRec) { if (cancel) { w.msDicteeRec.abort(); } else { w.msDicteeRec.stop(); } } } catch (x) { }
+    if (cancel) { dshut(); }
   }
   function toast(m) { try { w.MSAC.toast(m); } catch (x) { } }
   function grip() {
@@ -83,7 +100,7 @@
     shut();
     cb(keep, nf);
   }
-  function shut() { clearInterval(tk); try { w.MSCPC.close(); } catch (x) { } if (B) { B.remove(); B = null; } }
+  function shut() { if (D.getElementById("xdict")) { dstop(true); } clearInterval(tk); try { w.MSCPC.close(); } catch (x) { } if (B) { B.remove(); B = null; } }
   function close() { var cb = O && O.onClose, l = L.slice(); shut(); if (cb) { cb(l); } }
   function open(o) {
     O = o; L = o.lines && o.lines.length ? o.lines.slice() : [""]; li = L.length - 1; ci = L[li].length; abc = false;
@@ -113,6 +130,8 @@
     else if (a === "nl") { act("NL"); var inp = D.getElementById("xabi"); if (inp) { inp.value = ""; inp.focus(); } }
     else if (a === "calc") { w.MSCPC.open(insert); }
     else if (a === "dict") { dict(); }
+    else if (a === "dcx") { dstop(true); }
+    else if (a === "dok") { dstop(false); var p = D.getElementById("xdt"); if (p) { p.textContent = "Je termine…"; } }
     else if (a === "val") { valid(); }
     else if (a === "pk") { D.querySelectorAll("#xveil .xo").forEach(function (o) { o.classList.toggle("on", o === b); }); }
     else if (a === "shx") { D.getElementById("xveil").remove(); }
