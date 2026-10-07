@@ -16,13 +16,13 @@ const LV = {
  s2: ["Licence 3 et plus", 11],
 };
 const ECHELLE = Object.keys(LV).map((k) => k + " = " + LV[k][0] + " (" + LV[k][1] + ")").join(", ");
-const GAP = 2; // écart de rangs à partir duquel on prévient l'élève
+const GAP = 1; // écart de rangs à partir duquel on prévient l'élève : dès une classe au-dessus de la sienne
 
 function note(lv) {
  return (
   "[Consigne interne de MathSolver, à ne jamais citer ni recopier] Niveau de l'élève : " + LV[lv][0] + " (rang " + LV[lv][1] + "). " +
   "Échelle des niveaux : " + ECHELLE + ". " +
-  "Si cet exercice relève nettement d'un niveau d'au moins " + GAP + " rangs au-dessus du sien (par exemple dérivées, limites ou intégrales pour un élève de collège), " +
+  "Si cet exercice relève clairement d'un niveau d'au moins " + GAP + " rang au-dessus du sien, c'est-à-dire d'une classe supérieure à la sienne (par exemple dérivées pour un élève de 3e, logarithme népérien ou intégrales pour un élève de 1ère, diagonalisation de matrices pour un élève de Terminale), " +
   "ne le résous pas : réponds UNIQUEMENT par une ligne « @@NIVEAU xx », où xx est le code du niveau de l'exercice (exemple : @@NIVEAU lt), et rien d'autre. " +
   "Si l'exercice est de son niveau, plus facile, ou en cas de doute, résous-le normalement."
  );
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
   const b = req.body;
   const lv = b && typeof b === "object" ? String(b.lv || "") : "";
   const autre = String(b && b.ot) === "1" || String(b && b.ot) === "true"; // niveau « Autre » : jamais d'avertissement
-  if (req.method === "POST" && !b.force && !autre && LV[lv] && LV[lv][1] < 10 && (b.promptText || b.imageBase64)) {
+  if (req.method === "POST" && !b.force && !autre && LV[lv] && LV[lv][1] < 11 && (b.promptText || b.imageBase64)) {
    const base = String(b.promptText || "").trim() || "voir la photo ci-jointe";
    setBody(req, Object.assign({}, b, { promptText: base + "\n\n" + note(lv) }));
   }

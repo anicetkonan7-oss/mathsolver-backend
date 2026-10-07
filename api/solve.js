@@ -47,7 +47,7 @@ const RIGUEUR =
  "8. Rédige en entier les raisonnements types : récurrence (initialisation, hérédité avec l'hypothèse de récurrence écrite, conclusion) ; théorème des valeurs intermédiaires (continuité, stricte monotonie, valeurs ou limites aux bornes, conclusion) ; raisonnement par l'absurde ou par contraposée annoncé comme tel. " +
  "9. Termine chaque question par une phrase de conclusion qui répond exactement à la question posée. " +
  "10. Donne d'abord la valeur exacte, puis une valeur approchée si elle est utile. " +
- "11. Utilise uniquement des méthodes enseignées au niveau de l'élève ; si plusieurs méthodes existent, choisis celle qu'attend un professeur de ce niveau. " +
+ "11. Utilise uniquement des méthodes enseignées au niveau de l'exercice ; si plusieurs méthodes existent, choisis celle qu'attend un professeur de ce niveau. " +
  "12. Avant de répondre, vérifie ton résultat (remplace dans l'équation, contrôle les signes et la cohérence) et corrige toute erreur. " +
  "La ligne @@REPONSE est courte, complète et compréhensible seule : écris l'objet et sa valeur (par exemple I = 1, S = ]1 ; 2], P(X = 2) ≈ 0,2335), jamais un nombre seul ni un long calcul.";
 // code du niveau (envoyé par l'appli) : [groupe, nom]
@@ -64,24 +64,38 @@ const NIVEAUX = {
  s1: ["sup", "Licence 1 – 2 (études supérieures)"],
  s2: ["sup", "Licence 3, Master ou école d'ingénieur"],
 };
+// style de rédaction de chaque niveau (choisi d'après l'EXERCICE, pas d'après le profil)
 const STYLE = {
- pri: "Il est à l'école primaire : utilise des mots très simples et des phrases très courtes, une seule opération par ligne, des exemples concrets de la vie courante, et donne toujours l'unité. N'introduis pas de lettre (x) si l'énoncé n'en contient pas.",
- col: "Il est au collège : vocabulaire simple mais précis. Nomme chaque règle utilisée (priorités opératoires, distributivité, identités remarquables, théorème de Pythagore ou de Thalès et leurs réciproques…). Écris chaque ligne de calcul. En géométrie, rédige avec « On sait que… », « Or… », « Donc… ». Pas d'outil du lycée (dérivées, limites…).",
- lyc: "Il est au lycée : rédaction rigoureuse, celle qu'attend un correcteur du BAC. Utilise les outils et le vocabulaire du programme de sa classe, sans méthode du supérieur (par exemple pas de règle de L'Hôpital, pas de développements limités).",
- sup: "C'est un étudiant du supérieur : rigueur universitaire. Énonce les définitions utiles, vérifie explicitement les hypothèses de chaque théorème, utilise les quantificateurs et les notations standard, et cite les théorèmes par leur nom (Rolle, accroissements finis, Taylor, théorème du rang, Cauchy-Lipschitz…). Les démonstrations sont complètes. Détaille quand même chaque calcul : l'étudiant doit pouvoir suivre chaque ligne.",
+ pri: "PRIMAIRE : mots très simples, phrases très courtes, une seule opération par ligne, exemples concrets de la vie courante, toujours l'unité ; pas de lettre (x) si l'énoncé n'en contient pas.",
+ col: "COLLÈGE (6e à 3e) : vocabulaire de la classe, phrases de 15 mots au plus. Nomme chaque règle utilisée (priorités opératoires, distributivité, identités remarquables, théorème de Pythagore ou de Thalès et leurs réciproques…). En géométrie, rédige comme en classe, avec « On sait que… », « Or… », « Donc… » ; par exemple : « Dans le triangle ABC, le plus grand côté est [BC]. BC² = 10² = 100. AB² + AC² = 6² + 8² = 36 + 64 = 100. On constate que BC² = AB² + AC². D'après la réciproque du théorème de Pythagore, le triangle ABC est rectangle en A, sommet opposé au plus grand côté. » Pas d'outil du lycée (dérivées, limites…).",
+ lyc: "LYCÉE (2nde à Terminale) : rédaction rigoureuse, celle qu'attend un correcteur du BAC, avec les outils et le vocabulaire du programme de la classe, sans méthode du supérieur (par exemple pas de règle de L'Hôpital, pas de développements limités).",
+ sup: "SUPÉRIEUR (Licence, Master, école d'ingénieur) : rigueur universitaire. Énonce les définitions utiles, vérifie explicitement les hypothèses, utilise les quantificateurs et les notations standard. Quand tu utilises un théorème, nomme-le et énonce-le en une phrase (hypothèses et conclusion) avant de l'appliquer ; n'écris jamais « un théorème classique » sans dire lequel. Les démonstrations sont complètes et chaque calcul reste détaillé.",
+};
+const ADAPTE =
+ " ADAPTATION AU NIVEAU DE L'EXERCICE : commence par déterminer (sans l'écrire) la classe à laquelle correspond l'exercice, puis rédige comme un professeur de CETTE classe, même si l'élève a un niveau plus élevé (un étudiant qui envoie un exercice de 6e reçoit une correction de 6e). Styles : " +
+ STYLE.pri + " " + STYLE.col + " " + STYLE.lyc + " " + STYLE.sup;
+// niveau d'explication choisi par l'élève : e = Essentiel, s = Standard, d = Détaillé (par défaut)
+const DETAIL = {
+ e: " NIVEAU D'EXPLICATION : ESSENTIEL. Rédaction courte, pour réviser vite : seulement les étapes clés, chaque calcul important sur sa propre ligne, et une justification de quelques mots seulement quand elle est indispensable. Pas de phrase d'introduction ni de remplissage. Le résultat doit rester juste et vérifié. La ligne @@REPONSE est courte et complète (par exemple I = 1, S = ]1 ; 2]).",
+ s: " Réponds de façon claire et concise. La ligne @@REPONSE est courte et complète (par exemple I = 1, S = ]1 ; 2]).",
+ d: RIGUEUR +
+  " 13. Détaillé ne veut pas dire bavard : chaque phrase apporte un calcul, une justification ou une conclusion ; aucune phrase de remplissage (par exemple « Nous pouvons formuler cette observation… » ou « Les hypothèses sont pleinement vérifiées »). Écris « on » et non « nous », avec des phrases courtes. " +
+  "14. Justifie aussi le détail de la conclusion (par exemple le sommet de l'angle droit, l'unité, l'intervalle de validité).",
 };
 function niveau(lv) {
  const n = Object.prototype.hasOwnProperty.call(NIVEAUX, lv) ? NIVEAUX[lv] : null;
- if (!n) return { g: "", text: " NIVEAU : le niveau de l'élève n'est pas connu ; adapte la rédaction au niveau de l'exercice." };
- return { g: n[0], text: " NIVEAU DE L'ÉLÈVE : " + n[1] + ". " + STYLE[n[0]] + " Adapte la longueur des explications à ce niveau, sans jamais sauter d'étape." };
+ if (!n) return { g: "", text: " Le niveau de l'élève n'est pas connu." };
+ return { g: n[0], text: " Pour information, l'élève est en " + n[1] + "." };
 }
-// consigne complète et réglages selon le niveau
-function profil(lv) {
+// consigne complète et réglages selon le niveau de l'élève et le niveau d'explication choisi
+function profil(lv, dt) {
  const n = niveau(lv);
+ const d = dt === "e" || dt === "s" ? dt : "d";
+ const th = d === "d" ? THINKING[n.g] : "low"; // Essentiel et Standard : réflexion courte, comme avant
  return {
-  sys: CONSIGNE + RIGUEUR + n.text,
+  sys: CONSIGNE + DETAIL[d] + ADAPTE + n.text,
   variants: [
-   { thinking: THINKING[n.g], maxOut: MAX_OUTPUT_TOKENS, first: FIRST_MS[THINKING[n.g]] },
+   { thinking: th, maxOut: MAX_OUTPUT_TOKENS, first: FIRST_MS[th] },
    { thinking: "", maxOut: 0 },
   ],
  };
@@ -335,7 +349,7 @@ export default async function handler(req, res) {
  if (req.method !== "POST") {
   return res.status(405).json({ error: "POST uniquement" });
  }
- const { promptText, imageBase64, lv } = req.body || {};
+ const { promptText, imageBase64, lv, dt } = req.body || {};
  if (!promptText && !imageBase64) {
   return res.status(400).json({ error: "Question manquante" });
  }
@@ -361,7 +375,7 @@ export default async function handler(req, res) {
  });
  let out;
  try {
-  const r = await solve(parts, outer.signal, profil(typeof lv === "string" ? lv : ""));
+  const r = await solve(parts, outer.signal, profil(typeof lv === "string" ? lv : "", typeof dt === "string" ? dt : ""));
   out = typeof r === "string" ? { answer: fixAnswer(r) } : r;
  } catch (e) {
   out = failure(500, "exception");
