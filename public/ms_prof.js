@@ -20,13 +20,23 @@
     return lock(row(t("p_n"), P.n, "nl")).replace('</span><span class="v">', '<small style="display:block;font-size:12px;color:#8492b1">' + e(k[0]) + '</small></span><span class="v">');
   }
   function lb(k) { return '<label class="lb">' + e(t(k)) + "</label>"; }
+  // niveau d'explication des corrections : e = Essentiel, s = Standard, d = Détaillé (par défaut)
+  var DT = {
+    fr: { t: "Niveau d'explication", e: ["Essentiel", "Les étapes clés et le résultat, pour réviser vite."], s: ["Standard", "Une correction claire et concise."], d: ["Détaillé", "Comme un prof au tableau : chaque étape est justifiée."] },
+    en: { t: "Explanation level", e: ["Essential", "Key steps and the result, to revise quickly."], s: ["Standard", "A clear, concise solution."], d: ["Detailed", "Like a teacher at the board: every step is justified."] }
+  };
+  function dt() {
+    var L = DT[A.lang() === "en" ? "en" : "fr"], c = /^[esd]$/.test(A.P().dt || "") ? A.P().dt : "d", s = '<label class="lb">' + e(L.t) + '</label><div class="sg">', k;
+    for (k in { e: 1, s: 1, d: 1 }) { s += '<button data-o="dt" data-v="' + k + '"' + (k === c ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"') + ">" + e(L[k][0]) + "</button>"; }
+    return s + '</div><p class="fn" id="dtd" style="margin:-6px 4px 6px;text-align:left">' + e(L[c][1]) + "</p>";
+  }
   function seg(l, id, n) { return '<button data-o="l" data-v="' + id + '"' + (l === id ? ' class="on"' : "") + ">" + n + "</button>"; }
 
   function prof() {
     var P = A.P(), S = A.sess(), n = P.n || t("gu"), l = A.lang(), s;
     s = K.head(1, 0, t("p_t")) + '<div class="pc">' + A.av(n, 1) + "<b>" + e(n) + "</b><i>" + e(P.ln ? P.ln + (P.cn ? " · " + P.cn : "") : t("p_fill")) + '</i><span class="pill2' + (S ? "" : " g") + '">' + e(t(S ? "p_on" : "p_gs")) + "</span></div>";
     s += '<div class="rows">' + nick(P) + row(t("p_l"), P.ln || t("p_fill"), "lv") + (P.c ? lock(row(t("p_c"), G.flag(P.c) + " " + (P.cn || ""), "cl")) : row(t("p_c"), t("p_fill"), "c")) + "</div>";
-    s += lb("p_g") + '<div class="sg">' + seg(l, "fr", "Français") + seg(l, "en", "English") + "</div>" + lb("p_a");
+    s += lb("p_g") + '<div class="sg">' + seg(l, "fr", "Français") + seg(l, "en", "English") + "</div>" + dt() + lb("p_a");
     if (S) {
       return s + '<div class="rows"><div class="row"><span class="k">' + e(t("a_em")) + '</span><span class="v">' + e(S.em) + '</span></div></div><button class="sb2" data-o="out">' + e(t("p_out")) + '</button><button class="tl red" data-o="del">' + e(t("p_del")) + "</button>";
     }
@@ -96,6 +106,13 @@
     else if (o === "cl" || (o === "c" && A.P().c)) { A.toast(A.lang() === "en" ? "The country chosen at sign-up can't be changed." : "Le pays choisi à l'inscription ne peut plus être modifié."); }
     else if (o === "n" || o === "lv" || o === "c") { w.MSONB.show(o === "n" ? "name" : o === "lv" ? "level" : "country", 1); }
     else if (o === "l") { A.setLang(v, function () { show("prof"); }); }
+    else if (o === "dt") {
+      // choix mis à jour sur place (la page ne remonte pas en haut)
+      if (!/^[esd]$/.test(v || "") || v === (A.P().dt || "d")) { return; }
+      A.save({ dt: v });
+      D.querySelectorAll('#app [data-o="dt"]').forEach(function (b) { var y = b.getAttribute("data-v") === v; b.classList.toggle("on", y); b.setAttribute("aria-pressed", y ? "true" : "false"); });
+      if ($("dtd")) { $("dtd").textContent = DT[A.lang() === "en" ? "en" : "fr"][v][1]; }
+    }
     else if (o === "out") { A.out(1); A.toast(t("m_out")); w.MSONB.show("onb"); }
     else if (F[o]) { show(o); }
   }
